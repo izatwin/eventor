@@ -13,7 +13,7 @@ const Login = () => {
           <button type="submit" className="login-btn">Login</button>
         </form>
         <div className="login-footer">
-          <p>New user? <a href="#">Sign up</a></p>
+          <p>New user? <a href="/signup">Sign up</a></p>
           <p><a href="#">Forgot Password?</a></p>
         </div>
       </div>
