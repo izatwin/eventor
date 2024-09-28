@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const CREDENTIALS_PATH = 'credentials.json';  // Path to credentials.json file
-const TOKEN_PATH = 'token.json';  // Path to token
+const CREDENTIALS_PATH = 'credentials.json';
+const TOKEN_PATH = 'token.json';
 const SCOPES = ['https://www.googleapis.com/auth/gmail.send'];
 const PORT = 3000;
 
@@ -26,10 +26,22 @@ function authorize(credentials) {
   const { client_secret, client_id, redirect_uris } = credentials.installed;
   oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
 
-  // Remove old token to force re-authorization
-  fs.unlink(TOKEN_PATH, (err) => {
-    if (err && err.code !== 'ENOENT') return console.error('Error removing old token:', err);
-    getAccessToken(oAuth2Client);
+  fs.readFile(TOKEN_PATH, (err, token) => {
+    if (err) {
+      return getAccessToken(oAuth2Client);
+    }
+    oAuth2Client.setCredentials(JSON.parse(token));
+    oAuth2Client.on('tokens', (tokens) => {
+      if (tokens.refresh_token) {
+        fs.writeFile(TOKEN_PATH, JSON.stringify(oAuth2Client.credentials), (err) => {
+          if (err) return console.error('Error storing token:', err);
+          console.log('Token stored to', TOKEN_PATH);
+        });
+      }
+    });
+
+    console.log('OAuth2 Client initialized');
+    console.log('Access Token:', oAuth2Client.credentials.access_token);
   });
 }
 
@@ -37,12 +49,11 @@ function getAccessToken(oAuth2Client) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
-    prompt: 'consent',  // Ensure consent to get a new refresh token
+    prompt: 'consent',
   });
   console.log('Authorize this app by visiting this url:', authUrl);
 }
 
-// Route for OAuth2 callback
 app.get('/oauth2callback', (req, res) => {
   const code = req.query.code;
   oAuth2Client.getToken(code, (err, token) => {
@@ -136,20 +147,18 @@ function generateVerificationCode() {
     let email = "vmenapace@icloud.com";
     let verifyCode = generateVerificationCode();
 
-    // Wait until OAuth2 client is authenticated before calling sendVerificationEmail
     await new Promise((resolve, reject) => {
       const checkAuth = setInterval(() => {
         if (oAuth2Client && oAuth2Client.credentials && oAuth2Client.credentials.access_token) {
           clearInterval(checkAuth);
           resolve();
         }
-      }, 100);  // Check every 100ms
+      }, 100);
 
-      // Timeout after a certain period to avoid infinite waiting
       setTimeout(() => {
         clearInterval(checkAuth);
         reject('OAuth2 client not authenticated within the timeout period');
-      }, 60000); // 60 second timeout
+      }, 60000);
     });
 
     await sendVerificationEmail(email, verifyCode);
