@@ -1,7 +1,9 @@
-import './App.css';
-import Login from './Login';
-import Signup from './Signup';
-import Feed from './Feed';
+import './styles/App.css';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Home from './pages/Home';
+import Reset from './pages/Reset';
+import Code from './pages/Code';
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -13,9 +15,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-
+          <Route path="/reset" element={<Reset />} />
+          <Route path="/code" element={<Code />} />
           {isAuthenticated ? (
-            <Route path="/feed" element={<Feed />} />
+            <Route path="/home" element={<Home />} />
           ) : (
             <Route path="/" element={<Login />} /> // Redirect to login if not authenticated
           )}
