@@ -20,11 +20,17 @@ app.get("/", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}!`);
+  //console.log(`Example app listening on port ${port}!`);
 });
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // DEMO CODE BELOW
 (async () => {
+  await delay(0);
+
   console.log("- Account creation -");
   let email = prompt("Enter your email: ");
   console.log("Email: " + email); 
