@@ -40,8 +40,8 @@ function authorize(credentials) {
       }
     });
 
-    console.log('OAuth2 Client initialized');
-    console.log('Access Token:', oAuth2Client.credentials.access_token);
+    //console.log('OAuth2 Client initialized');
+    //console.log('Access Token:', oAuth2Client.credentials.access_token);
   });
 }
 
@@ -78,7 +78,7 @@ async function sendTestEmail(auth) {
       userId: 'me',
       resource: { raw },
     });
-    console.log('Email sent:', response.data.id);
+    // console.log('Email sent:', response.data.id);
   } catch (err) {
     console.error('Error sending email:', err);
   }
@@ -110,14 +110,14 @@ app.get('/authorize', (req, res) => {
   res.redirect(authUrl);
 });
 
-app.get('/send-email', async (req, res) => {
-  await sendTestEmail(oAuth2Client);
-  res.send('Email sent!');
-});
+// app.get('/send-email', async (req, res) => {
+//   await sendTestEmail(oAuth2Client);
+//   // res.send('Email sent!');
+// });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server is running on http://localhost:${PORT}`);
+// });
 
 async function sendVerificationEmail(recipientEmail, verificationCode) {
   const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
@@ -131,7 +131,7 @@ async function sendVerificationEmail(recipientEmail, verificationCode) {
       userId: 'me',
       resource: { raw },
     });
-    console.log('Email sent:', response.data.id);
+    // console.log('Email sent:', response.data.id);
   } catch (err) {
     console.error('Error sending email:', err);
   }
