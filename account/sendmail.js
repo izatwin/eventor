@@ -141,12 +141,10 @@ function generateVerificationCode() {
   return ('000000' + (crypto.randomInt(0, 1000000)).toString()).slice(-6);
 }
 
-// TEST CODE
-(async function() {
+async function doVerificationRequest(email) {
+  let verifyCode = generateVerificationCode();
+  
   try {
-    let email = "vmenapace@icloud.com";
-    let verifyCode = generateVerificationCode();
-
     await new Promise((resolve, reject) => {
       const checkAuth = setInterval(() => {
         if (oAuth2Client && oAuth2Client.credentials && oAuth2Client.credentials.access_token) {
@@ -165,4 +163,8 @@ function generateVerificationCode() {
   } catch (error) {
     console.error('Failed to authenticate OAuth2 client or send email:', error);
   }
-})();
+  
+  return verifyCode;
+};
+
+module.exports = {doVerificationRequest};
