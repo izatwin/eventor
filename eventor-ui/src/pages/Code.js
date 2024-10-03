@@ -8,8 +8,9 @@ import '../styles/eventor.css';
 const Code = () => {
 const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
+    /*username: "",
+    password: "", */ 
+    /* Handle 6 digit code */
   });
 
   const handleChange = (e) => {
@@ -19,7 +20,7 @@ const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData);
-    navigate("/code");
+    navigate("/password");
   };
 
   return (

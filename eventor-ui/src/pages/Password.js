@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import '../styles/Reset.css';
+import '../styles/Password.css';
 import '../styles/eventor.css';
 
-/* Page for inputting email when resetting password */ 
+/* Page for inputting new password */ 
 
-const Reset = () => {
+const Password= () => {
 const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email : "",
+    password: "",
+    confPassword: "",
   });
 
   const handleChange = (e) => {
@@ -18,29 +19,32 @@ const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData);
-    navigate("/code");
+    navigate("/home");
   };
 
-
-
   return (
-    <div className="reset-container">
+    <div className="password-container">
       <div className="eventor-box">
         
-        <form className="reset-form" onSubmit={handleSubmit}>
+        <form className="password-form" onSubmit={handleSubmit}>
           <h1 className="eventor-title">EVENTOR</h1>
           <p className="eventor-subtitle">Post. Meet. Share</p>
-          <p className="reset-desc"> Forgot your password?  Enter your email to
-reset your password.</p>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
+          <p className="password-desc"> Enter your new password</p>
+          <input 
+            type="password"
+            name="password"
+            placeholder="New Password" 
+            value={formData.password}
             onChange={handleChange}
           />
-          
-          <button type="submit" className="reset-btn">Continue</button>
+          <input 
+            type="password"
+            name="password"
+            placeholder="Confirm New Password" 
+            value={formData.confPassword}
+            onChange={handleChange}
+          />
+          <button type="submit" className="password-btn">Continue</button>
         
         </form>
 
@@ -54,4 +58,4 @@ reset your password.</p>
   );
 };
 
-export default Reset;
+export default Password;
