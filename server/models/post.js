@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const PostSchema = new Schema({
-    // timestamp: { type: Date, required: true },
+    timestamp: { type: Date, required: true, default: Date.now },
     // posters: [{type: Schema.Types.ObjectId, ref: "User", required: true}] We will add this when the User class is created
     views: { type: Number, min: 0, required: true, default: 0 },
     shares: { type: Number, min: 0, required: true, default: 0 },

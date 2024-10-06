@@ -3,24 +3,10 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/post');
+const postController = require('../controllers/post.controller')
 
 // POST /api/posts - create a new post
-router.post('/', async (req, res) => {
-    const {title, content } = req.body;
-
-    try {
-        //create the post
-        const newPost = new Post({title, content});
-
-        await newPost.save();
-
-        //send back a response
-        res.status(201).json({ message: "Post created successfully" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'server error'});
-    }
-})
+router.post('/', postController.create);
 
 router.get("/:postId", async (req, res) => {
     try {
