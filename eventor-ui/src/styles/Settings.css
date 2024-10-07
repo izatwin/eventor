@@ -1,4 +1,4 @@
-.home-container {
+.settings-container {
   display: flex;
   justify-content: center; 
   position: relative;
@@ -22,7 +22,6 @@
   right: 0;
   width: 325px; 
   height: 100vh;   
-
   border-left: 1px solid black;
   padding: 10px;
   box-sizing: border-box;

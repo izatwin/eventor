@@ -5,7 +5,7 @@ import homeIcon from './icons/home.png';
 import exploreIcon from './icons/explore.png'; 
 import userIcon from './icons/user.png'; 
 import profilePic from './icons/profile.png'; 
-
+import menuIcon from './icons/menu.png';
 
 
 const SidebarLeft = () => {
@@ -39,7 +39,7 @@ const SidebarLeft = () => {
       <div className="home-title"> EVENTOR </div>
       
       <div className="home-icon">
-        <img src={homeIcon} alt="Home" className="icon-left" />
+        <img onClick={()=>navigate("/home")} src={homeIcon} alt="Home" className="icon-left" />
         <span className="dot"></span>
       </div>
       <div className="explore-icon">
@@ -50,7 +50,8 @@ const SidebarLeft = () => {
       </div>
 
       {}
-      <div className="profile" onClick={handleProfileClick}>
+      <img onClick={handleProfileClick }src={menuIcon} alt="Menu" className="menu-icon" />
+      <div className="profile">
         <img src={profilePic} alt="Profile" className="profile-pic" />
         <div className="profile-info">
           <div className="profile-name">Suga Sean</div>
@@ -61,10 +62,11 @@ const SidebarLeft = () => {
       {}
       {isProfilePopupVisible && (
         <div className="profile-popup" ref={popupRef}>
-          <button className="popup-item">Settings</button>
+          <button onClick={()=>navigate("/settings")} className="popup-item">Settings</button>
           <button onClick={handleSignout} className="popup-item">Sign out</button>
         </div>
       )}
+
     </div>
   );
 };

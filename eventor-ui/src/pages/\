@@ -1,0 +1,18 @@
+import "../styles/SettingsContent.css";
+
+const SettingsContent = () => {
+
+  return (
+    <div className="settings-content-container">
+        <div className="settings-title">Settings</div>
+        <div className="settings-content">
+
+          
+        </div>
+    </div>
+  );
+};
+
+export default SettingsContent;
+
+

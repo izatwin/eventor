@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import Reset from './pages/Reset';
 import Code from './pages/Code';
 import Password from './pages/Password';
+import Settings from './pages/Settings';
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -19,6 +21,7 @@ function App() {
           <Route path="/reset" element={<Reset />} />
           <Route path="/code" element={<Code />} />
           <Route path="/password" element={<Password />} />
+          <Route path="/settings" element={<Settings />} />
           {isAuthenticated ? (
             <Route path="/home" element={<Home />} />
           ) : (
