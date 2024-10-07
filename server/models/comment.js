@@ -11,7 +11,7 @@ const CommentSchema = new Schema({
     comments: {
         type: [Schema.Types.ObjectId], ref: "Comment", validate: {
             validator: function (value) { // if comment is root comment, it accepts comments
-                if (this.isRoot === false && value) {
+                if (this.isRoot === false && !value) {
                     return false;
                 }
                 return true;
