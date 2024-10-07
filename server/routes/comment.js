@@ -1,12 +1,17 @@
 // server/routes/comment.js
 
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const commentController = require('../controllers/comment.controller');
 
 // Post /api/comment - create a new comment
 router.post('/', commentController.create);
 
-router.post('/child', commentController.addComment);
+router.get('/:id', commentController.findOne);
+
+router.delete('/:id', commentController.delete);
+
+router.put("/:id", commentController.update);
+
+router.post('/addChild/:id', commentController.addComment);
 
 module.exports = router
