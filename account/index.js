@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.get('/getcookie', (req, res) => {
+app.get('/getcookies', (req, res) => {
   //shows all the cookies 
   res.send(req.cookies);
 });
