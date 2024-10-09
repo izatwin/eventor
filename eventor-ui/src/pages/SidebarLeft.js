@@ -46,7 +46,7 @@ const SidebarLeft = () => {
         <img src={exploreIcon} alt="Explore" className="icon-left" />
       </div>
       <div className="user-icon">
-        <img src={userIcon} alt="User" className="icon-left" />
+        <img onClick={()=>navigate("/profile")} src={userIcon} alt="User" className="icon-left" />
       </div>
 
       {}

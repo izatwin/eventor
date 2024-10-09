@@ -69,7 +69,9 @@
   flex-direction: column;
   margin-left: 10px;
 }
-
+.profile-name {
+  font-weight: bold;
+}
 
 .menu-icon {
   width: 35px; 
@@ -95,7 +97,7 @@
 
 .profile-popup {
   position: fixed;
-  bottom: 200px;
+  bottom: 180px;
   left: 40px; 
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
