@@ -1,0 +1,10 @@
+.bell-icon {
+  margin-left: 10px;
+  display: flex;
+}
+
+.icon-right {
+  width: 35px;  
+  height: 35px; 
+  cursor: pointer;
+}

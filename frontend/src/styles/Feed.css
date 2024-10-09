@@ -1,0 +1,35 @@
+.feed-container {
+  display: flex;
+  justify-content: center; 
+  height: 100vh;
+  width: 100vh;
+
+}
+
+.main-feed {
+  overflow-y: auto;
+
+}
+
+.feed-title {
+  z-index: 2000;
+  position: fixed;
+  transform: translateX(-50%);
+  width: 760px;
+  padding: 15px;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid black; 
+}
+
+.feed-content {
+  margin-top: 60px; 
+
+}
+
+
+
+
+
+
