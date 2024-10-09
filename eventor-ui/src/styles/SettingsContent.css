@@ -92,6 +92,7 @@
 .picPreview {
   width: 60px;
   height: 60px;
+  border-radius: 50%;
 }
 .settings-form .upload-button {
   margin-top: 20px;
