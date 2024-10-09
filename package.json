@@ -1,16 +1,8 @@
 {
-  "name": "eventor",
-  "version": "0.0.0",
-  "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "dev": "concurrently \"cd eventor-ui && npm start\" \"cd server && npm start\" "
   },
   "dependencies": {
-    "cookie-parser": "^1.4.6",
-    "debug": "^4.3.7",
-    "express": "^4.21.0",
-    "http-errors": "~2.0.0",
-    "mongoose": "^8.7.0",
-    "morgan": "^1.10.0"
+    "concurrently": "^9.0.1"
   }
 }

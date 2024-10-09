@@ -1,40 +1,27 @@
-const crypto = require("crypto");
+const mongoose = require("mongoose")
 
-class Event {
-    /*
-    eventId : string;
-    name : string;
-    description : string;
+const Schema = mongoose.Schema;
 
-    startTime : Date | undefined;
-    endTime : Date | undefined;
-    embeddedImage : string | undefined;
-    */
+const baseOptions = {
+    discriminatorKey: "type",
+    collection: "event",
+};
+
+const baseEventSchema = new Schema({
+    eventName: { type: String, required: true},
+    eventDescription: { type: String, required: true},
     
-    constructor(name, description) {
-        let eventId = crypto.randomUUID();
+    startTime: {type: Date, required: false},
+    endTime: {type: Date, required: false},
+    embeddedImage: {type: String, required: false},
+}, baseOptions);
 
-        this.eventId = eventId;
-        this.name = name;
-        this.description = description;
+const BaseEvent = mongoose.model("Event", baseEventSchema)
 
-        this.startTime = undefined;
-        this.endTime = undefined;
-        this.embeddedImage = undefined;
-    }
-}
-
-class NormalEvent extends Event {
-    /*
-    location : str;
-    */
-    constructor(name, description, location) {
-        super(name, description);
-
-        this.location = location;
-    }
-
-}
+const NormalEvent = BaseEvent.discriminator('NormalEvent', new Schema({
+    location: {type: String, required: true}
+    })
+);
 
 const ReleaseType = Object.freeze({
     SINGLE:     Symbol("single"),
@@ -42,64 +29,21 @@ const ReleaseType = Object.freeze({
     ALBUM:      Symbol("album")
 })
 
-class MusicReleaseEvent extends Event {
-    /*
-    releaseTitle : str;
-    releaseArtist : str;
-    releaseType : enum ReleaseType;
-    songs : Song[];
+const MusicReleaseEvent = BaseEvent.discriminator('MusicReleaseEvent', new Schema({
+    releaseTitle: {type: String, required: true},
+    releaseArtist: {type: String, required: true},
+    releaseType: {type: ReleaseType, required: true},  // Not sure if this works
+    songs: {type: [Song], required: true, default: []},  // Not sure if this works
 
-    appleMusicLink : str;
-    spotifyLink : str;
-    */
-    constructor(name, description, releaseTitle, releaseArtist, releaseType, songs) {
-        super(name, description)
+    appleMusicLink: {type: String, required: false},
+    spotifyLink: {type: String, required: false}
+    })
+);
 
-        this.releaseTitle = releaseTitle;
-        this.releaseArtist = releaseArtist;
-        this.releaseType = releaseType;
-        this.songs = songs;
+const TicketedEvent = BaseEvent.discriminator('TicketedEvent', new Schema({
+    getTicketsLink: {type: String, requrired: true},
+    destinations: {type: [Destination], required: true}
+    })
+);
 
-        this.appleMusicLink = "";
-        this.spotifyLink = "";
-
-    }
-
-}
-
-class Song {
-    /*
-    songTitle : str;
-    songArtist : str;
-    songDuration : int;
-    */
-    constructor(songTitle, songArtist, songDuration) {
-        this.songTitle = songTitle;
-        this.songArtist = songArtist;
-        this.songDuration = songDuration;
-    }
-}
-
-class TicketedEvent extends Event {
-    /*
-    getTicketsLink : str;
-    destinations : Destination[]
-    */
-    constructor(getTicketsLink, destinations) {
-        this.getTicketsLink = getTicketsLink;
-        this.destinations = destinations;
-    }
-}
-
-class Destination {
-    /*
-    location : str;
-
-    time : Date | undefined;
-    */
-    constructor(location) {
-        this.location = location;
-
-        this.time = undefined;
-    }
-}
+//TODO song and destination stuff
