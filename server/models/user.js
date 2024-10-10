@@ -154,6 +154,7 @@ const UserSchema = new Schema({
     // displayName : { type: string, required: true, default: "UNDEF" },
 
     userCredentials : UserCredentialsSchema,
+    posts : [{ type: Schema.Types.ObjectId, ref: "Post", required: false }]
     
     // user : {type: User, required: true}
 });

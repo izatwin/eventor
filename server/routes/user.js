@@ -9,4 +9,6 @@ router.post('/', userController.signup);
 // login and get user info
 router.get('/login', userController.login);
 
+// router.get('/posts', userController.findAllPosts);
+
 module.exports = router;
