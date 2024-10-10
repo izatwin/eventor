@@ -6,18 +6,14 @@
   height: 100vh; 
   padding: 10px;
   box-sizing: border-box;
-}
-
-.home-title {
-  font-size: 50px; 
-  color: #d32f2f;
-  margin-bottom: 8px;
-  font-weight: bold;
+  display: flex; 
+  flex-direction: column;
 }
 
 .home-title {
   font-family: 'Poppins', sans-serif; 
-  font-size: 50px; 
+  font-size: 4vw; 
+  width: 100%;
   font-weight: bold;   
   color: #d32f2f;
   text-transform: uppercase;
@@ -31,44 +27,36 @@
   transform: scale(1.05); 
 }
 
+.icon {
+  align-items: left;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  margin-left: 8%;
+}
+
 .icon-left {
   width: 35px; 
   height: 35px;
-  margin-right: 200px;
   cursor: pointer;
+
 }
 
 .home-icon {
-  margin-top: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  margin-top: 150px;
 
+}
 
 .explore-icon {
   margin-top: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .user-icon {
   margin-top: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .menu-icon {
-  width: 35px; 
-  height: 35px;
-  cursor: pointer;
-  margin-right: 200px;
-  margin-top: 210px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-top: 250px;
 
 }
 
@@ -76,26 +64,14 @@
   height: 8px;
   width: 8px;
   border-radius: 50%;
-  background-color: red;
   display: inline-block;
   margin-left: 8px;
 }
 
 .profile {
-  margin-top: 50px;
-  margin-left: 30px;
   display: flex;
-  align-items: center;
-}
-
-.profile .profile-info {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  padding-left: 20px;
-}
-.profile-name {
-  font-weight: bold;
+  margin-top: auto;
+  margin-left: 6%;
 }
 
 .profile-pic {
@@ -104,18 +80,29 @@
   border-radius: 50%;
 }
 
-.profile-name {
+.profile .profile-info {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding-left: 20px;
+  width: 100%;
   font-size: 18px;
+}
+.profile-name {
+  display: flex;
+  font-weight: bold;
+  width: 100%;
 }
 
 .profile-username {
-  font-size: 18px;
+  display: flex;
+  font-size: 100%;
 }
 
 .profile-popup {
   position: fixed;
   bottom: 180px;
-  left: 40px; 
+  left: 2%; 
   background-color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 5px;

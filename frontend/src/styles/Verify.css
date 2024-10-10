@@ -1,4 +1,4 @@
-.reset-container {
+.verify-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@
 }
 
 
-.reset-form input {
+.verify-form input {
   width: 92%;
   padding: 10px;
   margin-bottom: 15px;
@@ -16,11 +16,11 @@
   font-size: 16px;
 }
 
-.reset-desc {
+.verify-desc {
   color: gray;
 }
 
-.reset-btn {
+.verify-btn {
   background-color: #d32f2f;
   color: white;
   padding: 10px;
@@ -31,20 +31,20 @@
   cursor: pointer;
 }
 
-.reset-btn:hover {
+.verify-btn:hover {
   background-color: #b71c1c;
 }
 
-.reset-footer {
+.verify-footer {
   margin-top: 60px;
   font-size: 15px;
 }
 
-.reset-footer a {
+.verify-footer a {
   color: #d32f2f;
   text-decoration: none;
 }
 
-.reset-footer a:hover {
+.verify-footer a:hover {
   text-decoration: underline;
 }

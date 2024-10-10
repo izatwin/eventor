@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import '../styles/Reset.css';
+import '../styles/Verify.css';
 import '../styles/eventor.css';
 
-/* Page for inputting email when resetting password */ 
+/* Page for inputting email when verifying */ 
 
-const Reset = () => {
-const navigate = useNavigate();
+const Verify = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email : "",
   });
@@ -24,14 +25,13 @@ const navigate = useNavigate();
 
 
   return (
-    <div className="reset-container">
+    <div className="verify-container">
       <div className="eventor-box">
         
-        <form className="reset-form" onSubmit={handleSubmit}>
+        <form className="verify-form" onSubmit={handleSubmit}>
           <h1 className="eventor-title">EVENTOR</h1>
           <p className="eventor-subtitle">Post. Meet. Share</p>
-          <p className="reset-desc"> Forgot your password?  Enter your email to
-reset your password.</p>
+          <p className="verify-desc"> Enter your email.</p>
           <input
             type="email"
             name="email"
@@ -40,11 +40,11 @@ reset your password.</p>
             onChange={handleChange}
           />
           
-          <button type="submit" className="reset-btn">Continue</button>
+          <button type="submit" className="verify-btn">Continue</button>
         
         </form>
 
-      <div className="reset-footer">
+      <div className="verify-footer">
         <p>New user? <a href="/signup">Sign up</a></p>
         <p>Already a user? <a href="/">Login</a></p>
       </div>
@@ -54,4 +54,4 @@ reset your password.</p>
   );
 };
 
-export default Reset;
+export default Verify;

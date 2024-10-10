@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from '../AuthContext';
 import '../styles/Code.css';
 import '../styles/eventor.css';
 
@@ -7,6 +8,9 @@ import '../styles/eventor.css';
 
 const Code = () => {
   const navigate = useNavigate();
+  const { action } = useAuth();
+
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     /*username: "",
@@ -21,7 +25,12 @@ const Code = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData);
-    navigate("/password");
+    console.log(location);
+    if (action === 'signup') {
+      navigate('/signup'); 
+    } else if (action === 'resetPassword') {
+      navigate('/password'); 
+    }
   };
 
   return (
@@ -43,7 +52,7 @@ const Code = () => {
             <input type="text" maxlength="1" class="code-input"/>
           </div>
           
-          <button type="submit" className="reset-btn">Continue</button>
+          <button type="submit" className="code-btn">Continue</button>
         
         </form>
 
