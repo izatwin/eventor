@@ -1,10 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import '../styles/Signup.css'; 
 import '../styles/eventor.css';
+
 
 /* Page for signing up */ 
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     displayName: "",
     email: "",
@@ -20,6 +24,7 @@ const SignUp = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData); 
+    navigate("/home");
   };
 
   return (

@@ -1,3 +1,13 @@
+.sidebar-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 25vw; 
+  height: 100vh; 
+  padding: 10px;
+  box-sizing: border-box;
+}
+
 .home-title {
   font-size: 50px; 
   color: #d32f2f;
@@ -27,12 +37,14 @@
   margin-right: 200px;
   cursor: pointer;
 }
+
 .home-icon {
   margin-top: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
+
 
 .explore-icon {
   margin-top: 30px;
@@ -46,6 +58,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.menu-icon {
+  width: 35px; 
+  height: 35px;
+  cursor: pointer;
+  margin-right: 200px;
+  margin-top: 210px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }
 
 .active .dot {
@@ -64,21 +88,14 @@
   align-items: center;
 }
 
-.profile-info {
+.profile .profile-info {
   display: flex;
   flex-direction: column;
-  margin-left: 10px;
+  text-align: center;
+  padding-left: 20px;
 }
 .profile-name {
   font-weight: bold;
-}
-
-.menu-icon {
-  width: 35px; 
-  height: 35px;
-  cursor: pointer;
-  margin-right: 200px;
-  margin-top: 210px;
 }
 
 .profile-pic {

@@ -10,9 +10,9 @@ const Feed = () => {
     const fetchAllPosts = async () => {
       try {
         /* .get() */
-        const res = await axios.get("")
+        const res = await axios.post("http://localhost:3001/api/posts");
         setPosts(res.data[0]);
-
+        console.log(res.data[0]);
       } catch (err) {
         console.log(err)
       }
@@ -23,15 +23,13 @@ const Feed = () => {
   return (
     <div className="feed-container">
 
-      <div className="main-feed">
-        <div className="feed-title">My Feed</div>
-          <div className="feed-content">
-            {posts.map(post=>(
-              <div className="post" key = {post.id}>
-                /* Post attributes */
-              </div>
-            ))}
+      <div className="feed-title">My Feed</div>
+      <div className="feed-content">
+        {posts.map(post=>(
+          <div className="post" key = {post.id}>
+            /* Post attributes */
           </div>
+        ))}
       </div>
 
     </div>

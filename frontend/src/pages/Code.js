@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import '../styles/Code.css';
 import '../styles/eventor.css';
@@ -6,7 +6,8 @@ import '../styles/eventor.css';
 /* Page for the user to input their 6 digit code */ 
 
 const Code = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     /*username: "",
     password: "", */ 
