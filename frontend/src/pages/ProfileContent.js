@@ -7,6 +7,8 @@ import axios from 'axios'
 import React, { useState } from "react";
 
 const ProfileContent= () => {
+
+
   const [post, setPost] = useState({
     content : "", 
     event : "false",
@@ -21,9 +23,15 @@ const ProfileContent= () => {
   const handlePost = () => {
     axios.post("http://localhost:3001/api/posts", post)
       .then(response => {
-        console.log(response.data)})
+        console.log(response.data)
+        showSuccessPopup(); 
+        setPost({ ...post, content: "" });
+      })
       .catch (err => {
-        console.log(err)})
+        console.log(err)
+        showFailPopup(); 
+        setPost({ ...post, content: "" })
+      });
   }
 
   const handleImageChange = (e) => {
@@ -32,9 +40,28 @@ const ProfileContent= () => {
       console.log(file);
     }
   };
+
   const handleUploadClick = () => {
     document.getElementById('file-input').click();
   };
+  
+  const showSuccessPopup = () => {
+    var popup = document.getElementById("success");
+    popup.classList.add("show");
+
+    setTimeout(function() {
+        popup.classList.remove("show");
+    }, 1000);
+}
+
+  const showFailPopup = () => {
+    var popup = document.getElementById("fail");
+    popup.classList.add("show");
+
+    setTimeout(function() {
+        popup.classList.remove("show"); 
+    }, 1000);
+  }
 
   return (
     <div className="profile-content-container">
@@ -74,9 +101,7 @@ const ProfileContent= () => {
         <div className="post-card">
           
           <div className="post-input">
-            <input name="content" className="post-text" value={post.content} type="text" onChange={handleChange} placeholder="What will you be hosting next?"/> 
-            
-            
+            <textarea name="content" className="post-text" value={post.content} type="text" onChange={handleChange} placeholder="What will you be hosting next?"/>
           </div>
 
           <div className="post-buttons">
@@ -87,13 +112,17 @@ const ProfileContent= () => {
               style={{ display: 'none' }}
               onChange={handleImageChange}
             />
-            <img src={imageIcon} a onClick={handleUploadClick} lt="Image" className="image-icon"/> 
+            <img src={imageIcon} onClick={handleUploadClick} lt="Image" className="image-icon"/> 
             <img src={calendarIcon} alt="Calendar" className="calendar-icon"/> 
             <button onClick={handlePost} className="post-btn"> Post </button> 
           </div>
             
         </div>
         
+        <div className="postPopups">
+          <div class="popup" id="success">Post created successfully!</div>
+          <div class="popup" id="fail">Error creating post!</div>
+        </div>
         
       </div>
     </div>

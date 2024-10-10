@@ -1,14 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+
+
 import '../styles/Login.css';
 import '../styles/eventor.css';
+
+import { useAuth } from '../AuthContext'; 
+
 
 /* Page for logging in */ 
 
 const Login = () => {
   
   const navigate = useNavigate();
+  const { setAction } = useAuth();  
   
+
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -22,10 +29,25 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData);
-    navigate("/home");
+    axios.post("http://localhost:3001/")
+    .then(response => {
+      console.log(response);
+      navigate("/home");
+    })
+    .catch (err =>  {
+      console.log(err)
+    })
   };
 
+  const handleSignup = () => {
+    setAction('signup');
+    navigate("/verify");
+  };
 
+  const handlePassword = () => {
+    setAction('resetPassword');
+    navigate("/verify");
+  };
 
   return (
     <div className="login-container">
@@ -55,8 +77,8 @@ const Login = () => {
         </form>
 
       <div className="login-footer">
-        <p>New user? <a href="/signup">Sign up</a></p>
-        <p><a href="/reset">Forgot Password?</a></p>
+        <p>New user? <a onClick={handleSignup}>Sign up</a></p>
+        <p><a onClick={handlePassword}>Forgot Password?</a></p>
       </div>
 
     </div>
