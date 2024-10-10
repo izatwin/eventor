@@ -1,40 +1,43 @@
 .settings-content-container {
-  display: flex;
-  justify-content: center; 
   height: 100vh;
-  width: 100vh;
+  width: 720px;
+  position: fixed;
+  border-right: 1px solid black; 
+  border-left: 1px solid black; 
 }
 
 .settings-title {
   z-index: 2000;
   position: fixed;
-  width: 760px;
-  padding: 15px;
+  width: 720px;
+  padding-top: 15px;
+  padding-bottom: 15px;
   font-size: 30px;
   font-weight: bold;
   text-align: center;
+  align-items: center;
   border-bottom: 1px solid black; 
 }
 
 .settings-content {
   position: fixed;
   margin-top: 80px; 
-  width: 760px;
+  width: 720px;
   flex-direction: column; 
   display: flex;
   gap: 10px;               
   align-items: center;
 }
-.settings-pic {
-  width: 60px;
-  height: 60px;
-  margin-left: 15px;
-}
 
 .settings-options {
   display: flex;
   flex-direction: column;
-  width: 100vh;
+  width: 720px;
+}
+
+.settings-pic {
+  width: 60px;
+  height: 60px;
 }
 
 .settings-btn {
@@ -46,6 +49,9 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   height: 117px;
+  border-left: none;  
+  border-right: none;  
+  border-bottom: none;
 }
 
 .settings-btn:hover {
@@ -55,7 +61,7 @@
 .settings-form-content {
   position: fixed;
   margin-top: 280px; 
-  width: 760px;
+  width: 720px;
   flex-direction: column; 
   display: flex;
   gap: 10px;               
@@ -90,8 +96,8 @@
 }
 
 .picPreview {
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
 }
 .settings-form .upload-button {

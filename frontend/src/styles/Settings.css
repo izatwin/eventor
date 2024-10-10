@@ -4,27 +4,4 @@
   position: relative;
 }
 
-.sidebar-left {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 325px; 
-  height: 100vh; 
-  border-right: 1px solid black;
-  padding: 10px;
-  box-sizing: border-box;
-
-}
-
-.sidebar-right {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 325px; 
-  height: 100vh;   
-  border-left: 1px solid black;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
 

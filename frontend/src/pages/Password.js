@@ -39,7 +39,7 @@ const navigate = useNavigate();
           />
           <input 
             type="password"
-            name="password"
+            name="confPassword"
             placeholder="Confirm New Password" 
             value={formData.confPassword}
             onChange={handleChange}

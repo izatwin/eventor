@@ -13,6 +13,7 @@ const SettingsContent = () => {
     if (file) {
       setSelectedImage(file);
       setPreviewUrl(URL.createObjectURL(file));
+      console.log(file);
     }
   };
   
@@ -27,16 +28,16 @@ const SettingsContent = () => {
 
             <div className="settings-content">
               <img src={profilePic} alt="Profile" className="settings-pic" />
-              <div className="profile-info">
-              <div className="profile-name">Suga Sean</div>
-              <div className="profile-username">@sugasean2</div>
+                <div className="profile-info">
+                <div className="profile-name">Suga Sean</div>
+                <div className="profile-username">@sugasean2</div>
               </div>
-            <div className="settings-options">
-              <button onClick={()=>setContent("name-settings")} className="settings-btn"> Display Name </button>          
-              <button onClick={()=>setContent("pic-settings")} className="settings-btn"> Profile Picture</button>          
-              <button onClick={()=>setContent("username-settings")} className="settings-btn"> Username </button>          
-              <button onClick={()=>setContent("password-settings")} className="settings-btn"> Password </button>          
-              <button onClick={()=>setContent("delete-settings")} className="settings-btn"> Delete Account</button>          
+              <div className="settings-options">
+                <button onClick={()=>setContent("name-settings")} className="settings-btn"> Display Name </button>          
+                <button onClick={()=>setContent("pic-settings")} className="settings-btn"> Profile Picture</button>          
+                <button onClick={()=>setContent("username-settings")} className="settings-btn"> Username </button>          
+                <button onClick={()=>setContent("password-settings")} className="settings-btn"> Password </button>          
+                <button onClick={()=>setContent("delete-settings")} className="settings-btn"> Delete Account</button>          
             </div>
             </div>
 
@@ -66,9 +67,11 @@ const SettingsContent = () => {
                   style={{ display: 'none' }}
                   onChange={handleImageChange}
                 />
+
                 <button className="upload-button" onClick={handleUploadClick}>
                   Upload new image
                 </button>
+
                 <button onClick={() => setContent("default")}>Save</button>
             </div>
             </div>
