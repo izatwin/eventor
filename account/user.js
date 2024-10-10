@@ -35,6 +35,34 @@ class UserCredentials {
     let tryPasswordHash = tryDerivedKey.toString('hex');
     return realPasswordHash === tryPasswordHash;
   }
+
+  generateAuthToken() {
+    let token = crypto.randomBytes(48).toString('hex');
+
+    let lifetime = 60 * 1000;
+    let nowTime = Date.now();
+    let expireTime = nowTime + lifetime;
+
+    let accessTokens = this.accessTokens;
+    accessTokens[token] = expireTime;
+
+    return {
+      'token' : token,
+      'expire' : expireTime
+    };
+  }
+
+  matchAuthToken(token) {
+    let accessTokens = this.accessTokens;
+
+    let expireTime = accessTokens[token];
+    if (expireTime == null) {
+      return false;
+    }
+
+    let nowTime = Date.now();
+    return (nowTime <= expireTime);
+  }
 }
 
 class UserProfileInfo {
