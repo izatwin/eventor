@@ -43,6 +43,21 @@ exports.findOne = (req, res) => {
         });
 };
 
+exports.findAll = (req, res) => {
+    Post.find()
+        .then(data => {
+            if (!data)
+                return res.status(404).send({ message: "No posts found"});
+            else res.send(data);
+        })
+        .catch(err => {
+            return res.status(500).send({
+                message: "Error retreiving all posts",
+                error: err.message || "Unexpected Error"
+            })
+        })
+}
+
 // Update a post by the id
 exports.update = (req, res) => {
     if (!req.body) {
