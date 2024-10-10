@@ -127,11 +127,12 @@ async function sendVerificationEmail(recipientEmail, verificationCode) {
   const raw = makeBody(recipientEmail, 'me', subject, body);
 
   try {
+    console.log("sending email");
     const response = await gmail.users.messages.send({
       userId: 'me',
       resource: { raw },
     });
-    // console.log('Email sent:', response.data.id);
+    console.log('Email sent:', response.data.id);
   } catch (err) {
     console.error('Error sending email:', err);
   }
@@ -141,9 +142,7 @@ function generateVerificationCode() {
   return ('000000' + (crypto.randomInt(0, 1000000)).toString()).slice(-6);
 }
 
-async function doVerificationRequest(email) {
-  let verifyCode = generateVerificationCode();
-  
+async function doSendEmail(email, verifyCode) {
   try {
     await new Promise((resolve, reject) => {
       const checkAuth = setInterval(() => {
@@ -163,6 +162,12 @@ async function doVerificationRequest(email) {
   } catch (error) {
     console.error('Failed to authenticate OAuth2 client or send email:', error);
   }
+}
+
+function doVerificationRequest(email) {
+  let verifyCode = generateVerificationCode();
+  console.log("- sending verify code: " + verifyCode + " -");
+  doSendEmail(email, verifyCode);
   
   return verifyCode;
 };
