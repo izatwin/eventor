@@ -2,15 +2,18 @@ const Post = require("../models/post")
 
 // Create and save a new Post
 exports.create = (req, res) => {
-    if (!req.body) {
+    console.log("We are here")
+    if (!req.body || Object.keys(req.body).length === 0) {
         res.status(400).send({
             message: "Post cannot be empty."
         });
     }
+    console.log(req.body)
+    console.log("we are here1")
 
     const newPost = new Post({
         content: req.body.content,
-        event: req.body.event
+        is_event: req.body.event
     });
 
     newPost.save(newPost)
@@ -27,6 +30,7 @@ exports.create = (req, res) => {
 // Find a single post with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
+    const cookies = req.cookies
 
     Post.findById(id)
         .then(data => {
