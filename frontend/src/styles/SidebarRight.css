@@ -1,0 +1,21 @@
+.sidebar-right {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 25vw; 
+  height: 100vh;   
+  padding: 10px;
+  box-sizing: border-box;
+  z-index: 0;
+}
+
+.bell-icon {
+  margin-left: 10px;
+  display: flex;
+}
+
+.icon-right {
+  width: 35px;  
+  height: 35px; 
+  cursor: pointer;
+}

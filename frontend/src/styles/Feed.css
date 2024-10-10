@@ -1,0 +1,30 @@
+.feed-container {
+  position: fixed;
+  width: 50vw; 
+  height: 100vh; 
+  border-right: 1px solid black; 
+  border-left: 1px solid black; 
+  z-index: 100;
+}
+
+
+.feed-title {
+  z-index: 2000;
+  position: flex;
+  padding: 15px;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid black; 
+}
+
+.feed-content {
+  margin-top: 60px; 
+
+}
+
+
+
+
+
+

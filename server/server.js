@@ -16,8 +16,9 @@ const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
 const postRouter = require('./routes/posts')
-const CommentRouter = require('./routes/comment')
 const userRouter = require('./routes/user')
+const commentRouter = require('./routes/comment')
+const eventRouter = require('./routes/events')
 
 const app = express();
 
@@ -31,8 +32,9 @@ app.use(cookieParser());
 
 app.use('/', indexRouter);
 app.use('/api/posts', postRouter);
-app.use('/api/comment', CommentRouter)
 app.use('/api/user', userRouter)
+app.use('/api/comments', commentRouter);
+app.use('/api/events', eventRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,0 +1,157 @@
+.profile-content-container {
+  position: fixed;
+  width: 720px;
+  height: 100vh;
+  border-right: 1px solid black; 
+  border-left: 1px solid black; 
+  z-index: 100;
+}
+
+.profile-title {
+  position: fixed;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-size: 30px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid black; 
+  width: 720px;
+}
+
+.profile-content {
+  position: fixed;
+  margin-top: 80px; 
+  width: 720px;
+  display: column;
+}
+
+.upper-profile-card {
+  display: flex;
+}
+
+.profile-information {
+  font-size: 25px;
+  margin-top: 15px;
+  margin-left: 15px;
+}
+
+.p-name {
+  font-weight: bold;
+}
+
+.profile-picture {
+  width: 100px;
+  height: 100px;
+  margin-left: 60px;
+  margin-top: 8px;
+}
+
+.profile-status {
+  margin-top: 80px;
+  margin-left: -150px;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: bold;
+  width: 350px;
+  text-align: left;
+}
+
+.edit-icon {
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+  margin-top: 30px;
+}
+
+.profile-side {
+  display: column;
+  text-align: left;
+}
+
+.follower-count {
+  font-weight: bold;
+}
+
+.edit-text {
+  margin-top: 35px;
+}
+.edit-card {
+  display: flex;
+}
+.profile-lower-card {
+  margin-top: 20px;
+  border-bottom: 1px solid black; 
+}
+
+.about-section {
+  text-align: left;
+  margin-left: 20px;
+}
+
+.about-title {
+  font-weight: bold;
+  font-size: 30px;
+}
+
+.about-text {
+
+}
+
+
+.post-card {
+  display: column;
+  gap: 10px;
+
+  border: 1px solid #ccc;
+}
+
+.post-input {
+  position: relative;
+  display: flex;
+  padding: 10px;
+  flex: 1;
+}
+.post-text {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  margin-top: 20px;
+  margin-left: 30px;
+  margin-bottom: 20px;
+}
+
+.post-buttons {
+  display: flex;
+  text-align: left;  
+  margin-bottom: 20px;
+}
+
+.image-icon {
+  width: 25px;
+  height: 25px;
+  margin-left: 40px;
+  cursor: pointer;
+}
+
+.calendar-icon {
+  width: 25px;
+  height: 25px;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.post-btn {
+  background-color: #d32f2f;
+  z-index: 2000;
+  color: white;
+  padding: 10px;
+  width: 100px;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  cursor: pointer;
+  margin-left: 500px;
+}
+
+

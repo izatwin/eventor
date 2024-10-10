@@ -1,0 +1,28 @@
+.eventor-box {
+  background-color: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 320px;
+}
+
+.eventor-title {
+  font-size: 48px;
+  font-family: 'Poppins', sans-serif; 
+  color: #d32f2f;
+  margin-bottom: 8px;
+  text-shadow: 0px 2px 1px rgba(0, 0, 0, 0.3); 
+  font-weight: bold; 
+  transition: transform 0.3s ease-in-out;
+}
+
+.eventor-title:hover {
+  transform: scale(1.05); 
+}
+
+.eventor-subtitle {
+  font-size: 16px;
+  color: gray;
+  margin-bottom: 24px;
+}
