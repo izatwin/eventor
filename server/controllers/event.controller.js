@@ -1,22 +1,19 @@
-const Post = require("../models/post")
+const Event = require("../models/event")
 
 // Create and save a new Post
 exports.create = (req, res) => {
-    console.log("We are here")
-    if (!req.body || Object.keys(req.body).length === 0) {
+    if (!req.body) {
         res.status(400).send({
-            message: "Post cannot be empty."
+            message: "Event cannot be empty."
         });
     }
-    console.log(req.body)
-    console.log("we are here1")
 
-    const newPost = new Post({
+    const newEvent = new Event({
         content: req.body.content,
-        is_event: req.body.event
+        event: req.body.event
     });
 
-    newPost.save(newPost)
+    newEvent.save(newEvent)
         .then(data => {
             res.send(data);
         })
@@ -27,47 +24,46 @@ exports.create = (req, res) => {
         });
 };
 
-// Find a single post with an id
+// Find a single event with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
-    const cookies = req.cookies
 
-    Post.findById(id)
+    Event.findById(id)
         .then(data => {
             if (!data)
-                return res.status(404).send({ message: `Post not found with id=${id}` });
+                return res.status(404).send({ message: `Event not found with id=${id}` });
             else res.send(data);
         })
         .catch(err => {
             return res.status(500).send({
-                message: `Error retrieving post with id=${id}`,
+                message: `Error retrieving event with id=${id}`,
                 error: err.message || 'Unexpected Error'
             }
             );
         });
 };
 
-// Update a post by the id
+// Update a event by the id
 exports.update = (req, res) => {
     if (!req.body) {
         return res.status(400).send({
-            message: "Data to update post cannot be empty."
+            message: "Data to update event cannot be empty."
         });
     }
 
     const id = req.param.id;
 
-    Post.findByIdAndUpdate(id, req.body, { runValidators: true })
+    Event.findByIdAndUpdate(id, req.body, { runValidators: true })
         .then(data => {
             if (!data) {
                 res.status(404).send({
-                    message: `Cannot find Post with id=${id}`
+                    message: `Cannot find Event with id=${id}`
                 });
-            } else res.send({ message: "Post updated successfully." })
+            } else res.send({ message: "Event updated successfully." })
         })
         .catch(err => {
             res.status(500).send({
-                message: `Error updating post with id=${id}`,
+                message: `Error updating event with id=${id}`,
                 error: err
             });
         });
@@ -77,22 +73,22 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
     const id = req.params.id;
 
-    Post.findOneAndDelete(id)
+    Event.findOneAndDelete(id)
     .then(data => {
         if (!data) {
             return res.status(404).send({
-                message: `Cannot find post with id=${id}`,
+                message: `Cannot find event with id=${id}`,
                 data: data
             });
         } else {
             return res.send({
-                message: "Post deleted successfully."
+                message: "Event deleted successfully."
             });
         }
     })
     .catch(err => {
         return res.status(500).send({
-            message: `Error deleting post with id=${id}`,
+            message: `Error deleting event with id=${id}`,
             error: err.message || `Unexpected Error`
         })
     })

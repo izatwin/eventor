@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "concurrently \"cd eventor-ui && npm start\" \"cd server && npm start\" "
+    "dev": "concurrently \"cd frontend && npm start\" \"cd server && npm start\" "
   },
   "dependencies": {
     "concurrently": "^9.0.1"
