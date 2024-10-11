@@ -27,14 +27,14 @@ exports.isLoggedIn = async (req, res) => {
                 if (auth_token) {
                     let userCredentials = myUser.userCredentials;
                     if (userCredentials.matchAuthToken(auth_token)) {
-                        req.send({ "logged-in" : true, "user-info" : myUser.getInfoForClient() });
+                        req.send({ "logged-in": true, "user-info": myUser.getInfoForClient() });
                         return;
                     }
                 }
             }
         }
     }
-    req.send({ "logged-in" : false });
+    req.send({ "logged-in": false });
 }
 
 exports.isValidAccountEmail = async (req, res) => {
@@ -45,14 +45,14 @@ exports.isValidAccountEmail = async (req, res) => {
         });
     }
     // TODO sanity checks (type, format)
-    
+
     // TODO get user from email?!
-    const myUser = await User.findOne({ "email" : email }).exec();
+    const myUser = await User.findOne({ "email": email }).exec();
     if (myUser) {
-        res.send({ "exists" : true });
+        res.send({ "exists": true });
         return;
     }
-    res.send({ "exists" : false });
+    res.send({ "exists": false });
 }
 
 exports.beginVerification = (req, res) => {
@@ -80,7 +80,7 @@ exports.beginVerification = (req, res) => {
     emailVerifications[email] = myVerificationStatus;
 
     let verifyId = myVerificationStatus.verifyId;
-    req.send({ "verifyId" : verifyId });
+    res.send({ "verifyId": verifyId });
 }
 
 exports.verifyEmail = (req, res) => {
@@ -149,7 +149,7 @@ exports.signup = async (req, res) => {
         });
         return;
     }
-    
+
     let email = req.body.email;
     let password = req.body.password;
     let verifyId = req.body.verifyId;
@@ -192,7 +192,7 @@ exports.signup = async (req, res) => {
     emailVerifications[email] = null;
 
     // Make sure user doesn't already exist in the database with same email or username
-    const existingUser = await User.findOne({ "email" : email }).exec();
+    const existingUser = await User.findOne({ "email": email }).exec();
     if (existingUser) {
         res.status(409).send({
             topic: "email",
@@ -200,7 +200,7 @@ exports.signup = async (req, res) => {
         });
         return;
     }
-    const existingUser2 = await User.findOne({ "userName" : userName }).exec();
+    const existingUser2 = await User.findOne({ "userName": userName }).exec();
     if (existingUser2) {
         res.status(409).send({
             topic: "userName",
@@ -212,9 +212,9 @@ exports.signup = async (req, res) => {
     // create user
     const newUser = new User({
         email: email,
-        userName : userName,
-        displayName : displayName,
-        userCredentials : {}
+        userName: userName,
+        displayName: displayName,
+        userCredentials: {}
     });
 
     let userCredentials = newUser.userCredentials;
@@ -223,8 +223,8 @@ exports.signup = async (req, res) => {
     let authToken = userCredentials.generateAuthToken();
 
     res.cookie("user_id", newUser._id)
-    res.cookie("auth_token", authToken.token, {expire: authToken.expire})
-    
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire })
+
     newUser.save(newUser)
         .then(data => {
             res.status(200).send(data.getInfoForClient());
@@ -257,13 +257,13 @@ exports.login = async (req, res) => {
             }
         }
     }
-    
+
     if (!req.body) {
         res.status(400).send({
             message: "User cannot be empty."
         });
     }
-    
+
     let email = req.body.email;
     let password = req.body.password;
     if (!(email && password)) {
@@ -272,9 +272,9 @@ exports.login = async (req, res) => {
         });
     }
     // TODO sanity checks (type, format)
-    
+
     // get user from email
-    const myUser = await User.findOne({ "email" : email }).exec();
+    const myUser = await User.findOne({ "email": email }).exec();
     if (!myUser) {
         res.status(409).send({
             topic: "email",
@@ -284,7 +284,7 @@ exports.login = async (req, res) => {
     }
 
     const userCredentials = myUser.userCredentials;
-    
+
     if (!userCredentials.matchPassword(password)) {
         res.status(409).send({
             topic: "password",
@@ -296,11 +296,11 @@ exports.login = async (req, res) => {
     myUser.markModified('userCredentials.accessTokens');
 
     res.cookie("user_id", myUser._id)
-    res.cookie("auth_token", authToken.token, {expire: authToken.expire})
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire })
 
     myUser.save(myUser)
         .then(data => {
-            res.status(200).send(data.getInfoForClient()); 
+            res.status(200).send(data.getInfoForClient());
         })
         .catch(err => {
             res.status(500).json({
@@ -329,13 +329,13 @@ exports.resetPassword = async (req, res) => {
             }
         }
     }
-    
+
     if (!req.body) {
         res.status(400).send({
             message: "User cannot be empty."
         });
     }
-    
+
     let email = req.body.email;
     let newPassword = req.body.newPassword;
     let verifyId = req.body.verifyId;
@@ -345,7 +345,7 @@ exports.resetPassword = async (req, res) => {
         });
     }
     // TODO sanity checks (type, format)
-    
+
     let myVerificationStatus = emailVerifications[email];
     if (!myVerificationStatus) {
         res.status(400).send({
@@ -374,7 +374,7 @@ exports.resetPassword = async (req, res) => {
     emailVerifications[email] = null;
 
     // TODO get user from email?!
-    const myUser = await User.findOne({ "email" : email }).exec();
+    const myUser = await User.findOne({ "email": email }).exec();
     if (!myUser) {
         res.status(400).send({
             message: "Invalid email!"
@@ -389,11 +389,11 @@ exports.resetPassword = async (req, res) => {
     myUser.markModified('userCredentials.accessTokens');
 
     res.cookie("user_id", myUser._id)
-    res.cookie("auth_token", authToken.token, {expire: authToken.expire})
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire })
 
     myUser.save(myUser)
         .then(data => {
-            res.status(200).send(data.getInfoForClient()); 
+            res.status(200).send(data.getInfoForClient());
         })
         .catch(err => {
             res.status(500).json({
@@ -415,7 +415,7 @@ exports.logout = async (req, res) => {
                     if (userCredentials.matchAuthToken(auth_token)) {
                         res.clearCookie("user_id");
                         res.clearCookie("auth_token");
-                        
+
                         myUser.removeAuthToken(auth_token);
                         myUser.markModified('userCredentials.accessTokens');
 
@@ -433,6 +433,23 @@ exports.logout = async (req, res) => {
     res.status(400).send({
         message: "Not logged in!"
     });
+}
+
+exports.findAllPosts = (req, res) => {
+    const userId = req.params.id;
+
+    User.findById(userId)
+        .then(data => {
+            if (!data)
+                return res.status(404).send({ message: `User with userID=${userId} not found.` })
+            else res.send(data.posts);
+        })
+        .catch(err => {
+            return res.status(500).send({
+                message: "Error retrieving posts",
+                error: err.message
+            })
+        })
 }
 
 // exports.findOne = (req, res) => {

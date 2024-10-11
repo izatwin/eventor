@@ -20,6 +20,6 @@ router.post('/reset', userController.resetPassword);
 
 router.patch('/logout', userController.logout);
 
-// router.get('/posts', userController.findAllPosts);
+router.get('/:id/posts/', userController.findAllPosts);
 
 module.exports = router;
