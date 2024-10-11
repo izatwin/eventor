@@ -93,7 +93,8 @@ const UserSchema = new Schema({
     posts: [{ type: Schema.Types.ObjectId, ref: "Post", required: false }],
 
     biography: {type: String},
-    status: {type: String}
+    status: {type: String},
+    imageURL: {type: String}
 });
 
 UserSchema.methods.getInfoForClient = function () {
@@ -105,6 +106,7 @@ UserSchema.methods.getInfoForClient = function () {
     infoForClient.displayName = this.displayName;
     infoForClient.biography = this.biography;
     infoForClient.status = this.status;
+    infoForClient.imageURL = this.imageURL;
 
     return infoForClient;
 }
