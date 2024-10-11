@@ -1,0 +1,23 @@
+POST http://localhost:3001/api/posts/ HTTP/1.1
+content-type: application/json
+
+{
+    "content": "test-content",
+    "is_event": "false",
+    "userId": "8340e7ff-33a6-4f28-8078-08fc08a4995d"
+}
+
+###
+
+GET http://localhost:3001/api/posts/6708e85bb33317ad496a2672
+
+###
+
+GET http://localhost:3001/api/user/8340e7ff-33a6-4f28-8078-08fc08a4995d/posts HTTP/1.1
+
+###
+DELETE  http://localhost:3001/api/posts/6708e85bb33317ad496a2672
+
+###
+
+GET http://localhost:3001/api/user/8340e7ff-33a6-4f28-8078-08fc08a4995d/posts HTTP/1.1

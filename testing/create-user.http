@@ -12,8 +12,8 @@ content-type: application/json
 
 {
 	"email": "srettig@purdue.edu",
-    "verifyId": "e78b213272d3405040ab01d91ddd0bbd2f9a571e67df1da8",
-    "verifyCode": "084369"
+    "verifyId": "2812a98a53a1a65312095f563ee240efe172b24f7f8858c1",
+    "verifyCode": "128197"
 }
 
 ###
@@ -23,7 +23,7 @@ content-type: application/json
 
 {
 	"email": "srettig@purdue.edu",
-    "verifyId": "e78b213272d3405040ab01d91ddd0bbd2f9a571e67df1da8",
+    "verifyId": "2812a98a53a1a65312095f563ee240efe172b24f7f8858c1",
     "userName": "sean",
     "password": "password",
     "displayName": "seanDisplay"
