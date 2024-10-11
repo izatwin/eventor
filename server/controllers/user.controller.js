@@ -219,12 +219,14 @@ exports.signup = async (req, res) => {
     });
 
     let userCredentials = newUser.userCredentials;
-    userCredentials.initCredentials(password)
+    userCredentials.initCredentials(password);
 
     let authToken = userCredentials.generateAuthToken();
 
-    res.cookie("user_id", newUser._id)
-    res.cookie("auth_token", authToken.token, { expire: authToken.expire })
+    res.cookie("user_id", newUser._id);
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire });
+
+    sendmail.doConfirmationMesssage(email, userName);
 
     newUser.save(newUser)
         .then(data => {
