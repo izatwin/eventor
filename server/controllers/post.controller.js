@@ -108,8 +108,7 @@ exports.delete = (req, res) => {
         .then(data => {
             if (!data) {
                 return res.status(404).send({
-                    message: `Cannot find post with id=${id}`,
-                    data: data
+                    message: `Cannot find post with id=${id}`
                 });
             } else {
                 return res.send({
