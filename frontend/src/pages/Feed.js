@@ -13,14 +13,8 @@ const Feed = () => {
   
   useEffect(() => {
     console.log("hiii");
-    axios.get("http://localhost:3001/api/user/validate") 
-    .then(response => {
-      console.log(response);
-    })
-    .catch (err =>  {
-      console.log("err");
-      console.log(err)
-    })  
+    console.log("hiii");
+
     axios.get("http://localhost:3001/api/posts")
     .then(response => {
       console.log(response.data)
@@ -29,6 +23,15 @@ const Feed = () => {
     .catch (err => {
       console.log(err)
     })
+    axios.get("http://localhost:3001/api/user/validate") 
+    .then(response => {
+      console.log(response);
+    })
+    .catch (err =>  {
+      console.log("err");
+      console.log(err)
+    })  
+
 
 
   }, [])

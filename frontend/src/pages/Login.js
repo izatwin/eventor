@@ -13,7 +13,7 @@ import { useAuth } from '../AuthContext';
 const Login = () => {
   
   const navigate = useNavigate();
-  const { setAction } = useAuth();  
+  const { setAction, setUser } = useAuth();  
   
 
   const [formData, setFormData] = useState({
@@ -33,6 +33,11 @@ const Login = () => {
     .then(response => {
       console.log(response);
       if (response.status === 200) {
+       setUser({
+          email: response.data.email, 
+          displayName: response.data.displayName,
+          userName: response.data.userName,
+        });
         navigate("/home");
       }
     })

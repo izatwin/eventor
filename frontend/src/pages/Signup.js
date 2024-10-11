@@ -7,7 +7,7 @@ import { useAuth } from '../AuthContext';
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { email, verifyId } = useAuth();
+  const { email, verifyId, setUser } = useAuth();
 
   const [formData, setFormData] = useState({
     email: email,
@@ -29,6 +29,11 @@ const SignUp = () => {
     .then(response => {
       console.log(response); 
       if (response.status === 200) {
+        setUser({
+          email: response.data.email, 
+          displayName: response.data.displayName,
+          userName: response.data.userName,
+        });
         navigate("/home");
       }
     })

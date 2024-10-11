@@ -14,11 +14,25 @@ const ProfileContent= () => {
     event : "false",
     commentsEnabled: "false",
   })
+
+  const [bio, setBio] = useState({
+    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce tincidunt molestie ultricies. Aliquam erat volutpat. Proin dictum nibh at lectus faucibus vehicula",
+  })
+  
+  const [status, setStatus] = useState({
+    status: ""
+  })
   
   const handleChange = (e) => {
     setPost({ ...post, [e.target.name]: e.target.value });
     console.log(post);
   };
+  
+  const handleBioChange = (e) => {
+    setBio({ ...post, [e.target.name]: e.target.value });
+    console.log(post);
+  };
+  
 
   const handlePost = () => {
     axios.post("http://localhost:3001/api/posts", post)
@@ -94,14 +108,14 @@ const ProfileContent= () => {
 
           <div className="about-title-container">
             <h className="about-title"> About </h>
-            <div className="edit-card"> 
-              <img src={editIcon} alt="Edit" className="edit-icon"/> 
-              <p className="edit-text"> Edit Status </p>
+            <div className="edit-bio-card"> 
+              <img src={editIcon} alt="Edit" className="edit-bio-icon"/> 
+              <p className="edit-bio-text"> Edit Bio </p>
             </div>
           </div>
           
           <div className="about-text-container">
-            <p className="about-text"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce tincidunt molestie ultricies. Aliquam erat volutpat. Proin dictum nibh at lectus faucibus vehicula</p>
+            <textarea name="about" className="about-text" type="text" onChange={handleBioChange} value={bio.bio}/>
           </div>
 
         </div>

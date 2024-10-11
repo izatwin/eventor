@@ -7,11 +7,13 @@ import userIcon from './icons/user.png';
 import profilePic from './icons/profile.png'; 
 import menuIcon from './icons/menu.png';
 import axios from 'axios'
+import { useAuth } from '../AuthContext'; 
 
 const SidebarLeft = () => {
   const [isProfilePopupVisible, setProfilePopupVisible] = useState(false);
   const popupRef = useRef(null);
   const navigate = useNavigate();
+  const { user } = useAuth();  
 
   const handleProfileClick = () => {
     setProfilePopupVisible(!isProfilePopupVisible);
@@ -66,8 +68,8 @@ const SidebarLeft = () => {
         <img src={profilePic} alt="Profile" className="profile-pic" />
         
         <div className="profile-info">
-          <div className="profile-name">Suga Sean</div>
-          <div className="profile-username">@sugasean2</div>
+          <div className="profile-name">{user.displayName}</div>
+          <div className="profile-username">@{user.userName}</div>
         </div>
 
       </div>

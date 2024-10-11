@@ -83,28 +83,55 @@
 .edit-card {
   display: flex;
 }
+
 .profile-lower-card {
   margin-top: 20px;
   border-bottom: 1px solid black; 
   display: flex;
-  
+  flex-direction: column;
+  padding-left: 3%;
+  padding-right: 3%;
+}
+
+.about-title-container {
+  display: flex;
 }
 
 .about-section {
   text-align: left;
   margin-left: 20px;
   display: flex;
-  background-color: red;
 }
 
 .about-title {
   font-weight: bold;
   font-size: 30px;
+  margin-right: 3%;
 }
 
+.edit-bio-card {
+  display: flex;
+  margin-top: 5px;
+}
+
+.edit-bio-icon {
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
+}
+
+.edit-bio-text {
+  margin-top: 5px;
+}
+
+.about-text-container {
+  background-color: red; 
+}
 .about-text {
 
+    
 }
+
 
 
 .post-card {
