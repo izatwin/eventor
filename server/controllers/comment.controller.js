@@ -47,7 +47,6 @@ exports.addComment = async (req, res) => {
 
     const parentId = req.params.id;
     const childId = req.body.childId;
-    console.log(parentId)
 
     try {
         const childComment = await Comment.findById(childId).exec();

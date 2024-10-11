@@ -22,4 +22,8 @@ router.patch('/logout', userController.logout);
 
 router.get('/:id/posts/', userController.findAllPosts);
 
+router.post('/:id/biography', userController.setBiography)
+
+router.post('/:id/status', userController.setStatus)
+
 module.exports = router;
