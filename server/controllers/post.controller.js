@@ -1,30 +1,42 @@
-const Post = require("../models/post")
+const Post = require("../models/post");
+const User = require("../models/user");
 
 // Create and save a new Post
-exports.create = (req, res) => {
-    console.log("We are here")
+exports.create = async (req, res) => {
     if (!req.body || Object.keys(req.body).length === 0) {
         res.status(400).send({
             message: "Post cannot be empty."
         });
     }
-    console.log(req.body)
-    console.log("we are here1")
 
-    const newPost = new Post({
-        content: req.body.content,
-        is_event: req.body.event
-    });
+    try {
+        const possibleUserId = req.body.userId
 
-    newPost.save(newPost)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: err.message || "server error."
-            });
+        // First check if the user exists
+        const userPosting = await User.findById(possibleUserId);
+
+        if (!userPosting) {
+            return res.status(404).send(`User with userId=${possibleUserId} not found`)
+        }
+
+        // create the post
+        const newPost = new Post({
+            content: req.body.content,
+            is_event: req.body.is_event,
+            user: req.body.userId
         });
+
+        newPost.save();
+
+        //add post to user
+        userPosting.posts.push(newPost._id);
+        userPosting.save();
+
+        return res.send(newPost);
+    } catch (err) {
+        console.log(err.message);
+        return res.status(500).json({ message: err.message || "server error." });
+    }
 };
 
 // Find a single post with an id
@@ -51,7 +63,7 @@ exports.findAll = (req, res) => {
     Post.find()
         .then(data => {
             if (!data)
-                return res.status(404).send({ message: "No posts found"});
+                return res.status(404).send({ message: "No posts found" });
             else res.send(data);
         })
         .catch(err => {
@@ -93,22 +105,22 @@ exports.delete = (req, res) => {
     const id = req.params.id;
 
     Post.findOneAndDelete(id)
-    .then(data => {
-        if (!data) {
-            return res.status(404).send({
-                message: `Cannot find post with id=${id}`,
-                data: data
-            });
-        } else {
-            return res.send({
-                message: "Post deleted successfully."
-            });
-        }
-    })
-    .catch(err => {
-        return res.status(500).send({
-            message: `Error deleting post with id=${id}`,
-            error: err.message || `Unexpected Error`
+        .then(data => {
+            if (!data) {
+                return res.status(404).send({
+                    message: `Cannot find post with id=${id}`,
+                    data: data
+                });
+            } else {
+                return res.send({
+                    message: "Post deleted successfully."
+                });
+            }
         })
-    })
+        .catch(err => {
+            return res.status(500).send({
+                message: `Error deleting post with id=${id}`,
+                error: err.message || `Unexpected Error`
+            })
+        })
 };
