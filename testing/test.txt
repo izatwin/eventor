@@ -1,0 +1,57 @@
+POST http://localhost:3001/api/user/login HTTP/1.1
+content-type: application/json
+
+{
+	"email": "srettig@purdue.edu",
+	"password": "12345"
+}
+
+###
+
+GET http://localhost:3001/api/user/validate HTTP/1.1
+Cookie: user_id=ffcb927b-13f8-4d22-a988-6297085864df
+Cookie: auth_token=350d3732917291d1177ed54ba11dffd967b72e7ec95eea8e062460aaedef42fa245ee27c3c6de5c0cfb7dbc8ad416f32
+
+###
+
+POST http://localhost:3001/api/user/ffcb927b-13f8-4d22-a988-6297085864df/biography HTTP/1.1
+content-type: application/json
+
+{
+	"biography": "anotherone"
+}
+
+###
+
+GET http://localhost:3001/api/user/validate HTTP/1.1
+Cookie: user_id=ffcb927b-13f8-4d22-a988-6297085864df
+Cookie: auth_token=350d3732917291d1177ed54ba11dffd967b72e7ec95eea8e062460aaedef42fa245ee27c3c6de5c0cfb7dbc8ad416f32
+
+
+###
+POST http://localhost:3001/api/user/ffcb927b-13f8-4d22-a988-6297085864df/status HTTP/1.1
+content-type: application/json
+
+{
+	"status": "we goin in"
+}
+
+###
+
+GET http://localhost:3001/api/user/validate HTTP/1.1
+Cookie: user_id=ffcb927b-13f8-4d22-a988-6297085864df
+Cookie: auth_token=350d3732917291d1177ed54ba11dffd967b72e7ec95eea8e062460aaedef42fa245ee27c3c6de5c0cfb7dbc8ad416f32
+
+###
+POST http://localhost:3001/api/user/ffcb927b-13f8-4d22-a988-6297085864df/image HTTP/1.1
+content-type: application/json
+
+{
+	"imageURL": "https://i.redd.it/kh5qszq2s0ud1.jpeg"
+}
+
+###
+
+GET http://localhost:3001/api/user/validate HTTP/1.1
+Cookie: user_id=ffcb927b-13f8-4d22-a988-6297085864df
+Cookie: auth_token=350d3732917291d1177ed54ba11dffd967b72e7ec95eea8e062460aaedef42fa245ee27c3c6de5c0cfb7dbc8ad416f32

@@ -26,4 +26,6 @@ router.post('/:id/biography', userController.setBiography)
 
 router.post('/:id/status', userController.setStatus)
 
+router.post('/:id/image', userController.setImage)
+
 module.exports = router;

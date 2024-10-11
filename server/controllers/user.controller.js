@@ -488,7 +488,7 @@ exports.setBiography = async (req, res) => {
             curUser.save()
             return res.send({ user: curUser.getInfoForClient() })
         } else {
-            return res.send(400).send({ message: "Please send a biography to update." })
+            return res.status(400).send({ message: "Please send a biography to update." })
         }
     } catch (err) {
         return res.status(500).send({ message: `Error setting biography`, error: err })
@@ -514,9 +514,35 @@ exports.setStatus = async (req, res) => {
             curUser.save()
             return res.send({ user: curUser.getInfoForClient() })
         } else {
-            return res.send(400).send({ message: "Please send a status to update." })
+            return res.status(400).send({ message: "Please send a status to update." })
         }
     } catch (err) {
         return res.status(500).send({ message: `Error setting status`, error: err })
+    }
+}
+
+exports.setImage = async (req, res) => {
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Body for setting imageURL must not be empty."
+        });
+    }
+
+    const userId = req.params.id
+    try {
+        const curUser = await User.findById(userId).exec()
+        if (!curUser) {
+            return res.status(404).send({ message: `Cannot find user with id=${userId}` })
+        }
+
+        if (req.body.imageURL) {
+            curUser.imageURL = req.body.imageURL
+            curUser.save()
+            return res.send({ user: curUser.getInfoForClient() })
+        } else {
+            return res.status(400).send({ message: "Please send a picture url to update." })
+        }
+    } catch (err) {
+        return res.status(500).send({ message: `Error setting picture url`, error: err })
     }
 }
