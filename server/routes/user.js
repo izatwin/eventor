@@ -28,4 +28,6 @@ router.post('/:id/status', userController.setStatus)
 
 router.post('/:id/image', userController.setImage)
 
+router.delete('/:id', userController.delete);
+
 module.exports = router;

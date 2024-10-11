@@ -1,4 +1,5 @@
 const User = require("../models/user")
+const Post = require("../models/post")
 const crypto = require("crypto");
 
 const sendmail = require("../modules/sendmail.js");
@@ -545,4 +546,26 @@ exports.setImage = async (req, res) => {
     } catch (err) {
         return res.status(500).send({ message: `Error setting picture url`, error: err })
     }
+}
+
+exports.delete = async (req, res) => {
+    const id = req.params.id
+    console.log(id)
+
+
+    try {
+        const curUser = await User.findById(id).exec()
+        console.log(curUser)
+
+        for (let curPostId of curUser.posts) {
+            await Post.findByIdAndDelete(curPostId).exec()
+        }
+
+        await User.findByIdAndDelete(id)
+    } catch (err) {
+        return res.status(500).send({
+            message: "Error deleting User",
+            error: err.message || "Unexpected Error"
+        })
+    }  
 }
