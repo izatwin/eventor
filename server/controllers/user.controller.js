@@ -563,7 +563,7 @@ exports.updateUsername = async (req, res) => {
         return;
     }
 
-    const existingUser = await User.findOne({ "userName": userName }).exec();
+    const existingUser = await User.findOne({ "userName": newUsername }).exec();
     if (existingUser) {
         res.status(409).send({
             topic: "userName",
