@@ -5,6 +5,8 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [action, setAction] = useState('');
+  const [email, setEmail] = useState('');
+  const [verifyId, setVerifyId] = useState('');
   /*
   // Mock authentication function (replace with real API call)
   const login = (username, password) => {
@@ -19,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 */
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, action, setAction}}>
+    <AuthContext.Provider value={{ isAuthenticated, action, setAction, email, setEmail, verifyId, setVerifyId}}>
       {children}
     </AuthContext.Provider>
   );

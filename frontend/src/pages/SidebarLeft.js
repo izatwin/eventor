@@ -6,7 +6,7 @@ import exploreIcon from './icons/explore.png';
 import userIcon from './icons/user.png'; 
 import profilePic from './icons/profile.png'; 
 import menuIcon from './icons/menu.png';
-
+import axios from 'axios'
 
 const SidebarLeft = () => {
   const [isProfilePopupVisible, setProfilePopupVisible] = useState(false);
@@ -32,7 +32,13 @@ const SidebarLeft = () => {
 
 
   const handleSignout = () => {
-    navigate('/');
+    axios.patch("http://localhost:3001/api/user/logout")
+    .then(response => {
+      console.log(response);
+    })
+    .catch (err =>  {
+      console.log(err);
+    })
   }
   return (
     <div className="sidebar-left">

@@ -86,11 +86,15 @@
 .profile-lower-card {
   margin-top: 20px;
   border-bottom: 1px solid black; 
+  display: flex;
+  
 }
 
 .about-section {
   text-align: left;
   margin-left: 20px;
+  display: flex;
+  background-color: red;
 }
 
 .about-title {

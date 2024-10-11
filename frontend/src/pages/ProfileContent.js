@@ -91,10 +91,19 @@ const ProfileContent= () => {
 
 
         <div className="profile-lower-card">
-          <div className="about-section">
+
+          <div className="about-title-container">
             <h className="about-title"> About </h>
+            <div className="edit-card"> 
+              <img src={editIcon} alt="Edit" className="edit-icon"/> 
+              <p className="edit-text"> Edit Status </p>
+            </div>
+          </div>
+          
+          <div className="about-text-container">
             <p className="about-text"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce tincidunt molestie ultricies. Aliquam erat volutpat. Proin dictum nibh at lectus faucibus vehicula</p>
           </div>
+
         </div>
       
 

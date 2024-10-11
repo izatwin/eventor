@@ -17,8 +17,8 @@ const Login = () => {
   
 
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
+    email: "",
+    password: ""
   });
 
   const handleChange = (e) => {
@@ -29,15 +29,17 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData);
-    axios.post("http://localhost:3001/")
+    axios.post("http://localhost:3001/api/user/login", formData)
     .then(response => {
       console.log(response);
-      navigate("/home");
+      if (response.status === 200) {
+        navigate("/home");
+      }
     })
     .catch (err =>  {
+      console.log("err");
       console.log(err)
     })
-    navigate("/home");
   };
 
   const handleSignup = () => {
@@ -60,9 +62,9 @@ const Login = () => {
           
           <input 
             type="text"
-            name="username"
-            placeholder="Username" 
-            value={formData.username}
+            name="email"
+            placeholder="Email" 
+            value={formData.email}
             onChange={handleChange}
           />
           <input 
