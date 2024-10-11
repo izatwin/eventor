@@ -40,14 +40,14 @@ exports.isLoggedIn = async (req, res) => {
 }
 
 exports.isValidAccountEmail = async (req, res) => {
-    if (!req.body) {
+    if (!req.params) {
         res.status(400).send({
-            message: "Request body cannot be empty."
+            message: "Request params cannot be empty."
         });
         return;
     }
 
-    let email = req.body.email;
+    let email = req.params.email;
     if (!email) {
         res.status(400).send({
             message: "Email body field required."

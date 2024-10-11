@@ -10,7 +10,7 @@ router.post('/login', userController.login);
 
 router.get('/validate', userController.isLoggedIn);
 
-router.get('/exists', userController.isValidAccountEmail);
+router.get('/:email/exists', userController.isValidAccountEmail);
 
 router.post('/verify', userController.beginVerification);
 
