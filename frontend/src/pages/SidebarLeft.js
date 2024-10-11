@@ -37,6 +37,9 @@ const SidebarLeft = () => {
     axios.patch("http://localhost:3001/api/user/logout")
     .then(response => {
       console.log(response);
+      if (response.status === 200) {
+        navigate("/");
+      }
     })
     .catch (err =>  {
       console.log(err);

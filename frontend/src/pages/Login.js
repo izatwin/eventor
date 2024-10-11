@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 import '../styles/Login.css';
 import '../styles/eventor.css';
 
 import { useAuth } from '../AuthContext'; 
 
 
+axios.defaults.withCredentials = true;
 /* Page for logging in */ 
 
 const Login = () => {
@@ -29,6 +29,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData);
+
     axios.post("http://localhost:3001/api/user/login", formData)
     .then(response => {
       console.log(response);

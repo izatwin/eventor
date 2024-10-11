@@ -14,7 +14,7 @@ import { AuthProvider } from './AuthContext';
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 
-const isAuthenticated = true;
+const isAuthenticated = false;
 
 function App() {
   return (
