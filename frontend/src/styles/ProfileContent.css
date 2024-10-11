@@ -23,7 +23,6 @@
 
 .profile-content {
   position: fixed;
-  margin-top: 80px; 
   width: 50vw;
   display: flex;
   flex-direction: column;

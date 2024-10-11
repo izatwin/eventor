@@ -112,7 +112,6 @@ const ProfileContent= () => {
 
   return (
     <div className="profile-content-container">
-      <div className="profile-title">Profile</div>
       <div className="profile-content">
         <div className="upper-profile-card">
           
@@ -134,7 +133,7 @@ const ProfileContent= () => {
           
           <div className="status-container">
           
-            <textarea name="status" readOnly={!editingStatus} className="profile-status" type="text" onChange={handleStatusEdit} value={user.status}/>
+            <textarea name="status" readOnly={!editingStatus} className="profile-status" type="text" onChange={handleStatusEdit} value={user.status ? user.status : "Update your status!"}/>
             <div className="edit-card"> 
               <img src={editingStatus ? checkIcon : editIcon } onClick={editingStatus ? handleStatusChange : handleStatusEdit } alt="Edit" className="edit-icon"/> 
               <p className="edit-text"> Edit Status </p>
@@ -157,7 +156,7 @@ const ProfileContent= () => {
           
           <div className="about-text-container">
 
-            <textarea name="bio" readOnly={!editingBio} className="profile-bio" type="text" onChange={handleBioEdit} value={user.bio}/>
+            <textarea name="bio" readOnly={!editingBio} className="profile-bio" type="text" onChange={handleBioEdit} value={user.bio ? user.bio : "Update you bio here!"}/>
           </div>
 
         </div>
