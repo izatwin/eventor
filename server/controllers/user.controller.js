@@ -223,8 +223,8 @@ exports.signup = async (req, res) => {
 
     let authToken = userCredentials.generateAuthToken();
 
-    res.cookie("user_id", newUser._id);
-    res.cookie("auth_token", authToken.token, { expire: authToken.expire });
+    res.cookie("user_id", myUser._id, { sameSite: 'None', secure: true })
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire, sameSite: 'None', secure: true })
 
     sendmail.doConfirmationMesssage(email, userName);
 
@@ -298,8 +298,8 @@ exports.login = async (req, res) => {
     let authToken = userCredentials.generateAuthToken();
     myUser.markModified('userCredentials.accessTokens');
 
-    res.cookie("user_id", myUser._id)
-    res.cookie("auth_token", authToken.token, { expire: authToken.expire })
+    res.cookie("user_id", myUser._id, { sameSite: 'None', secure: true })
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire, sameSite: 'None', secure: true })
 
     myUser.save(myUser)
         .then(data => {
@@ -391,8 +391,8 @@ exports.resetPassword = async (req, res) => {
     let authToken = userCredentials.generateAuthToken();
     myUser.markModified('userCredentials.accessTokens');
 
-    res.cookie("user_id", myUser._id)
-    res.cookie("auth_token", authToken.token, { expire: authToken.expire })
+    res.cookie("user_id", myUser._id, { sameSite: 'None', secure: true })
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire, sameSite: 'None', secure: true })
 
     myUser.save(myUser)
         .then(data => {
