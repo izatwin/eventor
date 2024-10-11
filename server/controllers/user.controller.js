@@ -294,6 +294,7 @@ exports.login = async (req, res) => {
             topic: "password",
             message: "Invalid password!"
         });
+        return;
     }
 
     let authToken = userCredentials.generateAuthToken();
