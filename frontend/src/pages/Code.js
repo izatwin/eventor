@@ -37,6 +37,7 @@ const Code = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault(); 
+    console.log("a: " + formData.verifyId);
     console.log(formData);
     axios.patch("http://localhost:3001/api/user/verify", formData)
     .then(response => {
@@ -48,8 +49,16 @@ const Code = () => {
           navigate('/password'); 
         }
       }
+      if (response.verifyId === null) {
+        setFormData({
+        email : email,
+        verifyId : verifyId,
+        verifyCode : "",
+      });
+      }
     })
     .catch (err =>  {
+
       console.log(err)
     })
 

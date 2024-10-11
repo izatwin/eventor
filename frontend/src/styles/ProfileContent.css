@@ -23,7 +23,6 @@
 
 .profile-content {
   position: fixed;
-  margin-top: 80px; 
   width: 50vw;
   display: flex;
   flex-direction: column;
@@ -31,13 +30,19 @@
 
 .upper-profile-card {
   display: flex;
+  flex-direction: column;
   width: 50vw;
+}
+
+.profile-upper-container {
+  display: flex;
 }
 
 .profile-information {
   font-size: 25px;
   margin-top: 15px;
   margin-left: 15px;
+  text-align: left;
 }
 
 .p-name {
@@ -45,20 +50,39 @@
 }
 
 .profile-picture {
-  width: 100px;
-  height: 100px;
-  margin-left: 2%;
+  width: 70px;
+  height: 70px;
+  margin-left: 3%;
   margin-top: 8px;
 }
 
+.status-container {
+  display: flex;
+}
+
 .profile-status {
-  margin-top: 80px;
-  margin-left: -150px;
-  font-size: 20px;
+  margin-top: 2%;
+  margin-left: 3%;
+  font-size: 18px;
   font-style: italic;
   font-weight: bold;
-  width: 350px;
+  width: 100%;
   text-align: left;
+    border: none; 
+  background: transparent; 
+    resize: none; 
+  outline: none; 
+}
+
+.profile-bio {
+  margin-top: 2%;
+  font-size: 18px;
+  font-style: italic;
+  width: 100%;
+  border: none; 
+  background: transparent; 
+  resize: none; 
+  outline: none; 
 }
 
 .edit-icon {
@@ -70,7 +94,9 @@
 
 .profile-side {
   display: column;
-  text-align: left;
+  text-align: right;
+  margin-left: auto;
+  margin-right: 2%;
 }
 
 .follower-count {
@@ -82,10 +108,12 @@
 }
 .edit-card {
   display: flex;
+  margin-left: auto;
+  margin-right: 2%;
 }
 
 .profile-lower-card {
-  margin-top: 20px;
+  margin-top: 2%;
   border-bottom: 1px solid black; 
   display: flex;
   flex-direction: column;
@@ -125,14 +153,23 @@
 }
 
 .about-text-container {
-  background-color: red; 
+  
 }
 .about-text {
 
     
 }
 
+.modify-post {
+}
 
+.remove-icon {
+  cursor: pointer;
+}
+
+.edit-post-icon {
+  cursor: pointer;
+}
 
 .post-card {
   width: 100%; 
@@ -193,6 +230,16 @@
   margin-left: auto;
 }
 
+.profile-feed {
+  height: calc(100vh - 66px);
+  z-index: 100;
+  overflow: hidden;
+  overflow-y: auto;
+
+  scrollbar-width: none;
+}
+
+
 .popup {
     position: fixed;
     bottom: 20px;
@@ -220,4 +267,6 @@
     background-color: #dd222c; 
 }
 
+.post-content {
+}
 

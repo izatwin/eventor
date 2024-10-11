@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setAuthenticated] = useState(false);
   const [action, setAction] = useState('');
   const [email, setEmail] = useState('');
   const [verifyId, setVerifyId] = useState('');
@@ -12,6 +12,9 @@ export const AuthProvider = ({ children }) => {
     displayName: "",
     userName: "",
     userId : "",
+    status: "",
+    bio: "",
+    password: "",
   });
   /*
   // Mock authentication function (replace with real API call)
@@ -27,7 +30,7 @@ export const AuthProvider = ({ children }) => {
 */
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, action, setAction, email, setEmail, verifyId, setVerifyId, user, setUser}}>
+    <AuthContext.Provider value={{ isAuthenticated, setAuthenticated, action, setAction, email, setEmail, verifyId, setVerifyId, user, setUser}}>
       {children}
     </AuthContext.Provider>
   );

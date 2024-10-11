@@ -26,17 +26,23 @@ const Feed = () => {
       console.log(response);
       if (response.status === 200) {
         console.log("here"); 
-        console.log(response.data[0]);
+        console.log(response.data['user-info']);
         setUser({    
           email: response.data["user-info"].email,
           displayName: response.data["user-info"].displayName,
           userName: response.data["user-info"].userName,
-          userId : response.data["user-info"].userId}); 
+          userId : response.data["user-info"].userId}) 
       }
       else {
         navigate("/");
       }
     })
+    .catch (err =>  {
+
+      navigate("/");
+      console.log(err)
+    })  
+
     axios.get("http://localhost:3001/api/posts")
     .then(response => {
       console.log(response.data)
@@ -45,14 +51,6 @@ const Feed = () => {
     .catch (err => {
       console.log(err)
     })
-
-    .catch (err =>  {
-      console.log("err");
-      console.log(err)
-    })  
-
-
-
   }, [])
 
   return (

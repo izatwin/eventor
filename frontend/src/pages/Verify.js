@@ -20,46 +20,48 @@ const Verify = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- const handleSubmit = (e) => {
-    e.preventDefault(); 
-    console.log(formData);
-    axios.get("http://localhost:3001/api/user/exists", formData)
-    .then(response => {
-      if (action === 'signup') {
-        console.log(response.data.exists);
-        if (response.data.exists) {
-          return;
-        }
-      }
-      else if (action === 'resetPassword') {
-        if (!response.data.exists) {
-          return;
-        }
-      }
-      console.log(response.data.verifyId);
-      setVerifyId(response.data.verifyId);
-      console.log(verifyId);
-      setEmail(formData.email);
-      navigate("/code");
-    })
-    .catch (err =>  {
-      console.log("err");
-      console.log(err)
-    })
+const handleSubmit = async (e) => {
+  e.preventDefault(); 
+  console.log(formData);
+  let terminate = false;
 
-    axios.post("http://localhost:3001/api/user/verify", formData)
-    .then(response => {
-      console.log(response.data.verifyId);
-      setVerifyId(response.data.verifyId);
-      console.log(verifyId);
-      setEmail(formData.email);
-      navigate("/code");
-    })
-    .catch (err =>  {
-      console.log("err");
-      console.log(err)
-    })
-  };
+  try {
+    const response = await axios.get(`http://localhost:3001/api/user/${formData.email}/exists`);
+
+    if (action === 'signup') {
+      console.log(response.data.exists);
+      if (response.data.exists) {
+        terminate = true;
+        console.log("a:", terminate);
+      }
+    } else if (action === 'resetPassword') {
+      if (!response.data.exists) {
+        terminate = true;
+      }
+    }
+
+    if (terminate) {
+      setFormData({email : ""});
+      console.log('returning');
+      return;
+    }
+
+
+    setEmail(formData.email);
+
+    const verifyResponse = await axios.post("http://localhost:3001/api/user/verify", formData);
+    console.log(verifyResponse.data.verifyId);
+    console.log(verifyResponse.data.verifyId);
+    setVerifyId(verifyResponse.data.verifyId);
+    navigate("/code");
+    
+  } catch (err) {
+    console.log(formData);
+    console.log("Error:", err);
+  }
+
+  console.log("Completed the handleSubmit without terminating early");
+};
 
 
 
