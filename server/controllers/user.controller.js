@@ -555,7 +555,6 @@ exports.delete = async (req, res) => {
 
     try {
         const curUser = await User.findById(id).exec()
-        console.log(curUser)
 
         for (let curPostId of curUser.posts) {
             await Post.findByIdAndDelete(curPostId).exec()

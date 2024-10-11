@@ -107,6 +107,7 @@ UserSchema.methods.getInfoForClient = function () {
     infoForClient.biography = this.biography;
     infoForClient.status = this.status;
     infoForClient.imageURL = this.imageURL;
+    infoForClient.posts = this.posts;
 
     return infoForClient;
 }

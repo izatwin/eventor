@@ -82,7 +82,7 @@ exports.update = (req, res) => {
         });
     }
 
-    const id = req.param.id;
+    const id = req.params.id;
 
     Post.findByIdAndUpdate(id, req.body, { runValidators: true })
         .then(data => {
@@ -101,25 +101,36 @@ exports.update = (req, res) => {
 };
 
 // Delete a post by the id
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
 
-    Post.findOneAndDelete(id)
-        .then(data => {
-            if (!data) {
-                return res.status(404).send({
-                    message: `Cannot find post with id=${id}`
-                });
-            } else {
-                return res.send({
-                    message: "Post deleted successfully."
-                });
-            }
+    try {
+        const curPost = await Post.findById(id).exec()
+        if (!curPost) {
+            return res.status(404).send({
+                message: `Cannot find post with id=${id}`
+            });
+        }
+
+        const curUser = await User.findById(curPost.user).exec()
+
+        const postIndex = curUser.posts.indexOf(curPost._id)
+        if (postIndex > -1) {
+            curUser.posts = curUser.posts.splice(postIndex, 1)
+            curUser.save()
+        } else {
+            return res.status(500).send({ message: `UserId=${curPost.user} in Post cannot be found`})
+        }
+
+        await Post.findByIdAndDelete(id)
+        return res.send({
+            message: "Post deleted successfully."
+        });
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error deleting post with id=${id}`,
+            error: err.message || `Unexpected Error`
         })
-        .catch(err => {
-            return res.status(500).send({
-                message: `Error deleting post with id=${id}`,
-                error: err.message || `Unexpected Error`
-            })
-        })
+    }
 };
