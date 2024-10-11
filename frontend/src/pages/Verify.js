@@ -10,7 +10,7 @@ import { useAuth } from '../AuthContext';
 
 const Verify = () => {
   const navigate = useNavigate();
-  const { verifyId, setVerifyId, email, setEmail } = useAuth();
+  const { action, verifyId, setVerifyId, email, setEmail } = useAuth();
   
   const [formData, setFormData] = useState({
     email : "",
@@ -23,6 +23,30 @@ const Verify = () => {
  const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData);
+    axios.get("http://localhost:3001/api/user/exists", formData)
+    .then(response => {
+      if (action === 'signup') {
+        console.log(response.data.exists);
+        if (response.data.exists) {
+          return;
+        }
+      }
+      else if (action === 'resetPassword') {
+        if (!response.data.exists) {
+          return;
+        }
+      }
+      console.log(response.data.verifyId);
+      setVerifyId(response.data.verifyId);
+      console.log(verifyId);
+      setEmail(formData.email);
+      navigate("/code");
+    })
+    .catch (err =>  {
+      console.log("err");
+      console.log(err)
+    })
+
     axios.post("http://localhost:3001/api/user/verify", formData)
     .then(response => {
       console.log(response.data.verifyId);

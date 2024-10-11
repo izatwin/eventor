@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
     email: "",
     displayName: "",
     userName: "",
+    userId : "",
   });
   /*
   // Mock authentication function (replace with real API call)
