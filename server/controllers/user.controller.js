@@ -190,7 +190,6 @@ exports.signup = async (req, res) => {
         });
         return;
     }
-    emailVerifications[email] = null;
 
     // Make sure user doesn't already exist in the database with same email or username
     const existingUser = await User.findOne({ "email": email }).exec();
@@ -209,6 +208,8 @@ exports.signup = async (req, res) => {
         });
         return;
     }
+
+    emailVerifications[email] = null;
 
     // create user
     const newUser = new User({
