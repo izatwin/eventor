@@ -22,9 +22,14 @@ const eventRouter = require('./routes/events')
 
 const app = express();
 
+const corsOptions = {
+  origin: 'http://localhost:3000', // Your frontend origin
+  credentials: true, // Allow credentials to be sent
+};
+
 // parse requests of content-type - application/json
 app.use(express.json());
-app.use(cors({credentials: true}));
+app.use(cors(corsOptions));
 
 app.use(logger('dev'));
 app.use(cookieParser());
