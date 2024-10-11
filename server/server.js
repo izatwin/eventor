@@ -24,8 +24,7 @@ const app = express();
 
 // parse requests of content-type - application/json
 app.use(express.json());
-app.use(cors());
-
+app.use(cors({credentials: true}));
 
 app.use(logger('dev'));
 app.use(cookieParser());
