@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/Login.css';
 import '../styles/eventor.css';
@@ -21,6 +21,38 @@ const Login = () => {
     password: ""
   });
 
+
+  useEffect(() => {
+    const test = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/api/user/validate") 
+          console.log(response);
+          if (response.status === 200) {
+            console.log(response.data['user-info']);
+            setUser({    
+              email: response.data["user-info"].email,
+              displayName: response.data["user-info"].displayName,
+              userName: response.data["user-info"].userName,
+              userId : response.data["user-info"].userId}) 
+            setAuthenticated(true);
+            console.log("navigating");
+            navigate("/home");
+            return;
+          }
+          else {
+            navigate("/");
+          }
+      } catch (err) {
+        console.log("err");
+        console.log(err)
+      }
+    }
+
+    test();
+
+  }, [])
+
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     console.log(formData);
@@ -39,6 +71,7 @@ const Login = () => {
           displayName: response.data.displayName,
           userName: response.data.userName,
         });
+        console.log("SETTING TRUE");
         setAuthenticated(true);
         navigate("/home");
       }

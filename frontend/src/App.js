@@ -12,7 +12,7 @@ import { AuthProvider } from './AuthContext';
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 
-const isAuthenticated = true;
+const isAuthenticated = false;
 
 function App() {
   return (
@@ -22,16 +22,16 @@ function App() {
           <Routes>
       {/*<Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/login" />} /> */}
             
-            <Route path="/" element={<Navigate to="/login" />} /> 
-            <Route path="/login" element={<Login />} />
+   
+
+            <Route path="/home" element={<Home />} />
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} /> 
             <Route path="/signup" element={<Signup />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/code" element={<Code />} />
 
-            <Route
-              path="/home"
-              element={isAuthenticated ? <Home /> : <Navigate to="/login" />}
-            />
+      
             
             <Route path="/password" element={<Password />} />
             <Route path="/settings" element={<Settings />} />

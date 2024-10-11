@@ -160,6 +160,17 @@
     
 }
 
+.modify-post {
+}
+
+.remove-icon {
+  cursor: pointer;
+}
+
+.edit-post-icon {
+  cursor: pointer;
+}
+
 .post-card {
   width: 100%; 
   padding: 10px;
@@ -256,4 +267,6 @@
     background-color: #dd222c; 
 }
 
+.post-content {
+}
 

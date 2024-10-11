@@ -38,6 +38,11 @@
   align-items: center;
 }
 
+.profile-displayname {
+  justify-content: center;
+  font-weight: bold;
+}
+
 .settings-options {
   display: flex;
   flex-direction: column;
@@ -99,9 +104,15 @@
   cursor: pointer;
 }
 
+.back-btn {
+  background-color: black;
+}
+
 .settings-instruct {
   font-size: 28px; 
   margin-bottom: 20px;
+  display: flex;
+flex-direction: column;
 }
 
 .picPreview {

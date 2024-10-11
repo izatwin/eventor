@@ -4,50 +4,114 @@ import editIcon from './icons/edit.png'
 import imageIcon from './icons/image.png'
 import calendarIcon from './icons/calendar.png'
 import checkIcon from './icons/check.png'
+import removeIcon from './icons/remove.png'
 
 import axios from 'axios'
-import React, { useState } from "react";
+import { useState, useEffect } from 'react';
 
+import { useNavigate } from "react-router-dom";
 import { useAuth } from '../AuthContext'; 
 
-const ProfileContent= () => {
+import viewIcon from './icons/view.png'
+import likeIcon from './icons/like.png'
+import shareIcon from './icons/share.png'
 
+const ProfileContent= () => {
+  const navigate = useNavigate();
   const { user, setUser } = useAuth();  
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
+  const [posts, setPosts] = useState([]);
 
   const [post, setPost] = useState({
     content : "", 
-    event : "false",
+    is_event : "false",
     commentsEnabled: "false",
+    userId: user.userId,
   })
 
-  const [bio, setBio] = useState({
-    bio: ""
-  })
+  const [bio, setBio] = useState(user.bio)
   
   const [status, setStatus] = useState({
-    status: ""
+    status: user.status,
   })
   
+  useEffect(() => {
+    axios.get("http://localhost:3001/api/user/validate") 
+    .then(response => {
+      console.log(response);
+      if (response.status === 200) {
+        console.log("here"); 
+        console.log(response.data['user-info']);
+        setUser({    
+          email: response.data["user-info"].email,
+          displayName: response.data["user-info"].displayName,
+          userName: response.data["user-info"].userName,
+          userId : response.data["user-info"].userId}) 
+      }
+      else {
+        navigate("/");
+      }
+    })
+    .catch (err =>  {
+      navigate("/");
+      console.log(err)
+    })  
+    
+    console.log("yuhh" + user.userId);
+    axios.get(`http://localhost:3001/api/user/${user.userId}/posts/`)
+    .then(response => {
+      console.log(response.data)
+      setPosts(response.data)
+    })
+    .catch (err => {
+      console.log(err)
+    })
+  }, [])
+
   const handleChange = (e) => {
     setPost({ ...post, [e.target.name]: e.target.value });
     console.log(post);
   };
   
   
+  const changeBio = (e) => {
+    setBio(e.target.value);
+  }
+
   const handleBioEdit = () => {
     console.log("Handle change triggered");
     setEditingBio(true); 
   };
 
-
   const handleBioChange = (e) => {
-    setUser((prevUser) => ({
-      ...prevUser, 
-      bio: e.target.value,  
-    }));
-    console.log("false");
+    const bioChange = async () => {
+    try {
+      const params = {
+        biography: bio,
+      }
+      console.log(params); 
+      const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/biography`, params);  
+      console.log(response);
+      if (response.status === 200) {    
+        console.log("updatinggg")
+        
+        setUser(prevUser  => ({
+          ...prevUser, 
+          bio: bio,  
+        }));
+
+
+        console.log(user);
+      }
+      else {
+      }
+    } catch (err) {
+      console.log("Error:", err);
+    }
+  };
+
+    bioChange();
     setEditingBio(false); 
   };
   
@@ -55,13 +119,31 @@ const ProfileContent= () => {
     console.log("Handle change triggered");
     setEditingStatus(true); 
   };
-
+  
+  const changeStatus = (e) => {
+    setStatus(e.target.value);
+  }
   const handleStatusChange = (e) => {
-    setUser((prevUser) => ({
-      ...prevUser, 
-      status: e.target.value,  
-    }));
-    
+    console.log(status); 
+ 
+    const statusChange = async () => {
+    try {
+      const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/status`, status);  
+      console.log(response);
+      if (response.status === 200) {    
+        setUser((prevUser) => ({
+          ...prevUser, 
+        status: status,  
+        }));
+      }
+      else {
+      }
+    } catch (err) {
+      console.log("Error:", err);
+    }
+  };
+
+    statusChange();
     setEditingStatus(false); 
 
   };
@@ -126,14 +208,14 @@ const ProfileContent= () => {
 
             <div className="profile-side"> 
 
-              <p className="follower-count"> ### followers </p>
+              <p className="follower-count"> 0 followers </p>
       
             </div>
          </div> 
           
           <div className="status-container">
           
-            <textarea name="status" readOnly={!editingStatus} className="profile-status" type="text" onChange={handleStatusEdit} value={user.status ? user.status : "Update your status!"}/>
+            <textarea name="status" readOnly={!editingStatus} className="profile-status" type="text" onChange={changeStatus} value={user.status} />
             <div className="edit-card"> 
               <img src={editingStatus ? checkIcon : editIcon } onClick={editingStatus ? handleStatusChange : handleStatusEdit } alt="Edit" className="edit-icon"/> 
               <p className="edit-text"> Edit Status </p>
@@ -156,7 +238,7 @@ const ProfileContent= () => {
           
           <div className="about-text-container">
 
-            <textarea name="bio" readOnly={!editingBio} className="profile-bio" type="text" onChange={handleBioEdit} value={user.bio ? user.bio : "Update you bio here!"}/>
+            <textarea name="bio" readOnly={!editingBio} className="profile-bio" type="text" onChange={changeBio} value={bio}/>
           </div>
 
         </div>
@@ -185,7 +267,42 @@ const ProfileContent= () => {
         
 
         <div className="profile-feed">
-          
+          {posts.map(post=>(
+
+            <div className="post" key={post.id}>
+
+              <div className="post-header"> 
+
+                <img src={profilePic} alt="PostProfile" className="post-profilepic" />
+                
+                <div className="post-profile-info">
+                  <div className="post-name">{user.displayName}</div>
+                  <div className="post-username">@{user.userName}</div>
+                </div>      
+
+              </div>
+
+              <div className="post-content"> 
+                {post.content}
+              </div>
+
+              <div className="post-buttons">
+
+                <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
+                <div className="views-num num">{post.views}</div>
+                <img src={likeIcon} alt="Like" className="like-icon post-icon"/> 
+                <div className="likes-num num"> {post.likes} </div>
+                <img src={shareIcon} alt="Share" className="share-icon post-icon"/> 
+                <div className="shares-num num"> {post.shares} </div>
+                <div className="modify-post">
+                  <img src={removeIcon} alt="Remove" className="remove-icon post-icon" />
+                  <img src={editIcon} alt="Edit" className="edit-post-icon post-icon" />
+                </div>
+
+              </div>
+            </div>
+
+          ))}
         </div>
         
         
