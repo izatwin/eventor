@@ -4,10 +4,21 @@ const router = require('express').Router();
 const userController = require('../controllers/user.controller')
 
 // USER /api/user - create a new user
-router.post('/', userController.signup);
+router.post('/signup', userController.signup);
 
-// login and get user info
-router.get('/login', userController.login);
+router.post('/login', userController.login);
+
+router.get('/validate', userController.isLoggedIn);
+
+router.get('/exists', userController.isValidAccountEmail);
+
+router.post('/verify', userController.beginVerification);
+
+router.patch('/verify', userController.verifyEmail);
+
+router.post('/reset', userController.resetPassword);
+
+router.patch('/logout', userController.logout);
 
 // router.get('/posts', userController.findAllPosts);
 

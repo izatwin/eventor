@@ -1,17 +1,19 @@
 .feed-container {
-  position: fixed;
   width: 50vw; 
   height: 100vh; 
   border-right: 1px solid black; 
   border-left: 1px solid black; 
   z-index: 100;
+  position: fixed;
+  background-color: white;
 }
 
 
 .feed-title {
-  z-index: 2000;
-  position: flex;
-  padding: 15px;
+  z-index: 1000;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  width: 100%;
   font-size: 30px;
   font-weight: bold;
   text-align: center;
@@ -19,12 +21,79 @@
 }
 
 .feed-content {
-  margin-top: 60px; 
+  height: calc(100vh - 66px);
+  z-index: 100;
+  overflow: hidden;
+  overflow-y: auto;
+
+  scrollbar-width: none;
+}
+
+.post-content {
+  width: 100%;
+  height: 50px;
+  margin-top: 15px; 
+}
+
+.post {
+  border-bottom: 1px solid black;
+}
+
+.post-header {
+  display: flex;
+  margin-top: 2%;
+}
+
+.post-profilepic {
+  width: 30px;
+  height: 30px;
+  text-align: left;
+  margin-left: 2%;
+}
+
+.post-profile-info {
+  margin-left: 1%; 
+  text-align: left;
+}
+
+.post-name {
+  font-weight: bold;
+}
+
+.post-buttons {
+  display: flex;
+  margin-left: 7%;
+}
+
+.post-content {
+  display: flex;
+  text-align: left;
+  margin-left: 7%;
+  margin-bottom: 2%;
+  width: 80%;
+  height: 100%;
+}
+
+.post-icon {
+  width: 30px; 
+  height: 30px;
+}
+
+.num {
+  padding-right: 5%;
+  padding-left: 1%;
+  display: flex;
+  align-items: center;
+}
+
+.view-icon {
 
 }
 
+.like-icon {
+  cursor: pointer;
+}
 
-
-
-
-
+.share-icon {
+  cursor: pointer;
+}
