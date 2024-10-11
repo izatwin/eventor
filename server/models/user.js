@@ -94,11 +94,7 @@ UserCredentialsSchema.methods.generateAuthToken = function () {
     let expireTime = nowTime + lifetime;
 
     let accessTokens = this.accessTokens;
-    console.log("Access Tokens: ");
-    console.log(accessTokens);
     accessTokens[token] = expireTime;
-    console.log("Token: " + token);
-    console.log("Match: " + accessTokens[token]);
 
     return {
         'token' : token,
@@ -107,11 +103,7 @@ UserCredentialsSchema.methods.generateAuthToken = function () {
 },
 
 UserCredentialsSchema.methods.matchAuthToken = function (token) {
-    console.log("Looking for token: " + token);
-
     let accessTokens = this.accessTokens;
-    console.log("Access Tokens: ");
-    console.log(accessTokens);
 
     let expireTime = accessTokens[token];
     if (expireTime == null) {
@@ -121,9 +113,12 @@ UserCredentialsSchema.methods.matchAuthToken = function (token) {
 
     let nowTime = Date.now();
 
-    console.log(nowTime <= expireTime);
-
     return (nowTime <= expireTime);
+}
+
+UserCredentialsSchema.methods.removeAuthToken = function (token) {
+    let accessTokens = this.accessTokens;
+    accessTokens[token] = null;
 }
 
 const UserSchema = new Schema({
@@ -149,20 +144,25 @@ const UserSchema = new Schema({
     */
 
     _id: { type: String, required: true, default: crypto.randomUUID },
-    // userName: { type: string, required: true, default: "UNDEF" },
+    userName: { type: String, required: true, default: "UNDEF" },
     email : { type: String, required: true, default: "UNDEF" },
-    // displayName : { type: string, required: true, default: "UNDEF" },
+    displayName : { type: String, required: true, default: "UNDEF" },
 
     userCredentials : UserCredentialsSchema,
     
     // user : {type: User, required: true}
 });
 
-UserSchema.method("toJSON", function() {
-    const { __v, _id, ...object } = this.toObject();
-    object.userId = _id;
-    return object;
-});
+UserSchema.methods.getInfoForClient = function () {
+    let infoForClient = {};
+
+    infoForClient.email = this.email;
+    infoForClient.userId = this._id;
+    infoForClient.userName = this.userName;
+    infoForClient.displayName = this.displayName;
+
+    return infoForClient;
+}
 
 // Virtual for user's URL
 UserSchema.virtual("url").get(function () {
