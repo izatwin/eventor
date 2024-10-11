@@ -223,7 +223,7 @@ exports.signup = async (req, res) => {
 
     let authToken = userCredentials.generateAuthToken();
 
-    res.cookie("user_id", myUser._id, { sameSite: 'None', secure: true })
+    res.cookie("user_id", newUser._id, { sameSite: 'None', secure: true })
     res.cookie("auth_token", authToken.token, { expire: authToken.expire, sameSite: 'None', secure: true })
 
     sendmail.doConfirmationMesssage(email, userName);
