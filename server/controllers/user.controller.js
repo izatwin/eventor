@@ -1,6 +1,8 @@
 const User = require("../models/user")
 const crypto = require("crypto");
 
+const sendmail = require("../modules/sendmail.js");
+
 var emailVerifications = {};
 class verificationStatus {
     constructor(verifyCode) {
@@ -27,14 +29,14 @@ exports.isLoggedIn = async (req, res) => {
                 if (auth_token) {
                     let userCredentials = myUser.userCredentials;
                     if (userCredentials.matchAuthToken(auth_token)) {
-                        req.send({ "logged-in": true, "user-info": myUser.getInfoForClient() });
+                        res.send({ "logged-in": true, "user-info": myUser.getInfoForClient() });
                         return;
                     }
                 }
             }
         }
     }
-    req.send({ "logged-in": false });
+    res.send({ "logged-in": false });
 }
 
 exports.isValidAccountEmail = async (req, res) => {
@@ -73,10 +75,9 @@ exports.beginVerification = (req, res) => {
 
     // TODO sanity check email
 
-    // let verifyCode = sendVerifyEmail(email); // TODO implement
-    let verifyCode = "000000";
+    let verificationCode = sendmail.doVerificationRequest(email);
 
-    let myVerificationStatus = new verificationStatus(verifyCode);
+    let myVerificationStatus = new verificationStatus(verificationCode);
     emailVerifications[email] = myVerificationStatus;
 
     let verifyId = myVerificationStatus.verifyId;
@@ -416,7 +417,7 @@ exports.logout = async (req, res) => {
                         res.clearCookie("user_id");
                         res.clearCookie("auth_token");
 
-                        myUser.removeAuthToken(auth_token);
+                        userCredentials.removeAuthToken(auth_token);
                         myUser.markModified('userCredentials.accessTokens');
 
                         res.status(200).send({
