@@ -9,12 +9,10 @@ import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import { AuthProvider } from './AuthContext'; 
 
-
-
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 
-const isAuthenticated = false;
+const isAuthenticated = true;
 
 function App() {
   return (

@@ -3,11 +3,18 @@ import profilePic from './icons/profile.png';
 import editIcon from './icons/edit.png'
 import imageIcon from './icons/image.png'
 import calendarIcon from './icons/calendar.png'
+import checkIcon from './icons/check.png'
+
 import axios from 'axios'
 import React, { useState } from "react";
 
+import { useAuth } from '../AuthContext'; 
+
 const ProfileContent= () => {
 
+  const { user, setUser } = useAuth();  
+  const [editingStatus, setEditingStatus] = useState(false);
+  const [editingBio, setEditingBio] = useState(false);
 
   const [post, setPost] = useState({
     content : "", 
@@ -16,7 +23,7 @@ const ProfileContent= () => {
   })
 
   const [bio, setBio] = useState({
-    bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce tincidunt molestie ultricies. Aliquam erat volutpat. Proin dictum nibh at lectus faucibus vehicula",
+    bio: ""
   })
   
   const [status, setStatus] = useState({
@@ -28,9 +35,35 @@ const ProfileContent= () => {
     console.log(post);
   };
   
+  
+  const handleBioEdit = () => {
+    console.log("Handle change triggered");
+    setEditingBio(true); 
+  };
+
+
   const handleBioChange = (e) => {
-    setBio({ ...post, [e.target.name]: e.target.value });
-    console.log(post);
+    setUser((prevUser) => ({
+      ...prevUser, 
+      bio: e.target.value,  
+    }));
+    console.log("false");
+    setEditingBio(false); 
+  };
+  
+  const handleStatusEdit = () => {
+    console.log("Handle change triggered");
+    setEditingStatus(true); 
+  };
+
+  const handleStatusChange = (e) => {
+    setUser((prevUser) => ({
+      ...prevUser, 
+      status: e.target.value,  
+    }));
+    
+    setEditingStatus(false); 
+
   };
   
 
@@ -82,24 +115,32 @@ const ProfileContent= () => {
       <div className="profile-title">Profile</div>
       <div className="profile-content">
         <div className="upper-profile-card">
+          
+          <div className="profile-upper-container">
+            <img src={profilePic} alt="Profile" className="profile-picture" />
 
-          <img src={profilePic} alt="Profile" className="profile-picture" />
+            <div className="profile-information">
+              <div className="p-name">{user.displayName}</div>
+              <div className="p-username">@{user.userName}</div>
+            </div>
 
-          <div className="profile-information">
-            <div className="p-name">Suga Sean</div>
-            <div className="p-username">@sugasean2</div>
-          </div>
 
-          <div className="profile-status">"Everyday is a new beginning..."</div>
-          <div className="profile-side"> 
+            <div className="profile-side"> 
 
-            <p className="follower-count"> ### followers </p>
+              <p className="follower-count"> ### followers </p>
+      
+            </div>
+         </div> 
+          
+          <div className="status-container">
+          
+            <textarea name="status" readOnly={!editingStatus} className="profile-status" type="text" onChange={handleStatusEdit} value={user.status}/>
             <div className="edit-card"> 
-              <img src={editIcon} alt="Edit" className="edit-icon"/> 
+              <img src={editingStatus ? checkIcon : editIcon } onClick={editingStatus ? handleStatusChange : handleStatusEdit } alt="Edit" className="edit-icon"/> 
               <p className="edit-text"> Edit Status </p>
             </div>
-          </div>
 
+          </div>
 
         </div>
 
@@ -109,13 +150,14 @@ const ProfileContent= () => {
           <div className="about-title-container">
             <h className="about-title"> About </h>
             <div className="edit-bio-card"> 
-              <img src={editIcon} alt="Edit" className="edit-bio-icon"/> 
+              <img src={editingBio ? checkIcon : editIcon} onClick={editingBio ? handleBioChange : handleBioEdit} alt="Edit" className="edit-bio-icon"/> 
               <p className="edit-bio-text"> Edit Bio </p>
             </div>
           </div>
           
           <div className="about-text-container">
-            <textarea name="about" className="about-text" type="text" onChange={handleBioChange} value={bio.bio}/>
+
+            <textarea name="bio" readOnly={!editingBio} className="profile-bio" type="text" onChange={handleBioEdit} value={user.bio}/>
           </div>
 
         </div>
@@ -141,6 +183,12 @@ const ProfileContent= () => {
           </div>
             
         </div>
+        
+
+        <div className="profile-feed">
+          
+        </div>
+        
         
         <div className="postPopups">
           <div class="popup" id="success">Post created successfully!</div>

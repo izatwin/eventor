@@ -7,7 +7,7 @@ import { useAuth } from '../AuthContext';
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const { email, verifyId, setUser } = useAuth();
+  const { email, verifyId, setUser, setAuthenticated } = useAuth();
 
   const [formData, setFormData] = useState({
     email: email,
@@ -34,6 +34,7 @@ const SignUp = () => {
           displayName: response.data.displayName,
           userName: response.data.userName,
         });
+        setAuthenticated(true);
         navigate("/home");
       }
     })

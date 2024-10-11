@@ -2,11 +2,15 @@ import "../styles/SettingsContent.css";
 import profilePic from './icons/profile.png'; 
 import {useState} from 'react';
 
+import { useAuth } from '../AuthContext'; 
+
 const SettingsContent = () => {
 
   const [content, setContent] = useState("default");
   const [selectedImage, setSelectedImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(profilePic); 
+
+  const { setUser } = useAuth();  
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];

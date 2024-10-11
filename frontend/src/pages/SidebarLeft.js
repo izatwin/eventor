@@ -13,7 +13,7 @@ const SidebarLeft = () => {
   const [isProfilePopupVisible, setProfilePopupVisible] = useState(false);
   const popupRef = useRef(null);
   const navigate = useNavigate();
-  const { user } = useAuth();  
+  const { user, setAuthenticated } = useAuth();  
 
   const handleProfileClick = () => {
     setProfilePopupVisible(!isProfilePopupVisible);
@@ -37,7 +37,8 @@ const SidebarLeft = () => {
     axios.patch("http://localhost:3001/api/user/logout")
     .then(response => {
       console.log(response);
-      if (response.status === 200) {
+      if (response.status === 200) { 
+        setAuthenticated(true);
         navigate("/");
       }
     })
@@ -82,7 +83,6 @@ const SidebarLeft = () => {
         <div className="profile-popup" ref={popupRef}>
           <button onClick={()=>{
             navigate("/settings")
-            window.location.reload();
           }} className="popup-item">Settings</button>
           <button onClick={handleSignout} className="popup-item">Sign out</button>
         </div>

@@ -13,7 +13,7 @@ axios.defaults.withCredentials = true;
 const Login = () => {
   
   const navigate = useNavigate();
-  const { setAction, setUser } = useAuth();  
+  const { setAction, setUser, setAuthenticated } = useAuth();  
   
 
   const [formData, setFormData] = useState({
@@ -39,6 +39,7 @@ const Login = () => {
           displayName: response.data.displayName,
           userName: response.data.userName,
         });
+        setAuthenticated(true);
         navigate("/home");
       }
     })
