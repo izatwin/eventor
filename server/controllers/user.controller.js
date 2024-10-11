@@ -45,6 +45,7 @@ exports.isValidAccountEmail = async (req, res) => {
         res.status(400).send({
             message: "Email body field required."
         });
+        return;
     }
     // TODO sanity checks (type, format)
 
@@ -266,6 +267,7 @@ exports.login = async (req, res) => {
         res.status(400).send({
             message: "User cannot be empty."
         });
+        return;
     }
 
     let email = req.body.email;
@@ -274,6 +276,7 @@ exports.login = async (req, res) => {
         res.status(400).send({
             message: "Missing param(s) for User creation."
         });
+        return;
     }
     // TODO sanity checks (type, format)
 
@@ -339,6 +342,7 @@ exports.resetPassword = async (req, res) => {
         res.status(400).send({
             message: "User cannot be empty."
         });
+        return;
     }
 
     let email = req.body.email;
@@ -348,6 +352,7 @@ exports.resetPassword = async (req, res) => {
         res.status(400).send({
             message: "Missing param(s) for password reset."
         });
+        return;
     }
     // TODO sanity checks (type, format)
 
