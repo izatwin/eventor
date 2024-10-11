@@ -420,6 +420,76 @@ exports.resetPassword = async (req, res) => {
         });
 };
 
+exports.resetPasswordLoggedIn = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        res.status(401).send({
+            message: "Not logged in!"
+        });
+        return;
+    }
+
+    if (!req.body) {
+        res.status(400).send({
+            message: "User cannot be empty."
+        });
+        return;
+    }
+
+    let oldPassword = req.body.oldPassword;
+    let newPassword = req.body.newPassword;
+    if (!(oldPassword && newPassword)) {
+        res.status(400).send({
+            message: "Missing param(s) for password reset."
+        });
+        return;
+    }
+    // TODO sanity checks (type, format)
+
+    const userCredentials = myUser.userCredentials;
+    if (!userCredentials.matchPassword(oldPassword)) {
+        res.status(401).send({
+            message: "Invalid old password!"
+        });
+        return;
+    }
+
+    userCredentials.initCredentials(newPassword);
+
+    let authToken = userCredentials.generateAuthToken();
+    myUser.markModified('userCredentials.accessTokens');
+
+    res.cookie("user_id", myUser._id, { sameSite: 'None', secure: true })
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire, sameSite: 'None', secure: true })
+
+    myUser.save(myUser)
+        .then(data => {
+            res.status(200).send(data.getInfoForClient());
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: err.message || "server error."
+            });
+        });
+};
+
 exports.logout = async (req, res) => {
     let req_cookies = req.cookies;
     if (req_cookies) {
@@ -451,6 +521,121 @@ exports.logout = async (req, res) => {
     res.status(400).send({
         message: "Not logged in!"
     });
+}
+
+exports.updateUsername = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        res.status(401).send({
+            message: "Not logged in!"
+        });
+        return;
+    }
+
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Body for updating username must not be empty."
+        });
+    }
+
+    let newUsername = req.body.newUsername;
+    if (!(newUsername)) {
+        res.status(400).send({
+            message: "Missing newUsername param for password reset."
+        });
+        return;
+    }
+
+    const existingUser = await User.findOne({ "userName": userName }).exec();
+    if (existingUser) {
+        res.status(409).send({
+            topic: "userName",
+            message: "Username already taken!"
+        });
+        return;
+    }
+    
+    myUser.userName = newUsername;
+
+    myUser.save(myUser)
+        .then(data => {
+            res.status(200).send(data.getInfoForClient());
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: err.message || "server error."
+            });
+        });
+}
+
+exports.updateDisplayName = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        res.status(401).send({
+            message: "Not logged in!"
+        });
+        return;
+    }
+
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Body for updating username must not be empty."
+        });
+    }
+
+    let newDisplay = req.body.newDisplay;
+    if (!(newDisplay)) {
+        res.status(400).send({
+            message: "Missing newDisplay param for password reset."
+        });
+        return;
+    }
+    
+    myUser.displayName = newDisplay;
+
+    myUser.save(myUser)
+        .then(data => {
+            res.status(200).send(data.getInfoForClient());
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: err.message || "server error."
+            });
+        });
 }
 
 exports.findAllPosts = (req, res) => {
