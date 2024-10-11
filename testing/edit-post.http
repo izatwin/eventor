@@ -1,0 +1,25 @@
+POST http://localhost:3001/api/posts/ HTTP/1.1
+content-type: application/json
+
+{
+    "content": "test-content",
+    "is_event": "false",
+    "userId": "59d0b9cb-99c7-4044-831a-743be7ca2028"
+}
+
+###
+
+GET http://localhost:3001/api/posts/6708dfbc627bf5e5c531dca1 HTTP/1.1
+
+###
+
+PUT http://localhost:3001/api/posts/6708dfbc627bf5e5c531dca1 HTTP/1.1
+content-type: application/json
+
+{
+  "content": ""
+}
+
+###
+
+GET http://localhost:3001/api/posts/6708dfbc627bf5e5c531dca1 HTTP/1.1

@@ -1,0 +1,32 @@
+POST http://localhost:3001/api/user/verify HTTP/1.1
+content-type: application/json
+
+{
+	"email": "srettig@purdue.edu"
+}
+
+###
+
+PATCH  http://localhost:3001/api/user/verify HTTP/1.1
+content-type: application/json
+
+{
+	"email": "srettig@purdue.edu",
+    "verifyId": "2812a98a53a1a65312095f563ee240efe172b24f7f8858c1",
+    "verifyCode": "128197"
+}
+
+###
+
+POST  http://localhost:3001/api/user/signup HTTP/1.1
+content-type: application/json
+
+{
+	"email": "srettig@purdue.edu",
+    "verifyId": "2812a98a53a1a65312095f563ee240efe172b24f7f8858c1",
+    "userName": "sean",
+    "password": "password",
+    "displayName": "seanDisplay"
+}
+
+###
