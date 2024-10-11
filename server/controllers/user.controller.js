@@ -453,58 +453,54 @@ exports.findAllPosts = (req, res) => {
         })
 }
 
-// exports.findOne = (req, res) => {
-//     const userId = req.params.id;
-//     return getUserById(userId);
-// };
+exports.setBiography = async (req, res) => {
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Body for setting biography must not be empty."
+        });
+    }
 
-// Update a user by the id
-// exports.update = (req, res) => {
-//     if (!req.body) {
-//         return res.status(400).send({
-//             message: "Data to update post cannot be empty."
-//         });
-//     }
+    const userId = req.params.id
+    try {
+        const curUser = await User.findById(userId).exec()
+        if (!curUser) {
+            return res.status(404).send({ message: `Cannot find user with id=${userId}` })
+        }
 
-//     const id = req.param.id;
+        if (req.body.biography) {
+            curUser.biography = req.body.biography
+            curUser.save()
+            return res.send({ user: curUser.getInfoForClient() })
+        } else {
+            return res.send(400).send({ message: "Please send a biography to update." })
+        }
+    } catch (err) {
+        return res.status(500).send({ message: `Error setting biography`, error: err })
+    }
+}
 
-//     Post.findByIdAndUpdate(id, req.body, { runValidators: true })
-//         .then(data => {
-//             if (!data) {
-//                 res.status(404).send({
-//                     message: `Cannot find Post with id=${id}`
-//                 });
-//             } else res.send({ message: "Post updated successfully." })
-//         })
-//         .catch(err => {
-//             res.status(500).send({
-//                 message: `Error updating post with id=${id}`,
-//                 error: err
-//             });
-//         });
-// };
+exports.setStatus = async (req, res) => {
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Body for setting status must not be empty."
+        });
+    }
 
-// Delete a user by the id
-// exports.delete = (req, res) => {
-//     const id = req.params.id;
+    const userId = req.params.id
+    try {
+        const curUser = await User.findById(userId).exec()
+        if (!curUser) {
+            return res.status(404).send({ message: `Cannot find user with id=${userId}` })
+        }
 
-//     Post.findOneAndDelete(id)
-//     .then(data => {
-//         if (!data) {
-//             return res.status(404).send({
-//                 message: `Cannot find post with id=${id}`,
-//                 data: data
-//             });
-//         } else {
-//             return res.send({
-//                 message: "Post deleted successfully."
-//             });
-//         }
-//     })
-//     .catch(err => {
-//         return res.status(500).send({
-//             message: `Error deleting post with id=${id}`,
-//             error: err.message || `Unexpected Error`
-//         })
-//     })
-// };
+        if (req.body.status) {
+            curUser.status = req.body.status
+            curUser.save()
+            return res.send({ user: curUser.getInfoForClient() })
+        } else {
+            return res.send(400).send({ message: "Please send a status to update." })
+        }
+    } catch (err) {
+        return res.status(500).send({ message: `Error setting status`, error: err })
+    }
+}

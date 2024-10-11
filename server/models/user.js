@@ -5,70 +5,15 @@ const crypto = require("crypto");
 const Schema = mongoose.Schema;
 
 const UserCredentialsSchema = new Schema({
-    /*
-    this.passwordHash = passwordHash;
-    this.passwordSalt = randomSalt;
-    this.accessTokens = {};
-    */
+    passwordHash: { type: String, required: true, default: "0" },
+    passwordSalt: { type: String, required: true, default: "0" },
+    accessTokens: { type: Object, required: true, default: {} },
 
-    passwordHash : { type: String, required: true, default : "0" },
-    passwordSalt : { type: String, required: true, default : "0" },
-    accessTokens : { type: Object, required: true, default : {} },
-
-    // methods : {
-    //     init(password) {
-    //         let randomSalt = crypto.randomBytes(16).toString('hex'); // generate random salt
-            
-    //         let derivedKey = crypto.pbkdf2Sync(password, randomSalt, 100000, 64, 'sha512');
-    //         let passwordHash = derivedKey.toString('hex');
-
-    //         this.passwordHash = passwordHash;
-    //         this.passwordSalt = randomSalt;
-    //         this.accessTokens = {};
-    //     },
-
-    //     matchPassword(tryPassword) {
-    //         let realPasswordHash = this.passwordHash;
-    //         let randomSalt = this.passwordSalt;
-        
-    //         let tryDerivedKey = crypto.pbkdf2Sync(tryPassword, randomSalt, 100000, 64, 'sha512');
-    //         let tryPasswordHash = tryDerivedKey.toString('hex');
-    //         return realPasswordHash === tryPasswordHash;
-    //     },
-        
-    //     generateAuthToken() {
-    //         let token = crypto.randomBytes(48).toString('hex');
-        
-    //         let lifetime = 60 * 1000;
-    //         let nowTime = Date.now();
-    //         let expireTime = nowTime + lifetime;
-        
-    //         let accessTokens = this.accessTokens;
-    //         accessTokens[token] = expireTime;
-        
-    //         return {
-    //             'token' : token,
-    //             'expire' : expireTime
-    //         };
-    //     },
-    
-    //     matchAuthToken(token) {
-    //         let accessTokens = this.accessTokens;
-        
-    //         let expireTime = accessTokens[token];
-    //         if (expireTime == null) {
-    //             return false;
-    //         }
-        
-    //         let nowTime = Date.now();
-    //         return (nowTime <= expireTime);
-    //     }
-    // }
-}, { _id : false });
+}, { _id: false });
 
 UserCredentialsSchema.methods.initCredentials = function (password) {
     let randomSalt = crypto.randomBytes(16).toString('hex'); // generate random salt
-    
+
     let derivedKey = crypto.pbkdf2Sync(password, randomSalt, 100000, 64, 'sha512');
     let passwordHash = derivedKey.toString('hex');
 
@@ -77,44 +22,44 @@ UserCredentialsSchema.methods.initCredentials = function (password) {
     this.accessTokens = {};
 },
 
-UserCredentialsSchema.methods.matchPassword = function (tryPassword) {
-    let realPasswordHash = this.passwordHash;
-    let randomSalt = this.passwordSalt;
+    UserCredentialsSchema.methods.matchPassword = function (tryPassword) {
+        let realPasswordHash = this.passwordHash;
+        let randomSalt = this.passwordSalt;
 
-    let tryDerivedKey = crypto.pbkdf2Sync(tryPassword, randomSalt, 100000, 64, 'sha512');
-    let tryPasswordHash = tryDerivedKey.toString('hex');
-    return realPasswordHash === tryPasswordHash;
-},
+        let tryDerivedKey = crypto.pbkdf2Sync(tryPassword, randomSalt, 100000, 64, 'sha512');
+        let tryPasswordHash = tryDerivedKey.toString('hex');
+        return realPasswordHash === tryPasswordHash;
+    },
 
-UserCredentialsSchema.methods.generateAuthToken = function () {
-    let token = crypto.randomBytes(48).toString('hex');
+    UserCredentialsSchema.methods.generateAuthToken = function () {
+        let token = crypto.randomBytes(48).toString('hex');
 
-    let lifetime = 6000 * 1000;
-    let nowTime = Date.now();
-    let expireTime = nowTime + lifetime;
+        let lifetime = 6000 * 1000;
+        let nowTime = Date.now();
+        let expireTime = nowTime + lifetime;
 
-    let accessTokens = this.accessTokens;
-    accessTokens[token] = expireTime;
+        let accessTokens = this.accessTokens;
+        accessTokens[token] = expireTime;
 
-    return {
-        'token' : token,
-        'expire' : expireTime
-    };
-},
+        return {
+            'token': token,
+            'expire': expireTime
+        };
+    },
 
-UserCredentialsSchema.methods.matchAuthToken = function (token) {
-    let accessTokens = this.accessTokens;
+    UserCredentialsSchema.methods.matchAuthToken = function (token) {
+        let accessTokens = this.accessTokens;
 
-    let expireTime = accessTokens[token];
-    if (expireTime == null) {
-        console.log("Token not found!");
-        return false;
+        let expireTime = accessTokens[token];
+        if (expireTime == null) {
+            console.log("Token not found!");
+            return false;
+        }
+
+        let nowTime = Date.now();
+
+        return (nowTime <= expireTime);
     }
-
-    let nowTime = Date.now();
-
-    return (nowTime <= expireTime);
-}
 
 UserCredentialsSchema.methods.removeAuthToken = function (token) {
     let accessTokens = this.accessTokens;
@@ -123,10 +68,6 @@ UserCredentialsSchema.methods.removeAuthToken = function (token) {
 
 const UserSchema = new Schema({
     /*
-    userId : string;
-    userName : string;
-    email : string;
-    displayName : string;
 
     followers : string[];
     following : string[];
@@ -145,13 +86,14 @@ const UserSchema = new Schema({
 
     _id: { type: String, required: true, default: crypto.randomUUID },
     userName: { type: String, required: true, default: "UNDEF" },
-    email : { type: String, required: true, default: "UNDEF" },
-    displayName : { type: String, required: true, default: "UNDEF" },
+    email: { type: String, required: true, default: "UNDEF" },
+    displayName: { type: String, required: true, default: "UNDEF" },
 
-    userCredentials : UserCredentialsSchema,
-    posts : [{ type: Schema.Types.ObjectId, ref: "Post", required: false }]
-    
-    // user : {type: User, required: true}
+    userCredentials: UserCredentialsSchema,
+    posts: [{ type: Schema.Types.ObjectId, ref: "Post", required: false }],
+
+    biography: {type: String},
+    status: {type: String}
 });
 
 UserSchema.methods.getInfoForClient = function () {
@@ -161,6 +103,8 @@ UserSchema.methods.getInfoForClient = function () {
     infoForClient.userId = this._id;
     infoForClient.userName = this.userName;
     infoForClient.displayName = this.displayName;
+    infoForClient.biography = this.biography;
+    infoForClient.status = this.status;
 
     return infoForClient;
 }
