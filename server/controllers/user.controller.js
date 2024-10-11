@@ -440,7 +440,7 @@ exports.resetPasswordLoggedIn = async (req, res) => {
         }
     }
     if (!authenticated) {
-        res.status(401).send({
+        res.status(400).send({
             message: "Not logged in!"
         });
         return;
@@ -543,7 +543,7 @@ exports.updateUsername = async (req, res) => {
         }
     }
     if (!authenticated) {
-        res.status(401).send({
+        res.status(400).send({
             message: "Not logged in!"
         });
         return;
@@ -605,7 +605,7 @@ exports.updateDisplayName = async (req, res) => {
         }
     }
     if (!authenticated) {
-        res.status(401).send({
+        res.status(400).send({
             message: "Not logged in!"
         });
         return;
@@ -734,14 +734,55 @@ exports.setImage = async (req, res) => {
 }
 
 exports.delete = async (req, res) => {
-    const id = req.params.id
-    console.log(id)
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        res.status(400).send({
+            message: "Not logged in!"
+        });
+        return;
+    }
 
+    if (!req.body) {
+        res.status(400).send({
+            message: "User cannot be empty."
+        });
+        return;
+    }
+
+    let password = req.body.password;
+    if (!(password)) {
+        res.status(400).send({
+            message: "Missing param(s) for password reset."
+        });
+        return;
+    }
+
+    const userCredentials = myUser.userCredentials;
+    if (!userCredentials.matchPassword(password)) {
+        res.status(401).send({
+            message: "Invalid password!"
+        });
+        return;
+    }
 
     try {
-        const curUser = await User.findById(id).exec()
-        console.log(curUser)
-
         for (let curPostId of curUser.posts) {
             await Post.findByIdAndDelete(curPostId).exec()
         }
@@ -752,5 +793,7 @@ exports.delete = async (req, res) => {
             message: "Error deleting User",
             error: err.message || "Unexpected Error"
         })
-    }  
+    } 
+
+    res.status(200).send();
 }

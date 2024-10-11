@@ -34,6 +34,6 @@ router.post('/:id/status', userController.setStatus)
 
 router.post('/:id/image', userController.setImage)
 
-router.delete('/:id', userController.delete);
+router.delete('/account', userController.delete);
 
 module.exports = router;
