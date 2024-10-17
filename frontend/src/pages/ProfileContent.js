@@ -47,18 +47,27 @@ const ProfileContent= () => {
             if (!validateResponse.data['logged-in']) {
               navigate("/")
             }
+            const userInfo = validateResponse.data["user-info"];
             setUser({    
-              email: validateResponse.data["user-info"].email,
-              displayName: validateResponse.data["user-info"].displayName,
-              userName: validateResponse.data["user-info"].userName,
-              userId : validateResponse.data["user-info"].userId, 
-              bio: validateResponse.data["user-info"].biography,
-              status: validateResponse.data["user-info"].status
+              email: userInfo.email,
+              displayName: userInfo.displayName,
+              userName: userInfo.userName,
+              userId : userInfo.userId, 
+              bio: userInfo.biography,
+              status: userInfo.status
             })
-            const postResponse = await axios.get(`http://localhost:3001/api/user/${validateResponse.data["user-info"].userId}/posts/`) 
-            console.log("post response: ")
+            setPost(prevPost => ({
+              ...prevPost,
+              userId: userInfo.userId,
+            }));
+            /* postResponse is a list of post ids */
+            const postResponse = (await axios.get(`http://localhost:3001/api/user/${validateResponse.data["user-info"].userId}/posts/`)).data
             console.log(postResponse)
-            setPosts(postResponse.data)
+            
+            /* make request to get the content of each post using id */ 
+            
+            /* pass an array of posts to setPosts */
+            setPosts(postResponse)
           }
           else {
             navigate("/");
@@ -78,10 +87,6 @@ const ProfileContent= () => {
     setStatus(user.status || "No bio yet!");
   }, [user.bio, user.status]);
 
-
-
-
-  
   
   const changeBio = (e) => {
     setBio(e.target.value);
@@ -162,6 +167,7 @@ const ProfileContent= () => {
   };
 
   const handlePost = () => {
+    console.log(post)
     axios.post("http://localhost:3001/api/posts", post)
       .then(response => {
         console.log(response.data)

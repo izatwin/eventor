@@ -1,3 +1,12 @@
+/**
+ * App.js
+ *
+ * This file sets up the main structure of the React app.
+ *
+ * - Routes: Defines the available routes and maps them to their respective components.
+ * 
+ */
+
 import './styles/App.css';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -10,9 +19,7 @@ import Profile from './pages/Profile';
 import { AuthProvider } from './AuthContext'; 
 
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
-
-const isAuthenticated = false;
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
@@ -20,9 +27,6 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-      {/*<Route path="/" element={isAuthenticated ? <Home /> : <Navigate to="/login" />} /> */}
-            
-   
 
             <Route path="/home" element={<Home />} />
             <Route path="/" element={<Login />} />
@@ -31,8 +35,6 @@ function App() {
             <Route path="/verify" element={<Verify />} />
             <Route path="/code" element={<Code />} />
 
-      
-            
             <Route path="/password" element={<Password />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<Profile />} />

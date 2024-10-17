@@ -200,7 +200,7 @@
 .post-buttons {
   display: flex;
   text-align: left;  
-  margin-bottom: 20px;
+  margin-bottom: 5px;
 }
 
 .image-icon {
@@ -231,7 +231,7 @@
 }
 
 .profile-feed {
-  height: calc(100vh - 66px);
+  height: calc(100vh - 300px);
   z-index: 100;
   overflow: hidden;
   overflow-y: auto;
