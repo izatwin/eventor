@@ -571,7 +571,7 @@ exports.updateUsername = async (req, res) => {
         });
         return;
     }
-    
+
     myUser.userName = newUsername;
 
     myUser.save(myUser)
@@ -624,7 +624,7 @@ exports.updateDisplayName = async (req, res) => {
         });
         return;
     }
-    
+
     myUser.displayName = newDisplay;
 
     myUser.save(myUser)
@@ -769,7 +769,7 @@ exports.delete = async (req, res) => {
     let password = req.body.password;
     if (!(password)) {
         res.status(400).send({
-            message: "Missing param(s) for password reset."
+            message: "Missing param(s) for password."
         });
         return;
     }
@@ -783,17 +783,16 @@ exports.delete = async (req, res) => {
     }
 
     try {
-        for (let curPostId of curUser.posts) {
+        for (let curPostId of myUser.posts) {
             await Post.findByIdAndDelete(curPostId).exec()
         }
 
-        await User.findByIdAndDelete(id)
+        await User.findByIdAndDelete(myUser._id)
+        return res.send({message: "User deleted!"})
     } catch (err) {
         return res.status(500).send({
             message: "Error deleting User",
             error: err.message || "Unexpected Error"
         })
-    } 
-
-    res.status(200).send();
+    }
 }
