@@ -163,7 +163,7 @@ const SettingsContent = () => {
         password : password
       };
       console.log(params);
-      const response = await axios.delete(`http://localhost:3001/api/user/account`, params);  
+      const response = await axios.delete(`http://localhost:3001/api/user/account`, {data: params});  
 
       console.log(response);
       if (response.status === 200) {   
