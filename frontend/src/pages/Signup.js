@@ -81,7 +81,6 @@ const SignUp = () => {
         </form>
 
         <div className="signup-footer"> 
-          <p>Already a user? <a href="/">Login</a></p>
         </div>
 
       </div>

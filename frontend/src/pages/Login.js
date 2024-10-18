@@ -1,3 +1,11 @@
+/* 
+ * Login.js
+ *
+ * This component handles the login functionality for the app.
+ * 
+ *
+*/
+
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -8,7 +16,6 @@ import { useAuth } from '../AuthContext';
 
 
 axios.defaults.withCredentials = true;
-/* Page for logging in */ 
 
 const Login = () => {
   
@@ -23,6 +30,7 @@ const Login = () => {
 
 
   useEffect(() => {
+    
     const test = async () => {
       try {
         const response = await axios.get("http://localhost:3001/api/user/validate") 

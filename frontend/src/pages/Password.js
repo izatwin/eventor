@@ -64,8 +64,7 @@ const Password= () => {
         
         </form>
 
-      <div className="reset-footer">
-        <p>New user? <a href="/signup">Sign up</a></p>
+      <div className="password-footer">
         <p>Already a user? <a href="/">Login</a></p>
       </div>
 
