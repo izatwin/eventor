@@ -19,6 +19,7 @@ import shareIcon from './icons/share.png'
 const ProfileContent= () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();  
+  
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
   const [posts, setPosts] = useState([]);
@@ -30,49 +31,56 @@ const ProfileContent= () => {
     userId: user.userId,
   })
 
-  const [bio, setBio] = useState(user.bio)
+  const [bio, setBio] = useState("")
   
-  const [status, setStatus] = useState({
-    status: user.status,
-  })
+  const [status, setStatus] = useState("")
   
   useEffect(() => {
-    axios.get("http://localhost:3001/api/user/validate") 
-    .then(response => {
-      console.log(response);
-      if (response.status === 200) {
-        console.log("here"); 
-        console.log(response.data['user-info']);
-        setUser({    
-          email: response.data["user-info"].email,
-          displayName: response.data["user-info"].displayName,
-          userName: response.data["user-info"].userName,
-          userId : response.data["user-info"].userId}) 
-      }
-      else {
-        navigate("/");
-      }
-    })
-    .catch (err =>  {
-      navigate("/");
-      console.log(err)
-    })  
     
-    console.log("yuhh" + user.userId);
-    axios.get(`http://localhost:3001/api/user/${user.userId}/posts/`)
-    .then(response => {
-      console.log(response.data)
-      setPosts(response.data)
-    })
-    .catch (err => {
-      console.log(err)
-    })
+    const validateAndGetPosts = async () => {
+      try {
+        const validateResponse = await axios.get("http://localhost:3001/api/user/validate") 
+          console.log("validate response: ")
+          console.log(validateResponse);
+
+          if (validateResponse.status === 200) {
+            if (!validateResponse.data['logged-in']) {
+              navigate("/")
+            }
+            setUser({    
+              email: validateResponse.data["user-info"].email,
+              displayName: validateResponse.data["user-info"].displayName,
+              userName: validateResponse.data["user-info"].userName,
+              userId : validateResponse.data["user-info"].userId, 
+              bio: validateResponse.data["user-info"].biography,
+              status: validateResponse.data["user-info"].status
+            })
+            const postResponse = await axios.get(`http://localhost:3001/api/user/${validateResponse.data["user-info"].userId}/posts/`) 
+            console.log("post response: ")
+            console.log(postResponse)
+            setPosts(postResponse.data)
+          }
+          else {
+            navigate("/");
+          }
+      } catch (err) {
+        console.log("err");
+        console.log(err)
+      }
+    }
+
+    validateAndGetPosts();
+
   }, [])
 
-  const handleChange = (e) => {
-    setPost({ ...post, [e.target.name]: e.target.value });
-    console.log(post);
-  };
+  useEffect(() => {
+    setBio(user.bio || "No status yet!");
+    setStatus(user.status || "No bio yet!");
+  }, [user.bio, user.status]);
+
+
+
+
   
   
   const changeBio = (e) => {
@@ -84,25 +92,20 @@ const ProfileContent= () => {
     setEditingBio(true); 
   };
 
-  const handleBioChange = (e) => {
+  const handleBioChange = () => {
     const bioChange = async () => {
     try {
       const params = {
         biography: bio,
       }
-      console.log(params); 
       const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/biography`, params);  
+      console.log("change bio response: ")
       console.log(response);
       if (response.status === 200) {    
-        console.log("updatinggg")
-        
         setUser(prevUser  => ({
           ...prevUser, 
           bio: bio,  
         }));
-
-
-        console.log(user);
       }
       else {
       }
@@ -115,20 +118,25 @@ const ProfileContent= () => {
     setEditingBio(false); 
   };
   
+  const changeStatus = (e) => {
+    setStatus(e.target.value);
+  }
+
   const handleStatusEdit = () => {
     console.log("Handle change triggered");
     setEditingStatus(true); 
   };
-  
-  const changeStatus = (e) => {
-    setStatus(e.target.value);
-  }
-  const handleStatusChange = (e) => {
-    console.log(status); 
+
+
+  const handleStatusChange = () => {
  
     const statusChange = async () => {
     try {
-      const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/status`, status);  
+      const params = {
+        status: status,
+      }
+      const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/status`, params);  
+      console.log("status response: ")
       console.log(response);
       if (response.status === 200) {    
         setUser((prevUser) => ({
@@ -148,6 +156,10 @@ const ProfileContent= () => {
 
   };
   
+  const handlePostChange = (e) => {
+    setPost({ ...post, [e.target.name]: e.target.value });
+    console.log(post);
+  };
 
   const handlePost = () => {
     axios.post("http://localhost:3001/api/posts", post)
@@ -215,7 +227,7 @@ const ProfileContent= () => {
           
           <div className="status-container">
           
-            <textarea name="status" readOnly={!editingStatus} className="profile-status" type="text" onChange={changeStatus} value={user.status} />
+            <textarea name="status" readOnly={!editingStatus} className="profile-status" type="text" onChange={changeStatus} value={status} />
             <div className="edit-card"> 
               <img src={editingStatus ? checkIcon : editIcon } onClick={editingStatus ? handleStatusChange : handleStatusEdit } alt="Edit" className="edit-icon"/> 
               <p className="edit-text"> Edit Status </p>
@@ -247,7 +259,7 @@ const ProfileContent= () => {
         <div className="post-card">
           
           <div className="post-input">
-            <textarea name="content" className="post-text" value={post.content} type="text" onChange={handleChange} placeholder="What will you be hosting next?"/>
+            <textarea name="content" className="post-text" value={post.content} type="text" onChange={handlePostChange} placeholder="What will you be hosting next?"/>
           </div>
 
           <div className="post-buttons">
