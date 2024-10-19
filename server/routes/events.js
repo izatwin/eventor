@@ -1,15 +1,18 @@
 // server/routes/posts.js
 
 const router = require('express').Router();
-const eventController = require('../controllers/event.controller')
+const eventController = require('../controllers/event.controller');
 
-// POST /api/posts - create a new post
-router.post('/', eventController.create);
+// Retrieve an event by ID
+router.get('/:id', eventController.getEventById);
 
-router.get('/:id', eventController.findOne);
+// Create a new event
+router.post('/', eventController.createEvent);
 
-router.delete('/:id', eventController.delete);
+// Edit an existing event
+router.put('/:id', eventController.editEvent);
 
-router.put('/:id', eventController.update);
+// Delete an event
+router.delete('/:id', eventController.deleteEvent);
 
 module.exports = router;

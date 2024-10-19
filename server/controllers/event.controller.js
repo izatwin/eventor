@@ -1,95 +1,101 @@
-const Event = require("../models/event")
+const BaseEvent = require("../models/event");
 
-// Create and save a new Post
-exports.create = (req, res) => {
-    if (!req.body) {
-        res.status(400).send({
-            message: "Event cannot be empty."
-        });
-    }
+// Retrieve an event by ID
+exports.getEventById = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const event = await BaseEvent.findById(eventId);
 
-    const newEvent = new Event({
-        content: req.body.content,
-        event: req.body.event
-    });
-
-    newEvent.save(newEvent)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: err.message || "server error."
-            });
-        });
-};
-
-// Find a single event with an id
-exports.findOne = (req, res) => {
-    const id = req.params.id;
-
-    Event.findById(id)
-        .then(data => {
-            if (!data)
-                return res.status(404).send({ message: `Event not found with id=${id}` });
-            else res.send(data);
-        })
-        .catch(err => {
-            return res.status(500).send({
-                message: `Error retrieving event with id=${id}`,
-                error: err.message || 'Unexpected Error'
-            }
-            );
-        });
-};
-
-// Update a event by the id
-exports.update = (req, res) => {
-    if (!req.body) {
-        return res.status(400).send({
-            message: "Data to update event cannot be empty."
-        });
-    }
-
-    const id = req.param.id;
-
-    Event.findByIdAndUpdate(id, req.body, { runValidators: true })
-        .then(data => {
-            if (!data) {
-                res.status(404).send({
-                    message: `Cannot find Event with id=${id}`
-                });
-            } else res.send({ message: "Event updated successfully." })
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `Error updating event with id=${id}`,
-                error: err
-            });
-        });
-};
-
-// Delete a post by the id
-exports.delete = (req, res) => {
-    const id = req.params.id;
-
-    Event.findOneAndDelete(id)
-    .then(data => {
-        if (!data) {
+        if (!event) {
             return res.status(404).send({
-                message: `Cannot find event with id=${id}`,
-                data: data
-            });
-        } else {
-            return res.send({
-                message: "Event deleted successfully."
+                message: "Event not found."
             });
         }
-    })
-    .catch(err => {
-        return res.status(500).send({
-            message: `Error deleting event with id=${id}`,
-            error: err.message || `Unexpected Error`
-        })
-    })
+
+        res.status(200).send(event);
+    } catch (err) {
+        res.status(500).send({
+            message: "Error retrieving event.",
+            error: err.message
+        });
+    }
+};
+
+// Create a new event
+exports.createEvent = async (req, res) => {
+    try {
+        const { eventType, ...eventData } = req.body;
+
+        if (!eventType) {
+            return res.status(400).send({
+                message: "Event type is required."
+            });
+        }
+
+        let event;
+        if (eventType === 'NormalEvent') {
+            event = new BaseEvent.discriminators.NormalEvent(eventData);
+        } else if (eventType === 'MusicReleaseEvent') {
+            event = new BaseEvent.discriminators.MusicReleaseEvent(eventData);
+        } else if (eventType === 'TicketedEvent') {
+            event = new BaseEvent.discriminators.TicketedEvent(eventData);
+        } else {
+            return res.status(400).send({
+                message: "Invalid event type."
+            });
+        }
+
+        await event.save();
+        res.status(201).send(event);
+    } catch (err) {
+        res.status(500).send({
+            message: "Error creating event.",
+            error: err.message
+        });
+    }
+};
+
+// Edit an existing event
+exports.editEvent = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const updates = req.body;
+
+        const event = await BaseEvent.findByIdAndUpdate(eventId, updates, { new: true });
+        if (!event) {
+            return res.status(404).send({
+                message: "Event not found."
+            });
+        }
+
+        res.status(200).send(event);
+    } catch (err) {
+        res.status(500).send({
+            message: "Error updating event.",
+            error: err.message
+        });
+    }
+};
+
+// Delete an event
+exports.deleteEvent = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+
+        const event = await BaseEvent.findByIdAndDelete(eventId);
+        if (!event) {
+            return res.status(404).send({
+                message: "Event not found."
+            });
+        }
+
+        res.status(200).send({
+            message: "Event successfully deleted."
+        });
+    } catch (err) {
+        res.status(500).send({
+            message: "Error deleting event.",
+            error: err.message
+        });
+    }
 };
