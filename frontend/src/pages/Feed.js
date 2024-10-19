@@ -26,12 +26,15 @@ const Feed = () => {
       console.log(response);
       if (response.status === 200) {
         console.log("here"); 
-        console.log(response.data['user-info']);
+        const userInfo = response.data['user-info'];
+        console.log(userInfo);
         setUser({    
-          email: response.data["user-info"].email,
-          displayName: response.data["user-info"].displayName,
-          userName: response.data["user-info"].userName,
-          userId : response.data["user-info"].userId}) 
+          email: userInfo.email,
+          displayName: userInfo.displayName,
+          userName: userInfo.userName,
+          userId : userInfo.userId,
+          pfp: userInfo.imageURL
+        })
       }
       else {
         navigate("/");

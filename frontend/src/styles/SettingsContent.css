@@ -4,7 +4,6 @@
   position: fixed;
   border-right: 1px solid black; 
   border-left: 1px solid black; 
-  background-color: white;
 }
 
 .settings-title {
@@ -18,16 +17,6 @@
   border-bottom: 1px solid black; 
 }
 
-.feed-title {
-  z-index: 1000;
-  padding-top: 15px;
-  padding-bottom: 15px;
-  width: 100%;
-  font-size: 30px;
-  font-weight: bold;
-  text-align: center;
-  border-bottom: 1px solid black; 
-}
 .settings-content {
   width: 100%;
   margin-top: 25px;
@@ -36,6 +25,7 @@
   display: flex;
   gap: 10px;               
   align-items: center;
+
 }
 
 .profile-displayname {
@@ -52,6 +42,7 @@
 .settings-pic {
   width: 60px;
   height: 60px;
+  border-radius: 50%;
 }
 
 .settings-btn {
@@ -73,14 +64,20 @@
 }
 
 .settings-form-content {
-  margin-top: 30vh; 
   width: 100%;
   flex-direction: column; 
   display: flex;
   gap: 10px;               
   align-items: center;
+  height: calc(100vh - 66px);
+  justify-content: center;
 }
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
+}
 
 .settings-form input {
   width: 80%;
@@ -95,7 +92,8 @@
 .settings-form button {
   background-color: #d32f2f;
   color: white;
-  padding: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   box-sizing: border-box;
   width: 90%;
   border: none;
@@ -104,7 +102,8 @@
   cursor: pointer;
 }
 
-.back-btn {
+.settings-form .settings-back {
+  margin-top: 10px;
   background-color: black;
 }
 
@@ -120,8 +119,4 @@ flex-direction: column;
   height: 80px;
   border-radius: 50%;
 }
-.settings-form .upload-button {
-  margin-top: 20px;
-  margin-bottom: 10px;
-  background-color: deepskyblue;
-}
+

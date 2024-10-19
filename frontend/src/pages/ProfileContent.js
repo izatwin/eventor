@@ -54,7 +54,8 @@ const ProfileContent= () => {
               userName: userInfo.userName,
               userId : userInfo.userId, 
               bio: userInfo.biography,
-              status: userInfo.status
+              status: userInfo.status,
+              pfp: userInfo.imageURL,
             })
             setPost(prevPost => ({
               ...prevPost,
@@ -216,7 +217,7 @@ const ProfileContent= () => {
         <div className="upper-profile-card">
           
           <div className="profile-upper-container">
-            <img src={profilePic} alt="Profile" className="profile-picture" />
+            <img src={user.pfp || profilePic} alt="Profile" className="profile-picture" />
 
             <div className="profile-information">
               <div className="p-name">{user.displayName}</div>
@@ -291,7 +292,7 @@ const ProfileContent= () => {
 
               <div className="post-header"> 
 
-                <img src={profilePic} alt="PostProfile" className="post-profilepic" />
+                <img src={user.pfp || profilePic} alt="PostProfile" className="post-profilepic" />
                 
                 <div className="post-profile-info">
                   <div className="post-name">{user.displayName}</div>

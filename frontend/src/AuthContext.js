@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
     status: "",
     bio: "",
     password: "",
+    pfp: "",
   });
 
   return (
