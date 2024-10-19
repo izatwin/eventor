@@ -11,7 +11,7 @@ import { useAuth } from '../AuthContext';
 const SettingsContent = () => {
 
   const [content, setContent] = useState("default");
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState('');
   const [previewUrl, setPreviewUrl] = useState(profilePic); 
   const [newPassword, setNewPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -30,12 +30,15 @@ const SettingsContent = () => {
       console.log(response);
       if (response.status === 200) {
         console.log("here"); 
-        console.log(response.data['user-info']);
+        const userInfo = response.data['user-info'];
+        console.log(userInfo);
         setUser({    
-          email: response.data["user-info"].email,
-          displayName: response.data["user-info"].displayName,
-          userName: response.data["user-info"].userName,
-          userId : response.data["user-info"].userId}) 
+          email: userInfo.email,
+          displayName: userInfo.displayName,
+          userName: userInfo.userName,
+          userId : userInfo.userId,
+          pfp: userInfo.imageURL
+        })
       }
       else {
         navigate("/");
@@ -48,22 +51,18 @@ const SettingsContent = () => {
     })  
   }, [])
 
-
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedImage(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      console.log(file);
-    }
-  };
-  
-  const handleUploadClick = () => {
-    document.getElementById('file-input').click();
+  const handleUrlChange = (e) => {
+    const url = e.target.value;
+    setImageUrl(url);
+    setPreviewUrl(url);  
   };
   
   const handleDisplayName = async () => {
+    if (!newDisplay) {
+      console.error('No URL entered.');
+      return;
+    }
+    setNewDisplay(""); 
     try {
       const params =
         {newDisplay : newDisplay,
@@ -79,11 +78,9 @@ const SettingsContent = () => {
         setContent("default")
       }
       else {
-        setNewDisplay(""); 
       }
     } catch (err) {
       console.log("Error:", err);
-      setNewDisplay(""); 
     }
   };
 
@@ -91,13 +88,42 @@ const SettingsContent = () => {
     setNewDisplay(e.target.value);
   }
 
-  const handlePic = () => {
-    
-    setContent("default")
+  const handleProfilePic = async () => {    
+    if (!imageUrl) {
+      console.error('No URL entered.');
+      return;
+    }
+    setImageUrl(""); 
+      try {
+        const params =
+          {imageURL : imageUrl};
+        console.log(params);
+        const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/image`, params);  
+        console.log('pic response:')
+        console.log(response);
+        if (response.status === 200) {   
+          setUser(prevUser => ({
+            ...prevUser, 
+            pfp: imageUrl 
+          }));
+          setContent("default")
+        }
+        else {
+        }
+      } catch (err) {
+        console.log("Error:", err);
+      }
   };
 
   const handleUsername = async () => {
+    if (!newUsername) {
+
+      console.error('No username entered.');
+      return;  
+    }
     try {
+
+      setNewUsername(""); 
       const params =
         {newUsername : newUsername,
         };
@@ -112,11 +138,9 @@ const SettingsContent = () => {
         setContent("default")
       }
       else {
-        setNewUsername(""); 
       }
     } catch (err) {
       console.log("Error:", err);
-      setNewUsername(""); 
     }
   };
 
@@ -125,7 +149,14 @@ const SettingsContent = () => {
   }
 
   const handlePassword = async () => {
+    if (!oldPassword || !newPassword) {
+      console.error('Missing password input')
+      return;
+    }
+    setOldPassword("");
+    setNewPassword(""); 
     try {
+
       const params =
         {oldPassword : oldPassword,
          newPassword : newPassword
@@ -139,12 +170,9 @@ const SettingsContent = () => {
         setContent("default")
       }
       else {
-        setNewPassword(""); 
       }
     } catch (err) {
       console.log("Error:", err);
-      setOldPassword("");
-      setNewPassword(""); 
     }
   };
 
@@ -158,6 +186,11 @@ const SettingsContent = () => {
 
 
   const handleDelete= async () => {
+    if (!password) {
+      console.error('Missing password input')
+      return;
+    }
+    setPassword(""); 
     try {
       const params = {
         password : password
@@ -170,11 +203,9 @@ const SettingsContent = () => {
         navigate("/")
       }
       else {
-        setPassword(""); 
       }
     } catch (err) {
       console.log("Error:", err);
-      setPassword(""); 
     }
   };
   
@@ -188,7 +219,7 @@ const SettingsContent = () => {
           {content === "default" && (
 
             <div className="settings-content">
-              <img src={profilePic} alt="Profile" className="settings-pic" />
+              <img src={user.pfp || profilePic} alt="Profile" className="settings-pic" />
                 <div className="profile-info">
                 <div className="profile-displayname">{user.displayName}</div>
                 <div className="profile-username">@{user.userName}</div>
@@ -210,6 +241,7 @@ const SettingsContent = () => {
               <div className="settings-instruct">Change display name</div>
               <input value={newDisplay} onChange={handleNewDisplayChange}type="text" placeholder="New display name" />
               <button onClick={handleDisplayName}>Save</button>
+              <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
             </div>
           )}
@@ -219,23 +251,20 @@ const SettingsContent = () => {
           <div className="settings-form-content">
             <div className="settings-form">
               <div className="settings-instruct">Change profile picture</div>
-                <img src={previewUrl} className="picPreview" alt="Profile" />
+                {previewUrl && <img src={previewUrl} className="picPreview" alt="Profile" />}
+
 
                 <input
-                  id="file-input"
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={handleImageChange}
+                  type="text"
+                  placeholder="Enter image URL"
+                  value={imageUrl}
+                  onChange={handleUrlChange}
                 />
 
-                <button className="upload-button" onClick={handleUploadClick}>
-                  Upload new image
-                </button>
-
-                <button onClick={handlePic}>Save</button>
+                <button onClick={handleProfilePic}>Save</button>
+                <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
-            </div>
+          </div>
           )}
 
          {content === "username-settings" && (
@@ -244,8 +273,9 @@ const SettingsContent = () => {
               <div className="settings-instruct">Change username</div>
               <input value={newUsername} onChange={handleNewUsernameChange}type="text" placeholder="New username" />
               <button onClick={handleUsername}>Save</button>
+              <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
-            </div>
+          </div>
           )}
          {content === "password-settings" && (
 
@@ -255,6 +285,7 @@ const SettingsContent = () => {
               <input value={oldPassword} onChange={handleOldPasswordChange}type="password" placeholder="Old password" />
               <input value={newPassword} onChange={handleNewPasswordChange}type="password" placeholder="New password" />
               <button onClick={handlePassword}>Save</button>
+              <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
            </div>
           )}
@@ -264,7 +295,8 @@ const SettingsContent = () => {
             <div className="settings-form">
               <div className="settings-instruct">Delete account</div>
               <input value={password} onChange={handlePasswordChange} type="password" placeholder="Confirm password" />
-              <button onClick={handleDelete}>Confirm</button>
+              <button onClick={handleDelete}>Submit</button>
+              <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
            </div>
           )}

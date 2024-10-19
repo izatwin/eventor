@@ -69,7 +69,7 @@ const SidebarLeft = () => {
       </div>
 
       <div className="profile">
-        <img src={profilePic} alt="Profile" className="profile-pic" />
+        <img src={user.pfp || profilePic} alt="Profile" className="profile-pic" />
         
         <div className="profile-info">
           <div className="profile-name">{user.displayName}</div>

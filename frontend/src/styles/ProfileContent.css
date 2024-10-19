@@ -54,6 +54,7 @@
   height: 70px;
   margin-left: 3%;
   margin-top: 8px;
+  border-radius: 50%;
 }
 
 .status-container {
@@ -160,8 +161,7 @@
     
 }
 
-.modify-post {
-}
+
 
 .remove-icon {
   cursor: pointer;
@@ -197,10 +197,17 @@
     outline: none;
 }
 
+.post-profilepic {
+  border-radius: 50%;
+}
+
 .post-buttons {
   display: flex;
   text-align: left;  
   margin-bottom: 5px;
+}
+
+.modify-post {
 }
 
 .image-icon {
