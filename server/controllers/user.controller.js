@@ -311,8 +311,8 @@ exports.login = async (req, res) => {
     let authToken = userCredentials.generateAuthToken();
     myUser.markModified('userCredentials.accessTokens');
 
-    res.cookie("user_id", myUser._id, { sameSite: 'None', secure: true })
-    res.cookie("auth_token", authToken.token, { expire: authToken.expire, sameSite: 'None', secure: true })
+    res.cookie("user_id", myUser._id, { sameSite: 'Strict', secure: false })
+    res.cookie("auth_token", authToken.token, { expire: authToken.expire, sameSite: 'Strict', secure: false })
 
     myUser.save(myUser)
         .then(data => {
