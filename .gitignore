@@ -131,3 +131,9 @@ dist
 
 # obsidian files
 .obsidian
+
+# python testing venv
+.venv/
+__pycache__/
+.pytest_cache/
+settings.json
