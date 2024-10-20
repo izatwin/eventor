@@ -251,7 +251,7 @@ const SettingsContent = () => {
           <div className="settings-form-content">
             <div className="settings-form">
               <div className="settings-instruct">Change profile picture</div>
-                {previewUrl && <img src={previewUrl} className="picPreview" alt="Profile" />}
+                {previewUrl && <img src={user.pfp || previewUrl} className="picPreview" alt="Profile" />}
 
 
                 <input

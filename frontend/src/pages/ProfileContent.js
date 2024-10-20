@@ -23,6 +23,9 @@ const ProfileContent= () => {
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [isEditPopupOpen, setEditPopupOpen] = useState(false);
+  const [isAddEventPopupOpen, setAddEventPopupOpen] = useState(false);
+  const [currentPost, setCurrentPost] = useState(null);
 
   const [post, setPost] = useState({
     content : "", 
@@ -193,6 +196,56 @@ const ProfileContent= () => {
     document.getElementById('file-input').click();
   };
   
+
+  /* Function to handle a user requesting to edit their post */
+  const handleEditPopup = (post) => {
+    setCurrentPost(post);  
+    setEditPopupOpen(true); 
+  }
+  
+  const closeEditPopup = () => {
+    setEditPopupOpen(false);
+    setCurrentPost(null);    
+  };
+
+  /* 
+   * This function is called when the value of the textarea 
+   * involved in editing a post is changed 
+   */
+  const handlePostEditChange = (e) => {
+    setCurrentPost(prevPost => ({
+      ...prevPost,        
+      content: e.target.value 
+    }));
+  }
+
+  /* Function to edit a user's post */
+  const handlePostEdit = () => {
+    /*const { id, content } = currentPost; */
+
+  }
+
+  /* Function to delete a user's post */
+  const handlePostDelete = (id) => {
+    // api request 
+  }
+
+
+  const handleAddEventPopup = (post) => {
+    setCurrentPost(post);  
+    setAddEventPopupOpen(true); 
+  }
+
+  const closeAddEventPopup = () => {
+    console.log("")
+    setAddEventPopupOpen(false);
+    setCurrentPost(null);    
+  };
+
+  const handleAddEvent = () => {
+    
+  }
+  
   const showSuccessPopup = () => {
     var popup = document.getElementById("success");
     popup.classList.add("show");
@@ -299,7 +352,14 @@ const ProfileContent= () => {
                   <div className="post-username">@{user.userName}</div>
                 </div>      
 
-              </div>
+                 <div className="modify-post">
+                  <button onClick={() => handleAddEventPopup(post)} className="add-event-btn"> Add Event </button> 
+                  <img src={editIcon} onClick={() => handleEditPopup(post)} alt="Edit" className="edit-post-icon " />
+                  <img src={removeIcon} onClick={() => handlePostDelete(post.id)} alt="Remove" className="remove-icon " />
+            
+                </div>
+
+             </div>
 
               <div className="post-content"> 
                 {post.content}
@@ -313,18 +373,52 @@ const ProfileContent= () => {
                 <div className="likes-num num"> {post.likes} </div>
                 <img src={shareIcon} alt="Share" className="share-icon post-icon"/> 
                 <div className="shares-num num"> {post.shares} </div>
-                <div className="modify-post">
-                  <img src={removeIcon} alt="Remove" className="remove-icon post-icon" />
-                  <img src={editIcon} alt="Edit" className="edit-post-icon post-icon" />
-                </div>
-
               </div>
             </div>
 
           ))}
         </div>
         
-        
+      {isEditPopupOpen && (
+        <div className="edit-popup">
+          <div className="edit-popup-content">
+            <h2>Edit post</h2>
+            <textarea 
+              value={currentPost?.content || ''} 
+              className="edit-post-textarea"
+              onChange={handlePostEditChange}  
+              placeholder="Edit your post"
+              rows="5"
+              cols="30"
+            />
+            <button onClick={handlePostEdit} className="save-button">Save</button>
+            <button onClick={closeEditPopup} className="close-button">x</button>
+          </div>
+        </div>
+      )}
+    
+          {isAddEventPopupOpen && (
+            <div className="add-event-popup">
+              <div className="add-event-content">
+                <h2>Create event</h2>
+                <form>
+                  <input type="text" placeholder="Name" name="name" className="input-field" />
+                  <textarea placeholder="Description" name="description" className="input-field textarea-field" />
+                  <input type="text" placeholder="Type" name="type" className="input-field" />
+                  <input type="text" placeholder="Image" name="image" className="input-field" />
+                  <div className="date-fields">
+                    <input type="date" name="start" className="input-field" />
+                    <span className="date-separator">-</span>
+                    <input type="date" name="end" className="input-field" />
+                  </div>
+                </form>
+                <button onClick={handleAddEvent} className="add-event-button">Add</button>
+                <button onClick={closeAddEventPopup} className="close-button">x</button>
+              </div>
+            </div>
+        )}
+
+
         <div className="postPopups">
           <div class="popup" id="success">Post created successfully!</div>
           <div class="popup" id="fail">Error creating post!</div>
