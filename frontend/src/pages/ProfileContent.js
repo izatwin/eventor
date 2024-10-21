@@ -87,8 +87,8 @@ const ProfileContent= () => {
   }, [])
 
   useEffect(() => {
-    setBio(user.bio || "No status yet!");
-    setStatus(user.status || "No bio yet!");
+    setBio(user.bio || "No bio yet!");
+    setStatus(user.status || "No status yet!");
   }, [user.bio, user.status]);
 
   
