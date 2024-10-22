@@ -796,3 +796,117 @@ exports.delete = async (req, res) => {
         })
     }
 }
+
+// Follow a user
+exports.followUser = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    const userToFollowId = req.body.userId;
+    if (!userToFollowId) {
+        return res.status(400).send({
+            message: "Missing userId to follow."
+        });
+    }
+
+    try {
+        const userToFollow = await User.findById(userToFollowId);
+        if (!userToFollow) {
+            return res.status(404).send({ message: `User with id=${userToFollowId} not found.` });
+        }
+
+        if (!myUser.following.includes(userToFollowId)) {
+            myUser.following.push(userToFollowId);
+            userToFollow.followers.push(myUser._id);
+
+            await myUser.save();
+            await userToFollow.save();
+            return res.status(200).send({ message: `Following user with id=${userToFollowId}` });
+        } else {
+            return res.status(400).send({ message: "Already following this user." });
+        }
+    } catch (err) {
+        return res.status(500).send({
+            message: "Error occurred while following user",
+            error: err.message
+        });
+    }
+}
+
+// Unfollow a user
+exports.unfollowUser = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    const userToUnfollowId = req.body.userId;
+    if (!userToUnfollowId) {
+        return res.status(400).send({
+            message: "Missing userId to unfollow."
+        });
+    }
+
+    try {
+        const userToUnfollow = await User.findById(userToUnfollowId);
+        if (!userToUnfollow) {
+            return res.status(404).send({ message: `User with id=${userToUnfollowId} not found.` });
+        }
+
+        if (myUser.following.includes(userToUnfollowId)) {
+            myUser.following.pull(userToUnfollowId);
+            userToUnfollow.followers.pull(myUser._id);
+
+            await myUser.save();
+            await userToUnfollow.save();
+            return res.status(200).send({ message: `Unfollowed user with id=${userToUnfollowId}` });
+        } else {
+            return res.status(400).send({ message: "Not following this user." });
+        }
+    } catch (err) {
+        return res.status(500).send({
+            message: "Error occurred while unfollowing user",
+            error: err.message
+        });
+    }
+}

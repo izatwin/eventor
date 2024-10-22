@@ -36,4 +36,8 @@ router.post('/:id/image', userController.setImage)
 
 router.delete('/account', userController.delete);
 
+router.post('/follow', userController.followUser);
+
+router.post('/unfollow', userController.unfollowUser);
+
 module.exports = router;
