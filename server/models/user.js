@@ -92,6 +92,9 @@ const UserSchema = new Schema({
     userCredentials: UserCredentialsSchema,
     posts: [{ type: Schema.Types.ObjectId, ref: "Post", required: false }],
 
+    followers: [{ type: Schema.Types.String, ref: "User", required: false }],
+    following: [{ type: Schema.Types.String, ref: "User", required: false }],
+
     biography: {type: String},
     status: {type: String},
     imageURL: {type: String}
