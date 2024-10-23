@@ -102,6 +102,10 @@
   cursor: pointer;
 }
 
+.settings-save-btn:hover {
+  background-color: #b71c1c;
+}
+
 .settings-form .settings-back {
   margin-top: 10px;
   background-color: black;
