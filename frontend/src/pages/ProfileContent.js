@@ -26,20 +26,21 @@ const ProfileContent= () => {
   const [isEditPopupOpen, setEditPopupOpen] = useState(false);
   const [isAddEventPopupOpen, setAddEventPopupOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
-
+  
   const [newPost, setNewPost] = useState({
     content : "", 
     is_event : "false",
     commentsEnabled: "false",
     userId: user.userId,
   })
+  
+  const [isFollowing, setIsFollowing] = useState(false)
 
   const [bio, setBio] = useState("")
-  
   const [status, setStatus] = useState("")
   
   const [eventStep, setEventStep] = useState("select-type")
-  
+    
   const defaultNewEvent = {
     eventType : "",
     eventName: "",
@@ -126,11 +127,24 @@ const ProfileContent= () => {
 
   }, [])
 
+
+  const handleFollow = () => {
+    // api req to follow userId 
+    if (isFollowing) {
+      // unfollow
+    }
+    else {
+      // follow
+    }
+
+    setIsFollowing(!isFollowing) 
+
+  }
+
   useEffect(() => {
     setBio(user.bio || "No bio yet!");
     setStatus(user.status || "No status yet!");
   }, [user.bio, user.status]);
-
   
   const changeBio = (e) => {
     setBio(e.target.value);
@@ -215,12 +229,12 @@ const ProfileContent= () => {
     axios.post("http://localhost:3001/api/posts", newPost)
       .then(response => {
         console.log(response.data)
-        showSuccessPopup(); 
+        showSuccessPopup("Post created successfully!"); 
         setNewPost({ ...newPost, content: "" });
       })
       .catch (err => {
         console.log(err)
-        showFailPopup(); 
+        showFailPopup("Error creating post!"); 
         setNewPost({ ...newPost, content: "" })
       });
   }
@@ -332,8 +346,11 @@ const ProfileContent= () => {
     }));
   };
 
-  const showSuccessPopup = () => {
+  const [popupMessage, setPopupMessage] = useState("")
+  
+  const showSuccessPopup = (message) => {
     var popup = document.getElementById("success");
+    setPopupMessage(message)
     popup.classList.add("show");
 
     setTimeout(function() {
@@ -341,8 +358,9 @@ const ProfileContent= () => {
     }, 1000);
 }
 
-  const showFailPopup = () => {
+  const showFailPopup = (message) => {
     var popup = document.getElementById("fail");
+    setPopupMessage(message)
     popup.classList.add("show");
 
     setTimeout(function() {
@@ -370,7 +388,13 @@ const ProfileContent= () => {
             <div className="profile-side"> 
 
               <p className="follower-count"> 0 followers </p>
-      
+
+              <button 
+                onClick={handleFollow}
+                className="follow-btn"> 
+                {isFollowing ? 'Following' : 'Follow'}
+              </button>
+
             </div>
          </div> 
           
@@ -845,8 +869,8 @@ const ProfileContent= () => {
         )}
 
         <div className="postPopups">
-          <div class="popup" id="success">Post created successfully!</div>
-          <div class="popup" id="fail">Error creating post!</div>
+          <div class="popup" id="success">{popupMessage}</div>
+          <div class="popup" id="fail">{popupMessage}</div>
         </div>
         
       </div>
