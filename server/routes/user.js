@@ -40,4 +40,6 @@ router.post('/follow', userController.followUser);
 
 router.post('/unfollow', userController.unfollowUser);
 
+router.get('/:id', userController.findOne);
+
 module.exports = router;

@@ -910,3 +910,22 @@ exports.unfollowUser = async (req, res) => {
         });
     }
 }
+
+// Find user by id
+exports.findOne = (req, res) => {
+    const id = req.params.id;
+
+    User.findById(id)
+        .then(data => {
+            if (!data)
+                return res.status(404).send({ message: `User not found with id=${id}` });
+            else res.send(data);
+        })
+        .catch(err => {
+            return res.status(500).send({
+                message: `Error retrieving user with id=${id}`,
+                error: err.message || 'Unexpected Error'
+            }
+            );
+        });
+};
