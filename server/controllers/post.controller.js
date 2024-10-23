@@ -29,7 +29,7 @@ exports.create = async (req, res) => {
         newPost.save();
 
         //add post to user
-        userPosting.posts.push(newPost._id);
+        userPosting.posts.unshift(newPost._id)
         userPosting.save();
 
         return res.send(newPost);

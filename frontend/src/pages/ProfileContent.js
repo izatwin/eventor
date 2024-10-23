@@ -106,12 +106,17 @@ const ProfileContent= () => {
             }));
             /* postResponse is a list of post ids */
             const postResponse = (await axios.get(`http://localhost:3001/api/user/${validateResponse.data["user-info"].userId}/posts/`)).data
-            console.log(postResponse)
             
+            const postContents = []
             /* make request to get the content of each post using id */ 
+            for (const currentPost of postResponse) {
+              postContents.push(((await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data))
+            }
             
             /* pass an array of posts to setPosts */
-            setPosts(postResponse)
+            /* sort posts */
+            
+            setPosts(postContents)
           }
           else {
             navigate("/");
@@ -217,6 +222,7 @@ const ProfileContent= () => {
         console.log(response.data)
         showSuccessPopup(); 
         setNewPost({ ...newPost, content: "" });
+        setPosts((prevPosts) => [newPost, ...prevPosts]);
       })
       .catch (err => {
         console.log(err)
@@ -267,7 +273,16 @@ const ProfileContent= () => {
 
   /* TODO: Function to delete a user's post */
   const handlePostDelete = (id) => {
-    // api request 
+    // api request
+    console.log(` We deleting this post http://localhost:3001/api/posts/${id}`)
+    axios.delete(`http://localhost:3001/api/posts/${id}`)
+    .then((response) => {
+      console.log(response)
+    })
+    .catch((err) => {
+      console.log(err);
+      showFailPopup();
+    })
   }
 
   /* TODO: Functiom to add/create an event */
@@ -501,7 +516,7 @@ const ProfileContent= () => {
                   />
                   <img 
                     src={removeIcon} 
-                    onClick={() => handlePostDelete(post.id)}   
+                    onClick={() => handlePostDelete(post._id)}   
                     alt="Remove" 
                     className="remove-icon " 
                   />
