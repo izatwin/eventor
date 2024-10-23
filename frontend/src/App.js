@@ -38,7 +38,7 @@ function App() {
             <Route path="/password" element={<Password />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<Profile />} />
-
+            // <Route path="/profile/:username" element={<Profile />} />
           </Routes>
         </BrowserRouter>
 

@@ -240,7 +240,7 @@ const SettingsContent = () => {
             <div className="settings-form">
               <div className="settings-instruct">Change display name</div>
               <input value={newDisplay} onChange={handleNewDisplayChange}type="text" placeholder="New display name" />
-              <button onClick={handleDisplayName}>Save</button>
+              <button className='settings-save-btn' onClick={handleDisplayName}>Save</button>
               <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
             </div>
@@ -261,7 +261,7 @@ const SettingsContent = () => {
                   onChange={handleUrlChange}
                 />
 
-                <button onClick={handleProfilePic}>Save</button>
+                <button className='settings-save-btn' onClick={handleProfilePic}>Save</button>
                 <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
           </div>
@@ -272,7 +272,7 @@ const SettingsContent = () => {
             <div className="settings-form">
               <div className="settings-instruct">Change username</div>
               <input value={newUsername} onChange={handleNewUsernameChange}type="text" placeholder="New username" />
-              <button onClick={handleUsername}>Save</button>
+              <button className='settings-save-btn' onClick={handleUsername}>Save</button>
               <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
           </div>
@@ -284,7 +284,7 @@ const SettingsContent = () => {
               <div className="settings-instruct">Change password</div>
               <input value={oldPassword} onChange={handleOldPasswordChange}type="password" placeholder="Old password" />
               <input value={newPassword} onChange={handleNewPasswordChange}type="password" placeholder="New password" />
-              <button onClick={handlePassword}>Save</button>
+              <button className='settings-save-btn' onClick={handlePassword}>Save</button>
               <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
            </div>
@@ -295,7 +295,7 @@ const SettingsContent = () => {
             <div className="settings-form">
               <div className="settings-instruct">Delete account</div>
               <input value={password} onChange={handlePasswordChange} type="password" placeholder="Confirm password" />
-              <button onClick={handleDelete}>Submit</button>
+              <button className='settings-save-btn' onClick={handleDelete}>Submit</button>
               <button className="settings-back" onClick={() => setContent('default')}> Back </button>
             </div>
            </div>

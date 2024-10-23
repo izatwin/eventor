@@ -27,7 +27,7 @@ const ProfileContent= () => {
   const [isAddEventPopupOpen, setAddEventPopupOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
 
-  const [post, setPost] = useState({
+  const [newPost, setNewPost] = useState({
     content : "", 
     is_event : "false",
     commentsEnabled: "false",
@@ -38,6 +38,46 @@ const ProfileContent= () => {
   
   const [status, setStatus] = useState("")
   
+  const [eventStep, setEventStep] = useState("select-type")
+  
+  const defaultNewEvent = {
+    eventType : "",
+    eventName: "",
+    eventDescription: "",
+    startTime : "",
+    endTime : "",
+    embeddedImage : "",
+    gaugeInterest : false,
+    interesteUsers: [],
+    interestTags: [],
+    
+    // NormalEvent
+    location: "",
+    
+    // MusicReleaseEvent
+    releaseTitle: "",
+    releaseArtist: "",
+    releaseType: "", // 'single, 'ep', 'album'
+    songs: [{                     
+        songTitle: "",
+        songArtist: "",
+        songDuration: 0
+    }],
+    appleMusicLink: "",           
+    spotifyLink: "",              
+
+    // TicketedEvent
+    getTicketsLink: "",           
+    destinations: [{              
+        location: "",
+        time: 0                   
+    }]
+  }
+
+  const [newEvent, setNewEvent] = useState(defaultNewEvent)
+  const [events, setEvents] = useState([]);
+
+
   useEffect(() => {
     
     const validateAndGetPosts = async () => {
@@ -60,7 +100,7 @@ const ProfileContent= () => {
               status: userInfo.status,
               pfp: userInfo.imageURL,
             })
-            setPost(prevPost => ({
+            setNewPost(prevPost => ({
               ...prevPost,
               userId: userInfo.userId,
             }));
@@ -87,8 +127,8 @@ const ProfileContent= () => {
   }, [])
 
   useEffect(() => {
-    setBio(user.bio || "No status yet!");
-    setStatus(user.status || "No bio yet!");
+    setBio(user.bio || "No bio yet!");
+    setStatus(user.status || "No status yet!");
   }, [user.bio, user.status]);
 
   
@@ -166,22 +206,22 @@ const ProfileContent= () => {
   };
   
   const handlePostChange = (e) => {
-    setPost({ ...post, [e.target.name]: e.target.value });
-    console.log(post);
+    setNewPost({ ...newPost, [e.target.name]: e.target.value });
+    console.log(newPost);
   };
 
   const handlePost = () => {
-    console.log(post)
-    axios.post("http://localhost:3001/api/posts", post)
+    console.log(newPost)
+    axios.post("http://localhost:3001/api/posts", newPost)
       .then(response => {
         console.log(response.data)
         showSuccessPopup(); 
-        setPost({ ...post, content: "" });
+        setNewPost({ ...newPost, content: "" });
       })
       .catch (err => {
         console.log(err)
         showFailPopup(); 
-        setPost({ ...post, content: "" })
+        setNewPost({ ...newPost, content: "" })
       });
   }
 
@@ -219,33 +259,79 @@ const ProfileContent= () => {
     }));
   }
 
-  /* Function to edit a user's post */
+  /* TODO : Function to edit a user's post */
   const handlePostEdit = () => {
     /*const { id, content } = currentPost; */
-
+    /* api req to update post content */
   }
 
-  /* Function to delete a user's post */
+  /* TODO: Function to delete a user's post */
   const handlePostDelete = (id) => {
     // api request 
   }
 
+  /* TODO: Functiom to add/create an event */
+  const handleAddEvent = () => {
+    // api request   
+    console.log(newEvent) 
+    setEvents([newEvent]);
+  }  
 
   const handleAddEventPopup = (post) => {
     setCurrentPost(post);  
     setAddEventPopupOpen(true); 
+    setEventStep('select-type')
+    setNewEvent(defaultNewEvent)
   }
 
   const closeAddEventPopup = () => {
-    console.log("")
     setAddEventPopupOpen(false);
     setCurrentPost(null);    
+    
   };
 
-  const handleAddEvent = () => {
-    
-  }
-  
+  const handleEventInputChange = (e) => {
+    setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
+  };
+
+  const addSong= () => {
+
+    setNewEvent((prevEvent) => ({
+      ...prevEvent,
+      songs : [...prevEvent.songs, { songTitle: "", songArtist: "", songDuration: 0 }]
+    }));
+  };
+
+  const handleSongChange = (index, e) => {
+    const { name, value } = e.target;
+    const updatedSongs= [...newEvent.songs];
+    updatedSongs[index][name] = value;
+
+    setNewEvent((prevEvent) => ({
+      ...prevEvent,
+      songs: updatedSongs
+    }));
+  };
+
+
+  const addDestination = () => {
+    setNewEvent((prevEvent) => ({
+      ...prevEvent,
+      destinations: [...prevEvent.destinations, { location: "", time: 0 }]
+    }));
+  };
+
+  const handleDestinationChange = (index, e) => {
+    const { name, value } = e.target;
+    const updatedDestinations = [...newEvent.destinations];
+    updatedDestinations[index][name] = value;
+
+    setNewEvent((prevEvent) => ({
+      ...prevEvent,
+      destinations: updatedDestinations
+    }));
+  };
+
   const showSuccessPopup = () => {
     var popup = document.getElementById("success");
     popup.classList.add("show");
@@ -270,7 +356,10 @@ const ProfileContent= () => {
         <div className="upper-profile-card">
           
           <div className="profile-upper-container">
-            <img src={user.pfp || profilePic} alt="Profile" className="profile-picture" />
+            <img 
+              src={user.pfp || profilePic} 
+              alt="Profile" 
+              className="profile-picture" />
 
             <div className="profile-information">
               <div className="p-name">{user.displayName}</div>
@@ -287,9 +376,21 @@ const ProfileContent= () => {
           
           <div className="status-container">
           
-            <textarea name="status" readOnly={!editingStatus} className="profile-status" type="text" onChange={changeStatus} value={status} />
+            <textarea 
+              name="status" 
+              readOnly={!editingStatus} 
+              className="profile-status" 
+              type="text" 
+              onChange={changeStatus} 
+              value={status} />
+
             <div className="edit-card"> 
-              <img src={editingStatus ? checkIcon : editIcon } onClick={editingStatus ? handleStatusChange : handleStatusEdit } alt="Edit" className="edit-icon"/> 
+              <img 
+                src={editingStatus ? checkIcon : editIcon } 
+                onClick={editingStatus ? handleStatusChange : handleStatusEdit } 
+                alt="Edit" 
+                className="edit-icon"
+              /> 
               <p className="edit-text"> Edit Status </p>
             </div>
 
@@ -303,23 +404,40 @@ const ProfileContent= () => {
           <div className="about-title-container">
             <h className="about-title"> About </h>
             <div className="edit-bio-card"> 
-              <img src={editingBio ? checkIcon : editIcon} onClick={editingBio ? handleBioChange : handleBioEdit} alt="Edit" className="edit-bio-icon"/> 
+              <img 
+                src={editingBio ? checkIcon : editIcon} 
+                onClick={editingBio ? handleBioChange : handleBioEdit} 
+                alt="Edit" 
+                className="edit-bio-icon"
+              /> 
               <p className="edit-bio-text"> Edit Bio </p>
             </div>
           </div>
           
           <div className="about-text-container">
 
-            <textarea name="bio" readOnly={!editingBio} className="profile-bio" type="text" onChange={changeBio} value={bio}/>
+            <textarea 
+              name="bio" 
+              readOnly={!editingBio} 
+              className="profile-bio" 
+              type="text" 
+              onChange={changeBio} 
+              value={bio}
+            />
           </div>
 
         </div>
-      
 
         <div className="post-card">
           
           <div className="post-input">
-            <textarea name="content" className="post-text" value={post.content} type="text" onChange={handlePostChange} placeholder="What will you be hosting next?"/>
+            <textarea 
+              name="content" 
+              className="post-text" 
+              value={newPost.content} 
+              type="text" 
+              onChange={handlePostChange} 
+              placeholder="What will you be hosting next?"/>
           </div>
 
           <div className="post-buttons">
@@ -330,14 +448,27 @@ const ProfileContent= () => {
               style={{ display: 'none' }}
               onChange={handleImageChange}
             />
-            <img src={imageIcon} onClick={handleUploadClick} lt="Image" className="image-icon"/> 
-            <img src={calendarIcon} alt="Calendar" className="calendar-icon"/> 
-            <button onClick={handlePost} className="post-btn"> Post </button> 
+            <img 
+              src={imageIcon} 
+              onClick={handleUploadClick} 
+              alt="Image" 
+              className="image-icon"
+            /> 
+            <img 
+              src={calendarIcon} 
+              alt="Calendar" 
+              className="calendar-icon"
+            /> 
+            <button 
+              onClick={handlePost} 
+              className="post-btn"> 
+              Post 
+            </button> 
           </div>
             
         </div>
         
-
+        
         <div className="profile-feed">
           {posts.map(post=>(
 
@@ -345,7 +476,11 @@ const ProfileContent= () => {
 
               <div className="post-header"> 
 
-                <img src={user.pfp || profilePic} alt="PostProfile" className="post-profilepic" />
+                <img
+                  src={user.pfp || profilePic} 
+                  alt="PostProfile" 
+                  className="post-profilepic" 
+                />
                 
                 <div className="post-profile-info">
                   <div className="post-name">{user.displayName}</div>
@@ -353,13 +488,27 @@ const ProfileContent= () => {
                 </div>      
 
                  <div className="modify-post">
-                  <button onClick={() => handleAddEventPopup(post)} className="add-event-btn"> Add Event </button> 
-                  <img src={editIcon} onClick={() => handleEditPopup(post)} alt="Edit" className="edit-post-icon " />
-                  <img src={removeIcon} onClick={() => handlePostDelete(post.id)} alt="Remove" className="remove-icon " />
+                  <button 
+                    onClick={() => handleAddEventPopup(post)} 
+                    className="add-event-btn"> 
+                    Add Event 
+                  </button> 
+                  <img 
+                    src={editIcon} 
+                    onClick={() => handleEditPopup(post)} 
+                    alt="Edit" 
+                    className="edit-post-icon " 
+                  />
+                  <img 
+                    src={removeIcon} 
+                    onClick={() => handlePostDelete(post.id)}   
+                    alt="Remove" 
+                    className="remove-icon " 
+                  />
             
                 </div>
 
-             </div>
+              </div>
 
               <div className="post-content"> 
                 {post.content}
@@ -379,45 +528,321 @@ const ProfileContent= () => {
           ))}
         </div>
         
-      {isEditPopupOpen && (
-        <div className="edit-popup">
-          <div className="edit-popup-content">
-            <h2>Edit post</h2>
-            <textarea 
-              value={currentPost?.content || ''} 
-              className="edit-post-textarea"
-              onChange={handlePostEditChange}  
-              placeholder="Edit your post"
-              rows="5"
-              cols="30"
-            />
-            <button onClick={handlePostEdit} className="save-button">Save</button>
-            <button onClick={closeEditPopup} className="close-button">x</button>
+        {isEditPopupOpen && (
+          <div className="edit-popup">
+            <div className="edit-popup-content">
+              <h2>Edit post</h2>
+              <textarea 
+                value={currentPost?.content || ''} 
+                className="edit-post-textarea"
+                onChange={handlePostEditChange}  
+                placeholder="Edit your post"
+                rows="5"
+                cols="30"
+              />
+              <button 
+                onClick={handlePostEdit} 
+                className="save-button">
+                Save
+              </button>
+              <button 
+                onClick={closeEditPopup} 
+                className="close-button">
+                x
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     
-          {isAddEventPopupOpen && (
-            <div className="add-event-popup">
+        {isAddEventPopupOpen && (
+          <div className="add-event-popup">
+
+            {eventStep === "select-type" && (
+              <div className="add-event-content">
+                <h2>Select event type</h2>
+           
+                <button 
+                  onClick={() => {
+                      setNewEvent(prevEvent => ({
+                        ...prevEvent,  
+                        eventType: 'NormalEvent'
+                      })); 
+                      setEventStep("normal")
+                    }
+                  } 
+                  className="event-type-btn"> 
+                  Normal
+                </button>
+
+                <button 
+                  onClick={() => {
+                      setNewEvent(prevEvent => ({
+                        ...prevEvent,  
+                        eventType: 'MusicReleaseEvent'
+                      })); 
+                      setEventStep("music-release")
+                    }
+                  } 
+                  className="event-type-btn">
+                  Music Release
+                </button>
+
+                <button 
+                  onClick={() => {
+                      setNewEvent(prevEvent => ({
+                        ...prevEvent,  
+                        eventType: 'TicketedEvent'
+                      })); 
+                      setEventStep("ticketed")
+                    }
+                  } 
+                  className="event-type-btn">
+                  Ticketed
+                </button>
+
+                <button 
+                  onClick={closeAddEventPopup} 
+                  className="close-button">
+                  x
+                </button>
+              </div>
+            )}
+
+            {(eventStep === "normal" || eventStep === "music-release" || eventStep === "ticketed") && (
               <div className="add-event-content">
                 <h2>Create event</h2>
+            
                 <form>
-                  <input type="text" placeholder="Name" name="name" className="input-field" />
-                  <textarea placeholder="Description" name="description" className="input-field textarea-field" />
-                  <input type="text" placeholder="Type" name="type" className="input-field" />
-                  <input type="text" placeholder="Image" name="image" className="input-field" />
+
+                  <input 
+                    type="text" 
+                    placeholder="Name" 
+                    name="eventName" 
+                    className="input-field" 
+                    value={newEvent.eventName}
+                    onChange={handleEventInputChange}
+                  />
+                  <textarea 
+                    placeholder="Description"
+                    name="eventDescription" 
+                    className="input-field textarea-field" 
+                    value={newEvent.eventDescription}
+                    onChange={handleEventInputChange}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Image URL" 
+                    name="embeddedImage" 
+                    className="input-field" 
+                    value={newEvent.embeddedImage}
+                    onChange={handleEventInputChange}
+                  />
+
                   <div className="date-fields">
-                    <input type="date" name="start" className="input-field" />
+                    <input 
+                      type="date" 
+                      name="startTime" 
+                      className="input-field" 
+                      value={newEvent.startTime}
+                      onChange={handleEventInputChange}
+                    />
                     <span className="date-separator">-</span>
-                    <input type="date" name="end" className="input-field" />
+                    <input 
+                      type="date" 
+                      name="endTime" 
+                      className="input-field" 
+                      value={newEvent.endTime}
+                      onChange={handleEventInputChange}
+                    />
                   </div>
+
                 </form>
+                <button 
+                  onClick={ () => { 
+                    setEventStep(prevEventStep => prevEventStep + "2")
+                    }
+                  } 
+                  className="add-event-button">
+                  Continue
+                </button>
+                <button 
+                  onClick={closeAddEventPopup} 
+                  className="close-button">
+                  x
+                </button>
+              </div>
+
+            )}
+
+            {eventStep === "normal2" && (
+
+              <div className="add-event-content">
+
+                <h2>Create event</h2>
+
+                <input 
+                  type="text" 
+                  placeholder="Address" 
+                  name="location" 
+                  className="input-field" 
+                  value={newEvent.location}
+                  onChange={handleEventInputChange}
+                />
                 <button onClick={handleAddEvent} className="add-event-button">Add</button>
                 <button onClick={closeAddEventPopup} className="close-button">x</button>
               </div>
-            </div>
-        )}
 
+            )}
+
+            {eventStep === "music-release2" && (
+              <div className="add-event-content">
+
+                <h2>Create event</h2>
+
+                <input 
+                  type="text" 
+                  placeholder="Release Title" 
+                  name="releaseTitle" 
+                  className="input-field" 
+                  value={newEvent.releaseTitle}
+                  onChange={handleEventInputChange}
+                />
+                <input 
+                  type="text" 
+                  placeholder="Release Artist" 
+                  name="releaseArtist" 
+                  className="input-field" 
+                  value={newEvent.releaseArtist}
+                  onChange={handleEventInputChange}
+                />
+
+                 <input 
+                  type="text" 
+                  placeholder="Apple Music Link" 
+                  name="appleMusicLink" 
+                  className="input-field" 
+                  value={newEvent.appleMusicLink}
+                  onChange={handleEventInputChange}
+                />
+                 <input 
+                  type="text" 
+                  placeholder="Spotify Link" 
+                  name="spotifyLink" 
+                  className="input-field" 
+                  value={newEvent.spotifyLink}
+                  onChange={handleEventInputChange}
+                />
+
+              
+                <h4>Songs</h4>
+                <div className="add-event-input"> 
+                  {newEvent.songs.map((song, index) => (
+                    <div key={index} className="song-input-group">
+
+                      <h5> {index + 1} </h5>
+                      <input 
+                        type="text" 
+                        placeholder="Title" 
+                        name="title" 
+                        value={song.title}
+                        onChange={(e) => handleSongChange(index, e)}
+                        className="input-field" 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Artist" 
+                        name="time" 
+                        value={song.artist}
+                        onChange={(e) => handleSongChange(index, e)}
+                        className="input-field" 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Duration" 
+                        name="duration" 
+                        value={song.duration}
+                        onChange={(e) => handleSongChange(index, e)}
+                        className="input-field" 
+                      />
+                    </div>
+                  ))}
+
+                </div>
+
+                <button
+                  onClick={addSong} 
+                  className="add-button"> 
+                  + 
+                </button>
+
+                <button 
+                  onClick={handleAddEvent} 
+                  className="add-event-button">
+                  Add
+                </button>
+
+                <button 
+                  onClick={closeAddEventPopup} 
+                  className="close-button">
+                  x
+                </button>
+              
+              </div>
+
+            )}
+
+            {eventStep === "ticketed2" && (
+              <div className="add-event-content">
+
+                <h2>Create event</h2>
+                <input 
+                  type="text" 
+                  placeholder="Ticket Link" 
+                  name="ticket-link" 
+                  className="input-field" 
+                  value={newEvent.getTicketsLink}
+                  onChange={handleEventInputChange}
+                />
+
+
+                <h4>Destintations</h4>
+
+                <div className="add-event-input"> 
+                  {newEvent.destinations.map((destination, index) => (
+                    <div key={index} className="destination-input-group">
+                      <h5> {index + 1} </h5>
+                      <input 
+                        type="text" 
+                        placeholder="Location" 
+                        name="location" 
+                        value={destination.location}
+                        onChange={(e) => handleDestinationChange(index, e)}
+                        className="input-field" 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Time" 
+                        name="time" 
+                        value={destination.time}
+                        onChange={(e) => handleDestinationChange(index, e)}
+                        className="input-field" 
+                      />
+                    </div>
+                  ))}
+
+                </div>
+
+
+                <button onClick={addDestination} className="add-button"> + </button>
+                <button onClick={closeAddEventPopup} className="close-button">x</button>
+                <button onClick={handleAddEvent} className="add-event-button">Add</button>
+                
+              </div>
+            )}
+
+          </div>
+
+        )}
 
         <div className="postPopups">
           <div class="popup" id="success">Post created successfully!</div>
