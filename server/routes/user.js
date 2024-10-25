@@ -42,4 +42,6 @@ router.post('/unfollow', userController.unfollowUser);
 
 router.get('/:id', userController.findOne);
 
+router.get('/search/:query', userController.searchUsers);
+
 module.exports = router;
