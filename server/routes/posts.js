@@ -14,4 +14,8 @@ router.delete('/:id', postController.delete);
 
 router.put('/:id', postController.update);
 
+router.post('/toggle-like', postController.toggleLike);
+
+router.post('/action', postController.viewOrSharePost);
+
 module.exports = router;
