@@ -134,3 +134,115 @@ exports.delete = async (req, res) => {
         })
     }
 };
+
+// Like or Unlike a post
+exports.toggleLike = async (req, res) => {
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Request body cannot be empty."
+        });
+    }
+
+    const postId = req.body.postId;
+    const like = req.body.like; // Expect a boolean to indicate like or unlike
+
+    let authenticated = false;
+    let reqCookies = req.cookies;
+    let myUser;
+    
+    if (reqCookies) {
+        let userId = reqCookies.user_id;
+        if (userId) {
+            myUser = await User.findById(userId).exec();
+            if (myUser) {
+                let authToken = reqCookies.auth_token;
+                if (authToken) {
+                    const userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(authToken)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    try {
+        const post = await Post.findById(postId).exec();
+        if (!post) {
+            return res.status(404).send({ message: `Post not found with id=${postId}` });
+        }
+
+        const likedPosts = myUser.likedPosts || [];
+        const isAlreadyLiked = likedPosts.includes(postId);
+
+        if (like && !isAlreadyLiked) {
+            // Increment like
+            post.likes += 1;
+            myUser.likedPosts.push(postId);
+        } else if (!like && isAlreadyLiked) {
+            // Decrement like
+            post.likes -= 1;
+            myUser.likedPosts = likedPosts.filter(id => id !== postId);
+        } else {
+            return res.status(400).send({ message: "Invalid operation." });
+        }
+
+        await post.save();
+        await myUser.save();
+
+        return res.status(200).send({ message: "Post like status updated." });
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error updating like status for post with id=${postId}`,
+            error: err.message || "Unexpected Error"
+        });
+    }
+};
+
+// Record a view or share for a post
+exports.viewOrSharePost = async (req, res) => {
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Request body cannot be empty."
+        });
+    }
+
+    const postId = req.body.postId;
+    const actionType = req.body.actionType; // Expect 'view' or 'share'
+
+    if (!['view', 'share'].includes(actionType)) {
+        return res.status(400).send({
+            message: "Invalid action type. Expect 'view' or 'share'."
+        });
+    }
+
+    try {
+        const post = await Post.findById(postId).exec();
+        if (!post) {
+            return res.status(404).send({ message: `Post not found with id=${postId}` });
+        }
+
+        if (actionType === 'view') {
+            post.views += 1;
+        } else if (actionType === 'share') {
+            post.shares += 1;
+        }
+
+        await post.save();
+
+        return res.status(200).send({ message: `Post ${actionType} count updated.` });
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error updating ${actionType} count for post with id=${postId}`,
+            error: err.message || "Unexpected Error"
+        });
+    }
+};
