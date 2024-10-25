@@ -62,7 +62,7 @@ const ProfileContent= () => {
     songs: [{                     
         songTitle: "",
         songArtist: "",
-        songDuration: 0
+        songDuration: ""
     }],
     appleMusicLink: "",           
     spotifyLink: "",              
@@ -71,7 +71,7 @@ const ProfileContent= () => {
     getTicketsLink: "",           
     destinations: [{              
         location: "",
-        time: 0                   
+        time: ""                   
     }]
   }
 
@@ -107,7 +107,8 @@ const ProfileContent= () => {
             }));
             /* postResponse is a list of post ids */
             const postResponse = (await axios.get(`http://localhost:3001/api/user/${validateResponse.data["user-info"].userId}/posts/`)).data
-            
+            console.log("post res: ")
+            console.log(postResponse) 
             const postContents = []
             /* make request to get the content of each post using id */ 
             for (const currentPost of postResponse) {
@@ -233,10 +234,11 @@ const ProfileContent= () => {
     console.log(newPost)
     axios.post("http://localhost:3001/api/posts", newPost)
       .then(response => {
+        console.log("posting res: ")
         console.log(response.data)
         showSuccessPopup("Post created successfully!"); 
         setNewPost({ ...newPost, content: "" });
-        setPosts((prevPosts) => [newPost, ...prevPosts]);
+        setPosts((prevPosts) => [response.data, ...prevPosts]);
       })
       .catch (err => {
         console.log(err)
@@ -292,10 +294,11 @@ const ProfileContent= () => {
     axios.delete(`http://localhost:3001/api/posts/${id}`)
     .then((response) => {
       console.log(response)
+      showSuccessPopup("Post deleted successfully!")
     })
     .catch((err) => {
       console.log(err);
-      showFailPopup();
+      showFailPopup("Error deleting post");
     })
   }
 
@@ -304,6 +307,7 @@ const ProfileContent= () => {
     // api request   
     console.log(newEvent) 
     setEvents([newEvent]);
+    closeAddEventPopup();
   }  
 
   const handleAddEventPopup = (post) => {
@@ -438,10 +442,10 @@ const ProfileContent= () => {
         </div>
 
 
-        <div className="profile-lower-card">
+        <div className="lower-profile-card">
 
           <div className="about-title-container">
-            <h className="about-title"> About </h>
+            <h1 className="about-title"> About </h1>
             <div className="edit-bio-card"> 
               <img 
                 src={editingBio ? checkIcon : editIcon} 
@@ -509,62 +513,131 @@ const ProfileContent= () => {
         
         
         <div className="profile-feed">
-          {posts.map(post=>(
+          {posts.length === 0 ? (
 
-            <div className="post" key={post.id}>
+            <div 
+              className="empty-message">
+              <h2> Nothing Here Yet </h2>
+              <p> Create a post for it to show up on your profile! </p>
+            </div>
 
-              <div className="post-header"> 
+          ) : (
+            posts.map(post=>(
+              <div className="post" key={post.id}>
 
-                <img
-                  src={user.pfp || profilePic} 
-                  alt="PostProfile" 
-                  className="post-profilepic" 
-                />
+                <div className="post-header"> 
+
+                  <img
+                    src={user.pfp || profilePic} 
+                    alt="PostProfile" 
+                    className="post-profilepic" 
+                  />
+                  
+                  <div className="post-profile-info">
+                    <div className="post-name">{user.displayName}</div>
+                    <div className="post-username">@{user.userName}</div>
+                  </div>      
+
+                   <div className="modify-post">
+                    <button 
+                      onClick={() => handleAddEventPopup(post)} 
+                      className="add-event-btn"> 
+                      Add Event 
+                    </button> 
+                    <img 
+                      src={editIcon} 
+                      onClick={() => handleEditPopup(post)} 
+                      alt="Edit" 
+                      className="edit-post-icon " 
+                    />
+                    <img 
+                      src={removeIcon} 
+                      onClick={() => handlePostDelete(post._id)}   
+                      alt="Remove" 
+                      className="remove-icon " 
+                    />
+              
+                  </div>
+
+                </div>
+
+                <div className="post-content"> 
+                  {post.content}
+                </div>
+
+  
+
+                {newEvent.eventType !== "" && (
+                  <div className="event"> 
+                    <h1 
+                      className="event-name"> 
+                      {newEvent.eventName} 
+                    </h1>
+                    <p 
+                      className="event-description"> 
+                      {newEvent.eventDescription} 
+                    </p>
+                    <div 
+                      className="event-times"> 
+                      {newEvent.startTime}-{newEvent.endTime}
+                    </div> 
+                    <img
+                      src={newEvent.embeddedImage} 
+                      alt="event-embeddedImage" 
+                      className="event-embeddedImage" 
+                    />
+                    
+                    {newEvent.eventType === "NormalEvent" && (
+                      <p className="event-location"> Location: {newEvent.location} </p>
+                    )}
+                    {newEvent.eventType === "MusicReleaseEvent" && (
+                      <div>
+                        <h2 className="event-release-title"> <b> {newEvent.releaseTitle} </b> </h2>
+                        <p className="event-release-artist"> {newEvent.releaseArtist} </p>
+                        <p className="event-release-type"> [{newEvent.releaseType}] </p> 
+      
+                        {newEvent.songs.map((song, index) => (
+                            <div className="event-song" key={index}> 
+                              {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
+                            </div>
+                        ))}
+                        <br/>
+                        <i> Apple Music: </i> <a href={newEvent.appleMusicLink} style= {{color: 'black'}}> {newEvent.appleMusicLink} </a>  <br/>
+                        <i> Spotify: </i> <a href={newEvent.spotifyLink} style= {{color: 'black'}} > {newEvent.spotifyLink} </a> <br/> <br/>
+
+  
+                      </div>
+                    )}
+                    {newEvent.eventType === "TicketedEvent" && (
+                      <div>
+                        <i> Get Tickets: </i> <a href={newEvent.getTicketsLink} style= {{color: 'black'}}> {newEvent.getTicketsLink} </a>  <br/><br/>
+                        {newEvent.destinations.map((destination, index) => (
+                            <div className="event-destination"> 
+                              {index + 1}. {destination.location} ({destination.time})
+                            </div>
+                        ))}
+                        <br/>
+                      </div>
+                    )}
+                    
+                    
+                  </div>
+                )}
                 
-                <div className="post-profile-info">
-                  <div className="post-name">{user.displayName}</div>
-                  <div className="post-username">@{user.userName}</div>
-                </div>      
+                <div className="post-buttons">
 
-                 <div className="modify-post">
-                  <button 
-                    onClick={() => handleAddEventPopup(post)} 
-                    className="add-event-btn"> 
-                    Add Event 
-                  </button> 
-                  <img 
-                    src={editIcon} 
-                    onClick={() => handleEditPopup(post)} 
-                    alt="Edit" 
-                    className="edit-post-icon " 
-                  />
-                  <img 
-                    src={removeIcon} 
-                    onClick={() => handlePostDelete(post._id)}   
-                    alt="Remove" 
-                    className="remove-icon " 
-                  />
-            
+                  <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
+                  <div className="views-num num">{post.views}</div>
+                  <img src={likeIcon} alt="Like" className="like-icon post-icon"/> 
+                  <div className="likes-num num"> {post.likes} </div>
+                  <img src={shareIcon} alt="Share" className="share-icon post-icon"/> 
+                  <div className="shares-num num"> {post.shares} </div>
                 </div>
 
               </div>
-
-              <div className="post-content"> 
-                {post.content}
-              </div>
-
-              <div className="post-buttons">
-
-                <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
-                <div className="views-num num">{post.views}</div>
-                <img src={likeIcon} alt="Like" className="like-icon post-icon"/> 
-                <div className="likes-num num"> {post.likes} </div>
-                <img src={shareIcon} alt="Share" className="share-icon post-icon"/> 
-                <div className="shares-num num"> {post.shares} </div>
-              </div>
-            </div>
-
-          ))}
+              
+            ))
+          )}
         </div>
         
         {isEditPopupOpen && (
@@ -677,17 +750,17 @@ const ProfileContent= () => {
                     onChange={handleEventInputChange}
                   />
 
-                  <div className="date-fields">
+                  <div className="time-fields">
                     <input 
-                      type="date" 
+                      type="time" 
                       name="startTime" 
                       className="input-field" 
                       value={newEvent.startTime}
                       onChange={handleEventInputChange}
                     />
-                    <span className="date-separator">-</span>
+                    <span className="time-separator">-</span>
                     <input 
-                      type="date" 
+                      type="time" 
                       name="endTime" 
                       className="input-field" 
                       value={newEvent.endTime}
@@ -771,6 +844,41 @@ const ProfileContent= () => {
                   value={newEvent.spotifyLink}
                   onChange={handleEventInputChange}
                 />
+                <div className="select-release-type">
+                  <button 
+                    className={`release-type-btn ${newEvent.releaseType === 'single' ? 'selected' : ''}`}
+                    onClick={() => 
+                      setNewEvent((prevEvent) => ({
+                        ...prevEvent,
+                        releaseType: 'single' 
+                      }))
+                    }>
+                    Single 
+                  </button>
+                  
+                  <button 
+                    className={`release-type-btn ${newEvent.releaseType === 'ep' ? 'selected' : ''}`}
+                    onClick={() => 
+                      setNewEvent((prevEvent) => ({
+                        ...prevEvent,
+                        releaseType: 'ep' 
+                      }))
+                    }>
+                    EP 
+                  </button>
+                  
+                  <button 
+                    className={`release-type-btn ${newEvent.releaseType === 'album' ? 'selected' : ''}`}
+                    onClick={() => 
+                      setNewEvent((prevEvent) => ({
+                        ...prevEvent,
+                        releaseType: 'album' 
+                      }))
+                    }>
+                    Album 
+                  </button>
+
+                </div>
 
               
                 <h4>Songs</h4>
@@ -782,7 +890,7 @@ const ProfileContent= () => {
                       <input 
                         type="text" 
                         placeholder="Title" 
-                        name="title" 
+                        name="songTitle" 
                         value={song.title}
                         onChange={(e) => handleSongChange(index, e)}
                         className="input-field" 
@@ -790,7 +898,7 @@ const ProfileContent= () => {
                       <input 
                         type="text" 
                         placeholder="Artist" 
-                        name="time" 
+                        name="songArtist" 
                         value={song.artist}
                         onChange={(e) => handleSongChange(index, e)}
                         className="input-field" 
@@ -798,7 +906,7 @@ const ProfileContent= () => {
                       <input 
                         type="text" 
                         placeholder="Duration" 
-                        name="duration" 
+                        name="songDuration" 
                         value={song.duration}
                         onChange={(e) => handleSongChange(index, e)}
                         className="input-field" 
@@ -837,7 +945,7 @@ const ProfileContent= () => {
                 <input 
                   type="text" 
                   placeholder="Ticket Link" 
-                  name="ticket-link" 
+                  name="getTicketsLink" 
                   className="input-field" 
                   value={newEvent.getTicketsLink}
                   onChange={handleEventInputChange}
@@ -884,8 +992,8 @@ const ProfileContent= () => {
         )}
 
         <div className="postPopups">
-          <div class="popup" id="success">{popupMessage}</div>
-          <div class="popup" id="fail">{popupMessage}</div>
+          <div className="popup" id="success">{popupMessage}</div>
+          <div className="popup" id="fail">{popupMessage}</div>
         </div>
         
       </div>

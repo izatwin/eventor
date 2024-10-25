@@ -48,6 +48,7 @@ const Feed = () => {
 
     axios.get("http://localhost:3001/api/posts")
     .then(response => {
+      console.log("feed posts res:")
       console.log(response.data)
       setPosts(response.data)
     })

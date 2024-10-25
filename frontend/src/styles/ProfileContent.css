@@ -7,7 +7,7 @@
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  background-color: white
+  background-color: white;
 }
 
 .profile-title {
@@ -24,6 +24,7 @@
 .profile-content {
   position: fixed;
   width: 50vw;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -32,17 +33,24 @@
   display: flex;
   flex-direction: column;
   width: 50vw;
+  height: 15vh;
 }
 
 .profile-upper-container {
   display: flex;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .profile-information {
+  display: flex;
+  flex-direction: column;
   font-size: 25px;
   margin-top: 15px;
   margin-left: 15px;
   text-align: left;
+  word-wrap: break-word;
+  max-width: 50%;
 }
 
 .p-name {
@@ -90,7 +98,6 @@
   height: 30px;
   width: 30px;
   cursor: pointer;
-  margin-top: 30px;
 }
 
 .profile-side {
@@ -122,25 +129,28 @@
 }
 
 .edit-text {
-  margin-top: 35px;
+  margin-top: 0px;
 }
 .edit-card {
   display: flex;
   margin-left: auto;
   margin-right: 2%;
+  margin-top: 2%;
 }
 
-.profile-lower-card {
+.lower-profile-card {
   margin-top: 2%;
   border-bottom: 1px solid black; 
   display: flex;
   flex-direction: column;
   padding-left: 3%;
   padding-right: 3%;
+  height: 15vh;
 }
 
 .about-title-container {
   display: flex;
+
 }
 
 .about-section {
@@ -153,6 +163,7 @@
   font-weight: bold;
   font-size: 30px;
   margin-right: 3%;
+  margin-top: 0px;
 }
 
 .edit-bio-card {
@@ -183,6 +194,7 @@
   padding: 10px;
   box-sizing: border-box; 
   border-bottom: 1px solid black; 
+  height: 15vh;
 }
 
 .post-input {
@@ -312,12 +324,44 @@
 }
 
 .profile-feed {
-  height: calc(100vh - 300px);
-  z-index: 100;
-  overflow: hidden;
+  flex-grow: 1;
   overflow-y: auto;
+  z-index: 100;
   scrollbar-width: none;
 }
+
+.empty-message {
+  display: flex;
+  flex-direction: column; 
+  height: 53vh;
+  justify-content: center;
+  align-items: center;
+}
+
+.event {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  text-align: left;
+  margin-left: 7%;
+}
+
+.event-name {
+  text-align: center;
+}
+
+.event-embeddedImage {
+  width: 80%;
+  height: auto;
+}
+.event-times {
+  margin-bottom: 2%;
+}
+
+.event-song {
+  text-align: left;  
+}
+
 
 .popup {
     position: fixed;
@@ -457,13 +501,13 @@ h2 {
   padding: 0;
 }
 
-.date-fields {
+.time-fields {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.date-separator {
+.time-separator {
   padding: 0 10px;
   font-size: 18px;
 }
@@ -510,6 +554,28 @@ h2 {
   background-color: #b71c1c;
 }
 
+.select-release-type {
+  display: flex;
+  gap: 10px;
+  justify-content: center; 
+}
+.release-type-btn {
+  padding: 10px;
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  
+}
+.release-type-btn.selected {
+  background-color: #b71c1c;
+}
+
+.release-type-btn:hover {
+  background-color: #b71c1c;
+}
 .add-button {
   background-color: white;
   cursor: pointer;
