@@ -225,7 +225,7 @@ const SettingsContent = () => {
                 <div className="profile-username">@{user.userName}</div>
               </div>
               <div className="settings-options">
-                <button onClick={()=>setContent("name-settings")} className="settings-btn"> Display Name </button>          
+                <button onClick={()=>setContent("name-settings")} className="settings-btn name-btn"> Display Name </button>          
                 <button onClick={()=>setContent("pic-settings")} className="settings-btn"> Profile Picture</button>          
                 <button onClick={()=>setContent("username-settings")} className="settings-btn"> Username </button>          
                 <button onClick={()=>setContent("password-settings")} className="settings-btn"> Password </button>          

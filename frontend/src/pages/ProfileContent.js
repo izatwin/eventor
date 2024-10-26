@@ -5,6 +5,8 @@ import imageIcon from './icons/image.png'
 import calendarIcon from './icons/calendar.png'
 import checkIcon from './icons/check.png'
 import removeIcon from './icons/remove.png'
+import expandIcon from './icons/expand.png'
+import commentIcon from './icons/comment.png'
 
 import axios from 'axios'
 import { useState, useEffect } from 'react';
@@ -15,6 +17,8 @@ import { useAuth } from '../AuthContext';
 import viewIcon from './icons/view.png'
 import likeIcon from './icons/like.png'
 import shareIcon from './icons/share.png'
+import { usePopup } from '../PopupContext';
+
 
 const ProfileContent= () => {
   const navigate = useNavigate();
@@ -41,6 +45,8 @@ const ProfileContent= () => {
   
   const [eventStep, setEventStep] = useState("select-type")
     
+  const { showSharePopup, updateShareCount } = usePopup();
+
   const defaultNewEvent = {
     eventType : "",
     eventName: "",
@@ -117,7 +123,8 @@ const ProfileContent= () => {
             
             /* pass an array of posts to setPosts */
             /* sort posts */
-            
+            console.log("postContents:") 
+            console.log(postContents) 
             setPosts(postContents)
           }
           else {
@@ -365,6 +372,16 @@ const ProfileContent= () => {
     }));
   };
 
+  // TODO
+  const handleShare = async (id) => {
+    const success = await updateShareCount(id);
+    if (success) {
+      // update share locally?
+    } else {
+      console.error('Error updating share count');
+    }
+  };
+
   const [popupMessage, setPopupMessage] = useState("")
   
   const showSuccessPopup = (message) => {
@@ -523,7 +540,7 @@ const ProfileContent= () => {
 
           ) : (
             posts.map(post=>(
-              <div className="post" key={post.id}>
+              <div className="post" key={post._id}> 
 
                 <div className="post-header"> 
 
@@ -630,8 +647,19 @@ const ProfileContent= () => {
                   <div className="views-num num">{post.views}</div>
                   <img src={likeIcon} alt="Like" className="like-icon post-icon"/> 
                   <div className="likes-num num"> {post.likes} </div>
-                  <img src={shareIcon} alt="Share" className="share-icon post-icon"/> 
+                  <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
                   <div className="shares-num num"> {post.shares} </div>
+                  
+                  <div className="expand-comment">
+                    <img src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
+                    <div className="comment-num num">{post.comments.length}</div>
+                    <img 
+                      src={expandIcon} 
+                      alt="Expand" 
+                      className="expand-icon post-icon"
+                      onClick={()=>{navigate(`/post/${post._id}`)}}/> 
+                  </div>
+
                 </div>
 
               </div>

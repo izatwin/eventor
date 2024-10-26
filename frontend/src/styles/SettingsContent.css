@@ -4,6 +4,8 @@
   position: fixed;
   border-right: 1px solid black; 
   border-left: 1px solid black; 
+  display: flex;
+  flex-direction: column;
 }
 
 .settings-title {
@@ -50,13 +52,17 @@
   font-size: 16px;
   text-align: center;
   background-color: #fff;
-  border: 1px solid #000;
   cursor: pointer;
   transition: background-color 0.2s ease;
   height: 117px;
   border-left: none;  
   border-right: none;  
-  border-bottom: none;
+  border-top: none;
+  border-bottom: 1px solid #000;
+}
+
+.name-btn {
+  border-top: 1px solid #000;
 }
 
 .settings-btn:hover {
