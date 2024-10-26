@@ -4,33 +4,48 @@ const User = require("../models/user");
 // Create and save a new Post
 exports.create = async (req, res) => {
     if (!req.body || Object.keys(req.body).length === 0) {
-        res.status(400).send({
+        return res.status(400).send({
             message: "Post cannot be empty."
         });
     }
 
-    try {
-        const possibleUserId = req.body.userId
-
-        // First check if the user exists
-        const userPosting = await User.findById(possibleUserId);
-
-        if (!userPosting) {
-            return res.status(404).send(`User with userId=${possibleUserId} not found`)
+    let authenticatedUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            authenticatedUser = await User.findById(user_id);
+            if (authenticatedUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = authenticatedUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
         }
+    }
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
 
-        // create the post
+    try {
+        // Create the post
         const newPost = new Post({
             content: req.body.content,
             is_event: req.body.is_event,
-            user: req.body.userId
+            user: authenticatedUser._id
         });
 
-        newPost.save();
+        await newPost.save();
 
-        //add post to user
-        userPosting.posts.unshift(newPost._id)
-        userPosting.save();
+        // Add post to user's posts list
+        authenticatedUser.posts.unshift(newPost._id);
+        await authenticatedUser.save();
 
         return res.send(newPost);
     } catch (err) {
@@ -40,98 +55,249 @@ exports.create = async (req, res) => {
 };
 
 // Find a single post with an id
-exports.findOne = (req, res) => {
-    const id = req.params.id;
-    const cookies = req.cookies
+exports.findOne = async (req, res) => {
+    let authenticatedUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
 
-    Post.findById(id)
-        .then(data => {
-            if (!data)
-                return res.status(404).send({ message: `Post not found with id=${id}` });
-            else res.send(data);
-        })
-        .catch(err => {
-            return res.status(500).send({
-                message: `Error retrieving post with id=${id}`,
-                error: err.message || 'Unexpected Error'
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            authenticatedUser = await User.findById(user_id);
+            if (authenticatedUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = authenticatedUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
             }
-            );
+        }
+    }
+
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
         });
+    }
+
+    const postId = req.params.id;
+
+    try {
+        const post = await Post.findById(postId).exec();
+        if (!post) {
+            return res.status(404).send({ message: `Post not found with id=${postId}` });
+        }
+
+        const postAuthor = await User.findById(post.user).exec();
+
+        if (!postAuthor) {
+            return res.status(404).send({ message: `Author not found for post with id=${postId}` });
+        }
+
+        // Check blocking conditions
+        const isBlockingThem = authenticatedUser.blockedUsers.includes(postAuthor._id.toString());
+        const isBlockedByThem = postAuthor.blockedUsers.includes(authenticatedUser._id.toString());
+
+        if (isBlockingThem || isBlockedByThem) {
+            return res.status(403).send({ message: "Access to this post is denied." });
+        }
+
+        // If authenticated and not blocked, send post data
+        return res.send(post);
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error retrieving post with id=${postId}`,
+            error: err.message || 'Unexpected Error'
+        });
+    }
 };
 
-exports.findAll = (req, res) => {
-    Post.find()
-        .then(data => {
-            if (!data)
-                return res.status(404).send({ message: "No posts found" });
-            else res.send(data);
-        })
-        .catch(err => {
-            return res.status(500).send({
-                message: "Error retreiving all posts",
-                error: err.message || "Unexpected Error"
-            })
-        })
-}
+// Find all posts by a specific user
+exports.findAllPostsByUser = async (req, res) => {
+    let authenticatedUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            authenticatedUser = await User.findById(user_id);
+            if (authenticatedUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = authenticatedUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    const targetUserId = req.params.id;
+
+    try {
+        const targetUser = await User.findById(targetUserId).exec();
+
+        if (!targetUser) {
+            return res.status(404).send({ message: `User not found with id=${targetUserId}` });
+        }
+
+        // Check blocking conditions
+        const isBlockingThem = authenticatedUser.blockedUsers.includes(targetUser._id.toString());
+        const isBlockedByThem = targetUser.blockedUsers.includes(authenticatedUser._id.toString());
+
+        if (isBlockingThem || isBlockedByThem) {
+            return res.status(403).send({ message: "Access to this user's posts is denied." });
+        }
+
+        const posts = await Post.find({ user: targetUserId }).sort({ timestamp: -1 }).exec();
+
+        return res.send(posts);
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error retrieving posts for user id=${targetUserId}`,
+            error: err.message || 'Unexpected Error'
+        });
+    }
+};
 
 // Update a post by the id
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
     if (!req.body) {
         return res.status(400).send({
             message: "Data to update post cannot be empty."
         });
     }
 
+    let authenticatedUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            authenticatedUser = await User.findById(user_id);
+            if (authenticatedUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = authenticatedUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
     const id = req.params.id;
 
-    Post.findByIdAndUpdate(id, req.body, { runValidators: true })
-        .then(data => {
-            if (!data) {
-                res.status(404).send({
-                    message: `Cannot find Post with id=${id}`
-                });
-            } else res.send({ message: "Post updated successfully." })
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `Error updating post with id=${id}`,
-                error: err
+    try {
+        const post = await Post.findById(id);
+        
+        if (!post) {
+            return res.status(404).send({
+                message: `Post not found with id=${id}`
             });
+        }
+
+        if (post.user.toString() !== authenticatedUser._id.toString()) {
+            return res.status(403).send({
+                message: "You are not allowed to update someone else's post."
+            });
+        }
+
+        const updatedPost = await Post.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
+        return res.send({ message: "Post updated successfully.", post: updatedPost });
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error updating post with id=${id}`,
+            error: err.message || "Unexpected Error"
         });
+    }
 };
 
 // Delete a post by the id
 exports.delete = async (req, res) => {
+    let authenticatedUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            authenticatedUser = await User.findById(user_id);
+            if (authenticatedUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = authenticatedUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
     const id = req.params.id;
 
     try {
-        const curPost = await Post.findById(id).exec()
-        if (!curPost) {
+        const post = await Post.findById(id);
+        if (!post) {
             return res.status(404).send({
                 message: `Cannot find post with id=${id}`
             });
         }
 
-        const curUser = await User.findById(curPost.user).exec()
-
-        const postIndex = curUser.posts.indexOf(curPost._id)
-        if (postIndex > -1) {
-            curUser.posts = curUser.posts.splice(postIndex, 1)
-            curUser.save()
-        } else {
-            return res.status(500).send({ message: `UserId=${curPost.user} in Post cannot be found`})
+        if (post.user.toString() !== authenticatedUser._id.toString()) {
+            return res.status(403).send({
+                message: "You are not allowed to delete someone else's post."
+            });
         }
 
-        await Post.findByIdAndDelete(id)
+        // If there is an attached event, delete it
+        if (post.is_event && post.eventId) {
+            await BaseEvent.findByIdAndDelete(post.eventId);
+        }
+
+        // Remove the post reference from the user's posts
+        const postIndex = authenticatedUser.posts.indexOf(post._id);
+        if (postIndex > -1) {
+            authenticatedUser.posts.splice(postIndex, 1);
+            await authenticatedUser.save();
+        }
+
+        await Post.findByIdAndDelete(id);
+
         return res.send({
-            message: "Post deleted successfully."
+            message: "Post and its attached event deleted successfully."
         });
 
     } catch (err) {
         return res.status(500).send({
             message: `Error deleting post with id=${id}`,
-            error: err.message || `Unexpected Error`
-        })
+            error: err.message || "Unexpected Error"
+        });
     }
 };
 

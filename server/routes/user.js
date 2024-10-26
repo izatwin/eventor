@@ -44,4 +44,8 @@ router.get('/:id', userController.findOne);
 
 router.get('/search/:query', userController.searchUsers);
 
+router.post('/block', userController.toggleBlockUser);
+
+router.get('/block-status/:id', userController.checkBlockStatus);
+
 module.exports = router;
