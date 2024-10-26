@@ -802,6 +802,8 @@ exports.followUser = async (req, res) => {
     let myUser = null;
     let authenticated = false;
     let req_cookies = req.cookies;
+    
+    // Authenticate the user
     if (req_cookies) {
         let user_id = req_cookies.user_id;
         if (user_id) {
@@ -817,6 +819,7 @@ exports.followUser = async (req, res) => {
             }
         }
     }
+    
     if (!authenticated) {
         return res.status(400).send({
             message: "Not logged in!"
@@ -836,6 +839,17 @@ exports.followUser = async (req, res) => {
             return res.status(404).send({ message: `User with id=${userToFollowId} not found.` });
         }
 
+        // Check if either user is blocking the other
+        const isBlockingThem = myUser.blockedUsers.includes(userToFollowId);
+        const isBlockedByThem = userToFollow.blockedUsers.includes(myUser._id);
+
+        if (isBlockingThem || isBlockedByThem) {
+            return res.status(403).send({
+                message: "Cannot follow a user who you have blocked or who has blocked you."
+            });
+        }
+
+        // Follow the user if not already following
         if (!myUser.following.includes(userToFollowId)) {
             myUser.following.push(userToFollowId);
             userToFollow.followers.push(myUser._id);
@@ -928,4 +942,129 @@ exports.findOne = (req, res) => {
             }
             );
         });
+};
+
+// Block or Unblock a user
+exports.toggleBlockUser = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    const userToBlockId = req.body.userId;
+    const block = req.body.block; // boolean indicating block or unblock
+    if (!userToBlockId) {
+        return res.status(400).send({
+            message: "Missing userId to block/unblock."
+        });
+    }
+
+    try {
+        const userToBlock = await User.findById(userToBlockId);
+        if (!userToBlock) {
+            return res.status(404).send({ message: `User with id=${userToBlockId} not found.` });
+        }
+
+        const isAlreadyBlocking = myUser.blockedUsers.includes(userToBlockId);
+
+        if (block && !isAlreadyBlocking) {
+            // Block user
+            myUser.blockedUsers.push(userToBlockId);
+            // Unfollow operations
+            myUser.following = myUser.following.filter(id => id !== userToBlockId);
+            userToBlock.followers = userToBlock.followers.filter(id => id !== myUser._id);
+            // Ensure the blocked user cannot see you
+            userToBlock.following = userToBlock.following.filter(id => id !== myUser._id);
+            myUser.followers = myUser.followers.filter(id => id !== userToBlock._id);
+        } else if (!block && isAlreadyBlocking) {
+            // Unblock user
+            myUser.blockedUsers = myUser.blockedUsers.filter(id => id !== userToBlockId);
+        } else {
+            return res.status(400).send({ message: "Invalid operation." });
+        }
+
+        await myUser.save();
+        await userToBlock.save();
+        return res.status(200).send({ message: `User block status updated.` });
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error updating block status for user with id=${userToBlockId}`,
+            error: err.message || "Unexpected Error"
+        });
+    }
+};
+
+// Check block status with another user
+exports.checkBlockStatus = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    const targetUserId = req.params.userId;
+    if (!targetUserId) {
+        return res.status(400).send({
+            message: "Missing userId to check block status."
+        });
+    }
+
+    try {
+        const targetUser = await User.findById(targetUserId);
+        if (!targetUser) {
+            return res.status(404).send({ message: `User with id=${targetUserId} not found.` });
+        }
+
+        const blockingThem = myUser.blockedUsers.includes(targetUserId);
+        const blockingUs = targetUser.blockedUsers.includes(myUser._id);
+
+        return res.status(200).send({
+            blockingThem,
+            blockingUs
+        });
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error checking block status with user id=${targetUserId}`,
+            error: err.message || "Unexpected Error"
+        });
+    }
 };

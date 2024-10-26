@@ -6,7 +6,7 @@ const postController = require('../controllers/post.controller')
 // POST /api/posts - create a new post
 router.post('/', postController.create);
 
-router.get('/', postController.findAll);
+router.get('/user/:id', postController.findAllPostsByUser);
 
 router.get('/:id', postController.findOne);
 

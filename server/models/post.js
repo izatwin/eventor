@@ -10,7 +10,7 @@ const PostSchema = new Schema({
     likes: { type: Number, min: 0, required: true, default: 0 },
     content: { type: String },
     is_event: { type: Boolean, required: true },
-    // event: {type: Schema.Types.ObjectId, ref: "Event"},
+    eventId: { type: Schema.Types.ObjectId, required: false },
     commentsEnabled: { type: Boolean, required: true, default: true },
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment", required: false }]
 });
