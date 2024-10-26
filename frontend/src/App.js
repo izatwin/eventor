@@ -16,7 +16,10 @@ import Code from './pages/Code';
 import Password from './pages/Password';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
+import Post from './pages/Post';
+
 import { AuthProvider } from './AuthContext'; 
+import { PopupProvider } from './PopupContext'; 
 
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -24,6 +27,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 function App() {
   return (
     <div className="App">
+    <PopupProvider>
       <AuthProvider>
         <BrowserRouter>
           <Routes>
@@ -38,11 +42,14 @@ function App() {
             <Route path="/password" element={<Password />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/post/:_id" element={<Post />} />
+
             // <Route path="/profile/:username" element={<Profile />} />
           </Routes>
         </BrowserRouter>
 
       </AuthProvider>
+      </PopupProvider>
     </div>
   );
 }
