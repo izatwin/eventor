@@ -307,10 +307,16 @@ const ProfileContent= () => {
     })
   }
 
-  /* TODO: Functiom to add/create an event */
+  /* TODO: Function to add/create an event */
   const handleAddEvent = () => {
     // api request   
-    console.log(newEvent) 
+    console.log(newEvent)
+    const requestData = {
+      "postId": currentPost._id,
+      "eventType": newEvent.eventType,
+      "eventData": newEvent
+    }
+    axios.post("http://localhost:3001/api/events",  requestData )
     setEvents([newEvent]);
     closeAddEventPopup();
   }  
