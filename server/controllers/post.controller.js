@@ -89,6 +89,7 @@ exports.findOne = async (req, res) => {
         if (!post) {
             return res.status(404).send({ message: `Post not found with id=${postId}` });
         }
+        console.log(post)
 
         const postAuthor = await User.findById(post.user).exec();
 
@@ -97,8 +98,15 @@ exports.findOne = async (req, res) => {
         }
 
         // Check blocking conditions
-        const isBlockingThem = authenticatedUser.blockedUsers.includes(postAuthor._id.toString());
-        const isBlockedByThem = postAuthor.blockedUsers.includes(authenticatedUser._id.toString());
+        const isBlockingThem = false
+        const isBlockedByThem = false
+        if (typeof authenticatedUser.blockedUsers !== 'undefined') {
+            isBlockingThem = authenticatedUser.blockedUsers.includes(postAuthor._id.toString());
+        }
+
+        if (typeof postAuthor.blockedUsers !== 'undefined') {
+            isBlockedByThem = postAuthor.blockedUsers.includes(authenticatedUser._id.toString());
+        }
 
         if (isBlockingThem || isBlockedByThem) {
             return res.status(403).send({ message: "Access to this post is denied." });
@@ -208,7 +216,7 @@ exports.update = async (req, res) => {
 
     try {
         const post = await Post.findById(id);
-        
+
         if (!post) {
             return res.status(404).send({
                 message: `Post not found with id=${id}`
@@ -236,7 +244,7 @@ exports.delete = async (req, res) => {
     let authenticatedUser = null;
     let authenticated = false;
     let req_cookies = req.cookies;
-    
+
     if (req_cookies) {
         let user_id = req_cookies.user_id;
         if (user_id) {
@@ -252,7 +260,7 @@ exports.delete = async (req, res) => {
             }
         }
     }
-    
+
     if (!authenticated) {
         return res.status(400).send({
             message: "Not logged in!"
@@ -315,7 +323,7 @@ exports.toggleLike = async (req, res) => {
     let authenticated = false;
     let reqCookies = req.cookies;
     let myUser;
-    
+
     if (reqCookies) {
         let userId = reqCookies.user_id;
         if (userId) {
