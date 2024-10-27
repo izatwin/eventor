@@ -1,4 +1,6 @@
 const BaseEvent = require("../models/event");
+const User = require("../models/user")
+const Post = require("../models/post");
 
 // Common function to authenticate the user
 async function authenticateUser(req) {
@@ -56,7 +58,7 @@ exports.createEvent = async (req, res) => {
             });
         }
 
-        const { eventType, postId, ...eventData } = req.body;
+        const { eventType, postId, eventData } = req.body;
 
         // Check for event type
         if (!eventType) {

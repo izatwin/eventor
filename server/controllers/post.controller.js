@@ -89,7 +89,6 @@ exports.findOne = async (req, res) => {
         if (!post) {
             return res.status(404).send({ message: `Post not found with id=${postId}` });
         }
-        console.log(post)
 
         const postAuthor = await User.findById(post.user).exec();
 
