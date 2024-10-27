@@ -20,6 +20,7 @@ const SidebarLeft = () => {
   };
 
   useEffect(() => {
+    console.log(window.location.pathname.split('/')[1])
     const handleClickOutside = (event) => {
       if (popupRef.current && !popupRef.current.contains(event.target)) {
         setProfilePopupVisible(false);
@@ -51,25 +52,56 @@ const SidebarLeft = () => {
       <div className="home-title"> EVENTOR </div>
       
       <div className="home-icon icon">
-        <img onClick={()=>navigate("/home")} src={homeIcon} alt="Home" className="icon-left" />
-        <span className="dot"></span>
+        <img 
+          className="icon-left"
+          onClick={()=>navigate("/home")} 
+          src={homeIcon} 
+          alt="Home" 
+        />
+        <span 
+          className={`dot ${window.location.pathname.split('/')[1] === 'home' ? 'active' : ''}`}>
+        </span>
       </div>
 
       <div className="explore-icon icon">
-        <img src={exploreIcon} alt="Explore" className="icon-left" />
+        <img 
+          onClick={()=>navigate("/discover")} 
+          src={exploreIcon} 
+          alt="Explore" 
+          className="icon-left" 
+        />
+        <span 
+          className={`dot ${window.location.pathname.split('/')[1] === 'discover' ? 'active' : ''}`}>
+        </span>
       </div>
 
       <div className="user-icon icon">
-        <img onClick={()=>navigate("/profile")} src={userIcon} alt="User" className="icon-left" />
+        <img 
+          onClick={()=>navigate("/profile")} 
+          src={userIcon} 
+          alt="User" 
+          className="icon-left" 
+        />
+        <span 
+          className={`dot ${window.location.pathname.split('/')[1] === 'profile' ? 'active' : ''}`}>
+        </span>
       </div>
 
       {}
       <div className="menu-icon icon">
-        <img onClick={handleProfileClick } src={menuIcon} alt="Menu" className="icon-left" />
+        <img 
+          onClick={handleProfileClick } 
+          src={menuIcon} 
+          alt="Menu" 
+          className="icon-left" />
       </div>
 
       <div className="profile">
-        <img src={user.pfp || profilePic} alt="Profile" className="profile-pic" />
+        <img 
+          src={user.pfp || profilePic} 
+          alt="Profile" 
+          className="profile-pic" 
+        />
         
         <div className="profile-info">
           <div className="profile-name">{user.displayName}</div>

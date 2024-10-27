@@ -778,7 +778,7 @@ const ProfileContent= () => {
 
                   <div className="time-fields">
                     <input 
-                      type="time" 
+                      type="date" 
                       name="startTime" 
                       className="input-field" 
                       value={newEvent.startTime}
@@ -786,7 +786,7 @@ const ProfileContent= () => {
                     />
                     <span className="time-separator">-</span>
                     <input 
-                      type="time" 
+                      type="date" 
                       name="endTime" 
                       className="input-field" 
                       value={newEvent.endTime}

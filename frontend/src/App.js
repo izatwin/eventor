@@ -17,6 +17,7 @@ import Password from './pages/Password';
 import Settings from './pages/Settings';
 import Profile from './pages/Profile';
 import Post from './pages/Post';
+import Discover from './pages/Discover';
 
 import { AuthProvider } from './AuthContext'; 
 import { PopupProvider } from './PopupContext'; 
@@ -43,6 +44,7 @@ function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/post/:_id" element={<Post />} />
+            <Route path="/discover" element={<Discover />} />
 
             // <Route path="/profile/:username" element={<Profile />} />
           </Routes>
@@ -55,4 +57,3 @@ function App() {
 }
 
 export default App;
-
