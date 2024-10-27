@@ -144,10 +144,10 @@ const ProfileContent= () => {
   const handleFollow = () => {
     // api req to follow userId 
     if (isFollowing) {
-      // unfollow
+      axios.post("http://localhost:3001/api/user/unfollow", {"userId": user.userId})
     }
     else {
-      // follow
+      axios.post("http://localhost:3001/api/user/follow", {"userId": user.userId})
     }
 
     setIsFollowing(!isFollowing) 

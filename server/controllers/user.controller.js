@@ -788,7 +788,7 @@ exports.delete = async (req, res) => {
         }
 
         await User.findByIdAndDelete(myUser._id)
-        return res.send({message: "User deleted!"})
+        return res.send({ message: "User deleted!" })
     } catch (err) {
         return res.status(500).send({
             message: "Error deleting User",
@@ -802,7 +802,7 @@ exports.followUser = async (req, res) => {
     let myUser = null;
     let authenticated = false;
     let req_cookies = req.cookies;
-    
+
     // Authenticate the user
     if (req_cookies) {
         let user_id = req_cookies.user_id;
@@ -819,7 +819,7 @@ exports.followUser = async (req, res) => {
             }
         }
     }
-    
+
     if (!authenticated) {
         return res.status(400).send({
             message: "Not logged in!"
@@ -839,9 +839,17 @@ exports.followUser = async (req, res) => {
             return res.status(404).send({ message: `User with id=${userToFollowId} not found.` });
         }
 
+
         // Check if either user is blocking the other
-        const isBlockingThem = myUser.blockedUsers.includes(userToFollowId);
-        const isBlockedByThem = userToFollow.blockedUsers.includes(myUser._id);
+        const isBlockingThem = false
+        const isBlockedByThem = false
+        if (typeof myUser.blockedUsers !== 'undefined') {
+            isBlockingThem = myUser.blockedUsers.includes(userToFollowId);
+        }
+
+        if (typeof userToFollow.blockedUsers !== 'undefined') {
+            isBlockedByThem = userToFollow.blockedUsers.includes(myUser._id);
+        }
 
         if (isBlockingThem || isBlockedByThem) {
             return res.status(403).send({
