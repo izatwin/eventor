@@ -1068,3 +1068,44 @@ exports.checkBlockStatus = async (req, res) => {
         });
     }
 };
+
+// Searching
+exports.searchUsers = async (req, res) => {
+    const { query } = req.params;
+
+    if (!query) {
+        return res.status(400).send({
+            message: "Query parameter is required for searching."
+        });
+    }
+
+    try {
+        // Use a regular expression to perform a case-insensitive search
+        const regex = new RegExp(query, 'i');
+
+        // Find users with matching userName or displayName
+        const users = await User.find({
+            $or: [
+                { userName: regex },
+                { displayName: regex }
+            ]
+        }).select('_id displayName userName');
+
+        // Sort users by prioritizing matches on userName, then displayName
+        const sortedUsers = users.sort((a, b) => {
+            const aUserNameMatch = a.userName.toLowerCase().includes(query.toLowerCase());
+            const bUserNameMatch = b.userName.toLowerCase().includes(query.toLowerCase());
+
+            if (aUserNameMatch && !bUserNameMatch) return -1;
+            if (!aUserNameMatch && bUserNameMatch) return 1;
+            return 0;
+        });
+
+        return res.status(200).send(sortedUsers);
+    } catch (err) {
+        return res.status(500).send({
+            message: "Error occurred during search.",
+            error: err.message || "Unexpected Error"
+        });
+    }
+};
