@@ -55,7 +55,7 @@ const ProfileContent= () => {
     endTime : "",
     embeddedImage : "",
     gaugeInterest : false,
-    interesteUsers: [],
+    interestedUsers: [],
     interestTags: [],
     
     // NormalEvent
@@ -288,10 +288,17 @@ const ProfileContent= () => {
     }));
   }
 
-  /* TODO : Function to edit a user's post */
   const handlePostEdit = () => {
-    /*const { id, content } = currentPost; */
-    /* api req to update post content */
+    const { _id, content } = currentPost;
+    axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content})
+
+    // Update the post dynamically on the page
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post._id === _id ? { ...post, content: content } : post
+      )
+    );
+
   }
 
   const handlePostDelete = (id) => {
@@ -784,7 +791,7 @@ const ProfileContent= () => {
 
                   <div className="time-fields">
                     <input 
-                      type="time" 
+                      type="date" 
                       name="startTime" 
                       className="input-field" 
                       value={newEvent.startTime}
@@ -792,7 +799,7 @@ const ProfileContent= () => {
                     />
                     <span className="time-separator">-</span>
                     <input 
-                      type="time" 
+                      type="date" 
                       name="endTime" 
                       className="input-field" 
                       value={newEvent.endTime}
@@ -984,7 +991,7 @@ const ProfileContent= () => {
                 />
 
 
-                <h4>Destintations</h4>
+                <h4>Destinations</h4>
 
                 <div className="add-event-input"> 
                   {newEvent.destinations.map((destination, index) => (

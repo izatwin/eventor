@@ -49,7 +49,8 @@ const Feed = () => {
       navigate("/");
       console.log(err)
     })  
-
+    // TODO
+    // update api req
     axios.get("http://localhost:3001/api/posts")
     .then(response => {
       console.log("feed posts res:")
