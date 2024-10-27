@@ -294,13 +294,11 @@ const ProfileContent= () => {
     /* api req to update post content */
   }
 
-  /* TODO: Function to delete a user's post */
   const handlePostDelete = (id) => {
     // api request
-    console.log(` We deleting this post http://localhost:3001/api/posts/${id}`)
     axios.delete(`http://localhost:3001/api/posts/${id}`)
     .then((response) => {
-      console.log(response)
+      setPosts((prevPosts) => prevPosts.filter((post) => post._id !== id));
       showSuccessPopup("Post deleted successfully!")
     })
     .catch((err) => {
