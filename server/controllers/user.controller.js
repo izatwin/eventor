@@ -937,7 +937,7 @@ exports.unfollowUser = async (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    User.findById(id)
+    User.findById(id).select('_id displayName userName biography status imageURL')
         .then(data => {
             if (!data)
                 return res.status(404).send({ message: `User not found with id=${id}` });
