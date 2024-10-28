@@ -47,6 +47,8 @@ const ProfileContent= () => {
     
   const { showSharePopup, updateShareCount } = usePopup();
 
+  const [isBlocked, setIsBlocked] = useState(false)
+
   const defaultNewEvent = {
     eventType : "",
     eventName: "",
@@ -107,6 +109,10 @@ const ProfileContent= () => {
               status: userInfo.status,
               pfp: userInfo.imageURL,
             })
+            // TODO
+            // check if user.userName === current profile userName
+            // if they are not equal modify page accordingly
+            // also checked if blocked <-> to limit view
             setNewPost(prevPost => ({
               ...prevPost,
               userId: userInfo.userId,
@@ -142,7 +148,7 @@ const ProfileContent= () => {
 
 
   const handleFollow = () => {
-    // api req to follow userId 
+    // api req to follow/unfollow userId 
     if (isFollowing) {
       axios.post("http://localhost:3001/api/user/unfollow", {"userId": user.userId})
     }
@@ -151,6 +157,21 @@ const ProfileContent= () => {
     }
 
     setIsFollowing(!isFollowing) 
+
+  }
+
+  const handleBlock = () => {
+    // api req to block/unblock userId 
+    if (isBlocked) {
+      // unblock
+      //axios.post("http://localhost:3001/api/user/unfollow", {"userId": user.userId})
+    }
+    else {
+      // block
+      //axios.post("http://localhost:3001/api/user/follow", {"userId": user.userId})
+    }
+
+    setIsBlocked(!isBlocked) 
 
   }
 
@@ -441,6 +462,13 @@ const ProfileContent= () => {
                 className="follow-btn"> 
                 {isFollowing ? 'Following' : 'Follow'}
               </button>
+              
+              <button 
+                onClick={handleBlock}
+                className="block-btn"> 
+                {isBlocked ? 'Block' : 'Unblock'}
+              </button>
+    
 
             </div>
          </div> 

@@ -80,7 +80,7 @@ const DiscoverContent = () => {
             <div 
               className="empty-message">
               <h2> Nothing Here Yet </h2>
-              <p> Create a post for it to show up on your profile! </p>
+              <p> Enter a search to get started with discovery</p>
             </div>
 
           ) : (
