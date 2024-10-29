@@ -98,8 +98,8 @@ exports.findOne = async (req, res) => {
         }
 
         // Check blocking conditions
-        const isBlockingThem = false
-        const isBlockedByThem = false
+        var isBlockingThem = false
+        var isBlockedByThem = false
         if (typeof authenticatedUser.blockedUsers !== 'undefined') {
             isBlockingThem = authenticatedUser.blockedUsers.includes(postAuthor._id.toString());
         }
@@ -358,7 +358,7 @@ exports.toggleLike = async (req, res) => {
         if (like && !isAlreadyLiked) {
             // Increment like
             post.likes += 1;
-            myUser.likedPosts.push(postId);
+            myUser.likedPosts = likedPosts.push(postId)
         } else if (!like && isAlreadyLiked) {
             // Decrement like
             post.likes -= 1;

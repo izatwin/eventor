@@ -841,8 +841,8 @@ exports.followUser = async (req, res) => {
 
 
         // Check if either user is blocking the other
-        const isBlockingThem = false
-        const isBlockedByThem = false
+        var isBlockingThem = false
+        var isBlockedByThem = false
         if (typeof myUser.blockedUsers !== 'undefined') {
             isBlockingThem = myUser.blockedUsers.includes(userToFollowId);
         }
