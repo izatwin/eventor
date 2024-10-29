@@ -87,8 +87,8 @@ const DiscoverContent = () => {
               <div className="profile-card"> 
               <img src={profilePic} alt="PostProfile" className="post-profilepic" />
               <div className="post-profile-info">
-                <div className="post-name">result.displayName</div>
-                <div className="post-username">result.userName</div>
+                <div className="post-name">{result.displayName}</div>
+                <div className="post-username">{result.userName}</div>
               </div>      
             </div>
             ))
