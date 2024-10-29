@@ -43,7 +43,7 @@ export const PopupProvider = ({ children }) => {
   }
 
   return (
-    <PopupContext.Provider value={{ showSharePopup, updateShareCount}}>
+    <PopupContext.Provider value={{ showSharePopup, updateShareCount, updateLike}}>
       {children}
       {isSharePopupOpen && (
         <div className="share-popup-container">

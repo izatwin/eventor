@@ -39,7 +39,8 @@ const PostContent = () => {
             displayName: userInfo.displayName,
             userName: userInfo.userName,
             userId: userInfo.userId,
-            pfp: userInfo.imageURL
+            pfp: userInfo.imageURL,
+            likedPosts: userInfo.likedPosts
           })
         }
         else {
@@ -81,7 +82,7 @@ const PostContent = () => {
   };
 
   const handleLike = async (id) => {
-    const success = false
+    var success = false
     const likedPosts = user.likedPosts || [];
     if (likedPosts.includes(id)) {
       // post is already liked, we want to unlike
