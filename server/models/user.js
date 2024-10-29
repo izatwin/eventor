@@ -94,6 +94,7 @@ const UserSchema = new Schema({
 
     followers: [{ type: Schema.Types.String, ref: "User", required: false }],
     following: [{ type: Schema.Types.String, ref: "User", required: false }],
+    blockedUsers: [{ type: Schema.Types.String, ref: "User", required: false }],
 
     biography: {type: String},
     status: {type: String},
@@ -111,6 +112,7 @@ UserSchema.methods.getInfoForClient = function () {
     infoForClient.status = this.status;
     infoForClient.imageURL = this.imageURL;
     infoForClient.posts = this.posts;
+    infoForClient.blockedUsers = this.blockedUsers;
 
     return infoForClient;
 }

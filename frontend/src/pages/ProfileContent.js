@@ -164,11 +164,11 @@ const ProfileContent= () => {
     // api req to block/unblock userId 
     if (isBlocked) {
       // unblock
-      //axios.post("http://localhost:3001/api/user/unfollow", {"userId": user.userId})
+      axios.post("http://localhost:3001/api/user/block", {"userId": user.userId, "block": false})
     }
     else {
       // block
-      //axios.post("http://localhost:3001/api/user/follow", {"userId": user.userId})
+      axios.post("http://localhost:3001/api/user/block", {"userId": user.userId, "block": true})
     }
 
     setIsBlocked(!isBlocked) 
@@ -466,7 +466,7 @@ const ProfileContent= () => {
               <button 
                 onClick={handleBlock}
                 className="block-btn"> 
-                {isBlocked ? 'Block' : 'Unblock'}
+                {!isBlocked ? 'Block' : 'Unblock'}
               </button>
     
 

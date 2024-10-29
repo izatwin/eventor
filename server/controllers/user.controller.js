@@ -992,7 +992,7 @@ exports.toggleBlockUser = async (req, res) => {
             return res.status(404).send({ message: `User with id=${userToBlockId} not found.` });
         }
 
-        const isAlreadyBlocking = myUser.blockedUsers.includes(userToBlockId);
+        const isAlreadyBlocking = myUser.blockedUsers.includes(userToBlockId) || false;
 
         if (block && !isAlreadyBlocking) {
             // Block user
