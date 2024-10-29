@@ -113,7 +113,12 @@ const ProfileContent= () => {
             // TODO
             // check if user.userName === current profile userName
             // if they are not equal modify page accordingly
+            
             // also checked if blocked <-> to limit view
+            // checks to see if user logged in is blocking userId in url
+            setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${userInfo.userId}`)).data['blockingThem'])
+            
+            console.log(isBlocked)
             setNewPost(prevPost => ({
               ...prevPost,
               userId: userInfo.userId,
