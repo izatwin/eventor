@@ -77,7 +77,7 @@ const SidebarLeft = () => {
 
       <div className="user-icon icon">
         <img 
-          onClick={()=>navigate("/profile")} 
+          onClick={()=>navigate(`/profile/${user.userId}`)} 
           src={userIcon} 
           alt="User" 
           className="icon-left" 
