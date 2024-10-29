@@ -91,6 +91,7 @@ const UserSchema = new Schema({
 
     userCredentials: UserCredentialsSchema,
     posts: [{ type: Schema.Types.ObjectId, ref: "Post", required: false }],
+    likedPosts: [{ type: Schema.Types.String, ref: "Post", required: false }],
 
     followers: [{ type: Schema.Types.String, ref: "User", required: false }],
     following: [{ type: Schema.Types.String, ref: "User", required: false }],
