@@ -83,7 +83,7 @@ const PostContent = () => {
 
   const handleLike = async (id) => {
     var success = false
-    const likedPosts = user.likedPosts || [];
+    var likedPosts = user.likedPosts || [];
     if (likedPosts.includes(id)) {
       // post is already liked, we want to unlike
       success = await updateLike(id, false);
@@ -92,6 +92,8 @@ const PostContent = () => {
           ...prevPost,
           likes: prevPost.likes - 1
         }));
+        likedPosts = likedPosts.filter(curId => curId !== id)
+        
       }
 
     } else {
@@ -102,8 +104,13 @@ const PostContent = () => {
           ...prevPost,
           likes: prevPost.likes + 1
         }));
+        likedPosts.push(id)
       }
     }
+    setUser(prevUser => ({
+      ...prevUser,
+      likedPosts: likedPosts
+    }))
 
     if (!success) {
       console.error('Error updating like status');
