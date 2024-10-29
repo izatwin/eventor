@@ -153,8 +153,7 @@ const ProfileContent= () => {
     validateAndGetPosts();
 
   }, [])
-
-
+  
   const handleFollow = () => {
     // api req to follow/unfollow userId 
     if (isFollowing) {
@@ -590,132 +589,139 @@ const ProfileContent= () => {
             </div>
 
           ) : (
-            posts.map(post=>(
-              <div className="post" key={post._id}> 
+            posts.map(post=>{
+              const postEvent = post.eventId && eventsById[post.eventId]
+              return (
+                <div className="post" key={post._id}> 
 
-                <div className="post-header"> 
+                  <div className="post-header"> 
 
-                  <img
-                    src={user.pfp || profilePic} 
-                    alt="PostProfile" 
-                    className="post-profilepic" 
-                  />
-                  
-                  <div className="post-profile-info">
-                    <div className="post-name">{user.displayName}</div>
-                    <div className="post-username">@{user.userName}</div>
-                  </div>      
-
-                   <div className="modify-post">
-                    <button 
-                      onClick={() => handleAddEventPopup(post)} 
-                      className="add-event-btn"> 
-                      Add Event 
-                    </button> 
-                    <img 
-                      src={editIcon} 
-                      onClick={() => handleEditPopup(post)} 
-                      alt="Edit" 
-                      className="edit-post-icon " 
-                    />
-                    <img 
-                      src={removeIcon} 
-                      onClick={() => handlePostDelete(post._id)}   
-                      alt="Remove" 
-                      className="remove-icon " 
-                    />
-              
-                  </div>
-
-                </div>
-
-                <div className="post-content"> 
-                  {post.content}
-                </div>
-
-  
-
-                {newEvent.eventType !== "" && (
-                  <div className="event"> 
-                    <h1 
-                      className="event-name"> 
-                      {newEvent.eventName} 
-                    </h1>
-                    <p 
-                      className="event-description"> 
-                      {newEvent.eventDescription} 
-                    </p>
-                    <div 
-                      className="event-times"> 
-                      {newEvent.startTime}-{newEvent.endTime}
-                    </div> 
                     <img
-                      src={newEvent.embeddedImage} 
-                      alt="event-embeddedImage" 
-                      className="event-embeddedImage" 
+                      src={user.pfp || profilePic} 
+                      alt="PostProfile" 
+                      className="post-profilepic" 
                     />
                     
-                    {newEvent.eventType === "NormalEvent" && (
-                      <p className="event-location"> Location: {newEvent.location} </p>
-                    )}
-                    {newEvent.eventType === "MusicReleaseEvent" && (
-                      <div>
-                        <h2 className="event-release-title"> <b> {newEvent.releaseTitle} </b> </h2>
-                        <p className="event-release-artist"> {newEvent.releaseArtist} </p>
-                        <p className="event-release-type"> [{newEvent.releaseType}] </p> 
-      
-                        {newEvent.songs.map((song, index) => (
-                            <div className="event-song" key={index}> 
-                              {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
-                            </div>
-                        ))}
-                        <br/>
-                        <i> Apple Music: </i> <a href={newEvent.appleMusicLink} style= {{color: 'black'}}> {newEvent.appleMusicLink} </a>  <br/>
-                        <i> Spotify: </i> <a href={newEvent.spotifyLink} style= {{color: 'black'}} > {newEvent.spotifyLink} </a> <br/> <br/>
+                    <div className="post-profile-info">
+                      <div className="post-name">{user.displayName}</div>
+                      <div className="post-username">@{user.userName}</div>
+                    </div>      
 
-  
-                      </div>
-                    )}
-                    {newEvent.eventType === "TicketedEvent" && (
-                      <div>
-                        <i> Get Tickets: </i> <a href={newEvent.getTicketsLink} style= {{color: 'black'}}> {newEvent.getTicketsLink} </a>  <br/><br/>
-                        {newEvent.destinations.map((destination, index) => (
-                            <div className="event-destination"> 
-                              {index + 1}. {destination.location} ({destination.time})
-                            </div>
-                        ))}
-                        <br/>
-                      </div>
-                    )}
-                    
-                    
-                  </div>
-                )}
+                     <div className="modify-post">
+                      <button 
+                        onClick={() => handleAddEventPopup(post)} 
+                        className="add-event-btn"> 
+                        Add Event 
+                      </button> 
+                      <img 
+                        src={editIcon} 
+                        onClick={() => handleEditPopup(post)} 
+                        alt="Edit" 
+                        className="edit-post-icon " 
+                      />
+                      <img 
+                        src={removeIcon} 
+                        onClick={() => handlePostDelete(post._id)}   
+                        alt="Remove" 
+                        className="remove-icon " 
+                      />
                 
-                <div className="post-buttons">
+                    </div>
 
-                  <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
-                  <div className="views-num num">{post.views}</div>
-                  <img src={likeIcon} alt="Like" className="like-icon post-icon"/> 
-                  <div className="likes-num num"> {post.likes} </div>
-                  <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
-                  <div className="shares-num num"> {post.shares} </div>
+                  </div>
+
+                  <div className="post-content"> 
+                    {post.content}
+                  </div>
+
+    
+
+                  {postEvent &&  (
+                    <div className="event"> 
+                      <h1 
+                        className="event-name"> 
+                        {postEvent.eventName} 
+                      </h1>
+                      <p 
+                        className="event-description"> 
+                        {postEvent.eventDescription} 
+                      </p>
+                      {(postEvent.startTime || postEvent.endTime) && (
+                        <div className="event-times"> 
+                          {postEvent.startTime ? new Date(postEvent.startTime).toLocaleString() : ""} 
+                          {postEvent.startTime && postEvent.endTime ? " - " : ""}
+                          {postEvent.endTime ? new Date(postEvent.endTime).toLocaleString() : ""}
+                        </div>
+                      )}                 
+                      {postEvent.embeddedImage && (
+                        <img
+                          src={postEvent.embeddedImage} 
+                          alt="Event Image" 
+                          className="event-embeddedImage" 
+                        />
+                      )}
+                      
+                      {postEvent.type === "NormalEvent" && (
+                        <p className="event-location"> Location: {postEvent.location} </p>
+                      )}
+                      
+                      {postEvent.type === "MusicReleaseEvent" && (
+                        <div>
+                          <h2 className="event-release-title"> <b> {postEvent.releaseTitle} </b> </h2>
+                          <p className="event-release-artist"> {postEvent.releaseArtist} </p>
+                          <p className="event-release-type"> [{postEvent.releaseType}] </p> 
+        
+                          {postEvent.songs.map((song, index) => (
+                              <div className="event-song" key={index}> 
+                                {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
+                              </div>
+                          ))}
+                          <br/>
+                          <i> Apple Music: </i> <a href={postEvent.appleMusicLink} style= {{color: 'black'}}> {postEvent.appleMusicLink} </a>  <br/>
+                          <i> Spotify: </i> <a href={postEvent.spotifyLink} style= {{color: 'black'}} > {postEvent.spotifyLink} </a> <br/> <br/>
+
+    
+                        </div>
+                      )}
+                      {postEvent.type === "TicketedEvent" && (
+                        <div>
+                          <i> Get Tickets: </i> <a href={postEvent.getTicketsLink} style= {{color: 'black'}}> {postEvent.getTicketsLink} </a>  <br/><br/>
+                          {postEvent.destinations.map((destination, index) => (
+                              <div className="event-destination"> 
+                                {index + 1}. {destination.location} ({destination.time})
+                              </div>
+                          ))}
+                          <br/>
+                        </div>
+                      )}
+                      
+                    </div>
+                  )}
                   
-                  <div className="expand-comment">
-                    <img src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
-                    <div className="comment-num num">{post.comments.length}</div>
-                    <img 
-                      src={expandIcon} 
-                      alt="Expand" 
-                      className="expand-icon post-icon"
-                      onClick={()=>{navigate(`/post/${post._id}`)}}/> 
+                  <div className="post-buttons">
+
+                    <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
+                    <div className="views-num num">{post.views}</div>
+                    <img src={likeIcon} alt="Like" className="like-icon post-icon"/> 
+                    <div className="likes-num num"> {post.likes} </div>
+                    <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
+                    <div className="shares-num num"> {post.shares} </div>
+                    
+                    <div className="expand-comment">
+                      <img src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
+                      <div className="comment-num num">{post.comments.length}</div>
+                      <img 
+                        src={expandIcon} 
+                        alt="Expand" 
+                        className="expand-icon post-icon"
+                        onClick={()=>{navigate(`/post/${post._id}`)}}/> 
+                    </div>
+
                   </div>
 
                 </div>
-
-              </div>
-              
-            ))
+              )
+            })
           )}
         </div>
         
@@ -831,7 +837,7 @@ const ProfileContent= () => {
 
                   <div className="time-fields">
                     <input 
-                      type="date" 
+                      type="datetime-local" 
                       name="startTime" 
                       className="input-field" 
                       value={newEvent.startTime}
@@ -839,7 +845,7 @@ const ProfileContent= () => {
                     />
                     <span className="time-separator">-</span>
                     <input 
-                      type="date" 
+                      type="datetime-local" 
                       name="endTime" 
                       className="input-field" 
                       value={newEvent.endTime}

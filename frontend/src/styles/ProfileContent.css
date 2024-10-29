@@ -51,6 +51,7 @@
   text-align: left;
   word-wrap: break-word;
   max-width: 50%;
+  background-color: green;
 }
 
 .p-name {
@@ -105,6 +106,7 @@
   margin-left: auto;
   margin-right: 2%;
   align-items: flex-start;
+  overflow: hidden;
 }
 
 .follower-count {
@@ -520,6 +522,7 @@ h2 {
 
 .time-fields {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
 }
