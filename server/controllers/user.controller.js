@@ -937,11 +937,13 @@ exports.unfollowUser = async (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    User.findById(id).select('_id displayName userName biography status imageURL')
+    User.findById(id).select('_id displayName userName biography status imageURL followers following')
         .then(data => {
-            if (!data)
+            if (!data) {
                 return res.status(404).send({ message: `User not found with id=${id}` });
-            else res.send(data);
+            }
+
+            res.send(data);
         })
         .catch(err => {
             return res.status(500).send({
