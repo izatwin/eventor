@@ -363,6 +363,7 @@ exports.toggleLike = async (req, res) => {
             // Decrement like
             post.likes -= 1;
             myUser.likedPosts = likedPosts.filter(id => id !== postId);
+            console.log(`liked posts: ${typeof id} nd ${typeof postId}`)
         } else {
             return res.status(400).send({ message: "Invalid operation." });
         }
