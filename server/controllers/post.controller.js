@@ -98,8 +98,8 @@ exports.findOne = async (req, res) => {
         }
 
         // Check blocking conditions
-        const isBlockingThem = false
-        const isBlockedByThem = false
+        var isBlockingThem = false
+        var isBlockedByThem = false
         if (typeof authenticatedUser.blockedUsers !== 'undefined') {
             isBlockingThem = authenticatedUser.blockedUsers.includes(postAuthor._id.toString());
         }
