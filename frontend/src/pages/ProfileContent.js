@@ -27,6 +27,7 @@ const ProfileContent= () => {
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [eventsById, setEventsById] = useState({});
   const [isEditPopupOpen, setEditPopupOpen] = useState(false);
   const [isAddEventPopupOpen, setAddEventPopupOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
@@ -124,13 +125,20 @@ const ProfileContent= () => {
             const postContents = []
             /* make request to get the content of each post using id */ 
             for (const currentPost of postResponse) {
-              postContents.push(((await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data))
+              const curPostData = (await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data
+              postContents.push(curPostData)
+  
+              if (curPostData.eventId) {
+                if (!eventsById[curPostData.eventId]) {
+                  const event = (await axios.get(`http://localhost:3001/api/events/${curPostData.eventId}`)).data
+                  setEventsById(prevEvents => ({
+                    ...prevEvents,
+                    [curPostData.eventId]: event
+                  }));
+  
+                }
+              }
             }
-            
-            /* pass an array of posts to setPosts */
-            /* sort posts */
-            console.log("postContents:") 
-            console.log(postContents) 
             setPosts(postContents)
           }
           else {
@@ -346,6 +354,10 @@ const ProfileContent= () => {
     }
     axios.post("http://localhost:3001/api/events",  requestData )
     setEvents([newEvent]);
+    setEventsById(prevEvents => ({
+      ...prevEvents,
+      [currentPost._id]: newEvent
+    }));
     closeAddEventPopup();
   }  
 
