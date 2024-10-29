@@ -46,7 +46,7 @@ function App() {
             <Route path="/post/:_id" element={<Post />} />
             <Route path="/discover" element={<Discover />} />
 
-            // <Route path="/profile/:username" element={<Profile />} />
+            /<Route path="/profile/:_id" element={<Profile />} />
           </Routes>
         </BrowserRouter>
 
