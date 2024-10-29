@@ -45,7 +45,7 @@ const ProfileContent= () => {
   
   const [eventStep, setEventStep] = useState("select-type")
     
-  const { showSharePopup, updateShareCount } = usePopup();
+  const { showSharePopup, updateShareCount, updateLike } = usePopup();
 
   const [isBlocked, setIsBlocked] = useState(false)
 
@@ -108,6 +108,7 @@ const ProfileContent= () => {
               bio: userInfo.biography,
               status: userInfo.status,
               pfp: userInfo.imageURL,
+              likedPosts: userInfo.likedPosts
             })
             // TODO
             // check if user.userName === current profile userName
@@ -408,9 +409,52 @@ const ProfileContent= () => {
   const handleShare = async (id) => {
     const success = await updateShareCount(id);
     if (success) {
-      // update share locally?
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post._id === id ? { ...post, shares: post.shares + 1 } : post
+        )
+      );
     } else {
       console.error('Error updating share count');
+    }
+  };
+
+  const handleLike = async (id) => {
+    var success = false
+    var likedPosts = user.likedPosts || [];
+    if (likedPosts.includes(id)) {
+      // post is already liked, we want to unlike
+      success = await updateLike(id, false);
+      if (success) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post._id === id ? { ...post, likes: post.likes - 1 } : post
+          )
+        );
+
+        likedPosts = likedPosts.filter(curId => curId !== id)
+
+      }
+
+    } else {
+      // post is not liked, want to like
+      success = await updateLike(id, true);
+      if (success) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post._id === id ? { ...post, likes: post.likes + 1 } : post
+          )
+        );
+        likedPosts.push(id)
+      }
+    }
+    setUser(prevUser => ({
+      ...prevUser,
+      likedPosts: likedPosts
+    }))
+
+    if (!success) {
+      console.error('Error updating like status');
     }
   };
 
@@ -684,7 +728,7 @@ const ProfileContent= () => {
 
                   <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
                   <div className="views-num num">{post.views}</div>
-                  <img src={likeIcon} alt="Like" className="like-icon post-icon"/> 
+                  <img onClick={() => { handleLike(post._id) }} src={likeIcon} alt="Like" className="like-icon post-icon"/> 
                   <div className="likes-num num"> {post.likes} </div>
                   <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
                   <div className="shares-num num"> {post.shares} </div>

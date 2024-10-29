@@ -113,6 +113,7 @@ UserSchema.methods.getInfoForClient = function () {
     infoForClient.status = this.status;
     infoForClient.imageURL = this.imageURL;
     infoForClient.posts = this.posts;
+    infoForClient.likedPosts = this.likedPosts;
     infoForClient.blockedUsers = this.blockedUsers;
 
     return infoForClient;
