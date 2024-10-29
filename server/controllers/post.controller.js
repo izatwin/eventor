@@ -1,5 +1,6 @@
 const Post = require("../models/post");
 const User = require("../models/user");
+const BaseEvent = require("../models/event")
 
 // Create and save a new Post
 exports.create = async (req, res) => {

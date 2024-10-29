@@ -19,6 +19,11 @@ const PostContent = () => {
   const navigate = useNavigate();
   const { _id } = useParams();
   const { showSharePopup, updateShareCount, updateLike } = usePopup();
+  const [newComment, setNewComment] = useState({
+    text: "",
+    isRoot: true,
+  })
+  const [comments, setComments] = useState([])
 
 
   useEffect(() => {
@@ -56,6 +61,10 @@ const PostContent = () => {
       .catch(err => {
         console.log(err)
       })
+
+    // TODO 
+    // api req for comments
+    //setComments([{text: "I'm excited"}, {text: "Can i bring a friend?"}])
   }, [])
 
   const handleShare = async (id) => {
@@ -100,6 +109,15 @@ const PostContent = () => {
     }
   };
 
+  const handleCommentChange = (e) => {
+    setNewComment({ ...newComment, [e.target.name]: e.target.value });
+    console.log(newComment);
+  }
+
+  const handleComment = async () => {
+    // api req
+  }
+
   return (
     <div className="post-content-container">
       <div className="post-content-content">
@@ -129,6 +147,41 @@ const PostContent = () => {
             <img onClick={() => { showSharePopup(post._id); handleShare(post._id) }} src={shareIcon} alt="Share" className="share-icon post-icon" />
             <div className="shares-num num"> {post.shares} </div>
           </div>
+        </div>
+
+        <div className="comment-card">
+          
+          <div className="comment-input">
+            <textarea 
+              name="text" 
+              className="comment-text" 
+              value={newComment.text} 
+              type="text" 
+              onChange={handleCommentChange} 
+              placeholder="What do you think?"/>
+          </div>
+
+          <div className="comment-buttons">
+            <button 
+              onClick={handleComment} 
+              className="comment-btn"> 
+              Comment 
+            </button> 
+          </div>
+          
+
+            
+        </div>
+        <div className="comment-section">
+
+        {comments.map(comment=>(
+          <div className="comment"> 
+            <div className="comment-content">
+              {comment.text}
+            </div>
+          </div>
+        ))}
+
         </div>
       </div>
     </div>
