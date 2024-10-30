@@ -142,9 +142,9 @@ const ProfileContent= () => {
               ...prevPost,
               userId: userInfo.userId,
             }));
-            console.log("userId="+profileUserResponse._id)
+            console.log("userId="+userInfo.userId)
             console.log("profileId="+profileId)
-            setIsOwnProfile(profileUserResponse._id===profileId)
+            setIsOwnProfile(userInfo.userId===profileId)
             setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${profileId}`)).data['blockingThem'])
             
             console.log(isBlocked)
