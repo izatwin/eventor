@@ -1,41 +1,83 @@
 const Comment = require('../models/comment');
+const Common = require(`./common.controller`)
 
 // Create a save a new comment
-exports.create = (req, res) => {
-    if (!req.body) {
+exports.create = async (req, res) => {
+    const authenticatedUser = await Common.authenticateUser(req);
+    if (!authenticatedUser) {
         return res.status(400).send({
-            message: "Comment cannot be empty."
+            message: "Not logged in!"
         });
     }
 
-    const newComment = new Comment({
-        text: req.body.text,
-        isRoot: req.body.isRoot,
-    });
-
-    newComment.save(newComment)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: err.message || "server error."
-            });
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Body cannot be empty."
         });
+    }
+
+    const postId = req.body.postId;
+    const commentFields = req.body.comment;
+
+
+
+    try {
+        const post = await Post.findById(postId).exec();
+        if (!post) {
+            return res.status(404).send({ message: `Post not found with id=${postId}` });
+        }
+
+        const postAuthor = await User.findById(post.user).exec();
+
+        const postAuthorBlockedUsers = postAuthor.blockedUsers || []
+
+        if (postAuthorBlockedUsers.includes(authenticatedUser._id)) {
+            return res.status(403).send({ message: "Access to comment to this post is denied." });
+        }
+        
+        const newComment = new Comment({
+            ...commentFields,
+            user: authenticatedUser._id,
+        });
+
+        await newComment.save();
+
+        post.unshift(newComment._id)
+        await post.save();
+
+        return res.send(newComment);
+    } catch (err) {
+        return res.status(500).send({
+            message: "Error creating comment.",
+            error: err.message
+        });
+    }
 };
 
-exports.findOne = (req, res) => {
-    const id = req.params.id;
+exports.findOne = async (req, res) => {
+    const authenticatedUser = await Common.authenticateUser(req);
+    if (!authenticatedUser) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
 
-    Comment.findById(id)
-    .then(data => {
-        if (!data)
-            res.status(404).send({ message: `Comment not found with id=${id}`});
-        else res.send(data);
-    })
-    .catch(err => {
-        res.status(500).send({message: `Error retrieving comment with id=${id}`});
-    })
+    const commentId = req.params.id;
+
+    try {
+        const comment = await Comment.findById(commentId).exec();
+        if (!comment) {
+            return res.status(404).send({ message: `Comment not found with id=${commentId}` });
+        }
+
+        return res.send(comment)
+        
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error retrieving post with id=${postId}`,
+            error: err.message || 'Unexpected Error'
+        });
+    }
 }
 
 exports.addComment = async (req, res) => {
