@@ -1,6 +1,8 @@
 const Post = require("../models/post");
 const User = require("../models/user");
 const BaseEvent = require("../models/event")
+const mongoose = require("mongoose");
+
 
 // Create and save a new Post
 exports.create = async (req, res) => {
@@ -427,3 +429,64 @@ exports.viewOrSharePost = async (req, res) => {
         });
     }
 };
+
+exports.getFeed = async (req, res) => {
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Request body cannot be empty."
+        });
+    }
+
+    let authenticated = false;
+    let reqCookies = req.cookies;
+    let myUser;
+
+    if (reqCookies) {
+        let userId = reqCookies.user_id;
+        if (userId) {
+            myUser = await User.findById(userId).exec();
+            if (myUser) {
+                let authToken = reqCookies.auth_token;
+                if (authToken) {
+                    const userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(authToken)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    // get followed list
+    const followingList = myUser.following;
+    let feedIds = []
+
+    // for each person followed, get their posts
+    for (var followedUserId of followingList) {
+        // get their posts by first checking if the person is blocking them
+        let followedUser = await User.findById(followedUserId);
+        let followedUserBlockList = followedUser.blockedUsers || []
+
+        if (!(followedUserBlockList.includes(myUser._id))) {
+            feedIds.push(...followedUser.posts)
+        }
+    }
+
+    // then if not, get their posts
+    const postIdsCorrectType = feedIds.map(id => new mongoose.Types.ObjectId(id))
+
+    Post.find({ _id: { $in: postIdsCorrectType } })
+        .sort({ timestamp: -1 }) // Use 1 for ascending, -1 for descending
+        .then(posts => {
+            res.send(posts)
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}

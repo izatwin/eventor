@@ -202,10 +202,10 @@ const ProfileContent= () => {
   const handleFollow = () => {
     // api req to follow/unfollow userId 
     if (isFollowing) {
-      axios.post("http://localhost:3001/api/user/unfollow", {"userId": user.userId})
+      axios.post("http://localhost:3001/api/user/unfollow", {"userId": profileUser.userId})
     }
     else {
-      axios.post("http://localhost:3001/api/user/follow", {"userId": user.userId})
+      axios.post("http://localhost:3001/api/user/follow", {"userId": profileUser.userId})
     }
 
     setIsFollowing(!isFollowing) 
@@ -216,11 +216,11 @@ const ProfileContent= () => {
     // api req to block/unblock userId 
     if (isBlocked) {
       // unblock
-      axios.post("http://localhost:3001/api/user/block", {"userId": user.userId, "block": false})
+      axios.post("http://localhost:3001/api/user/block", {"userId": profileUser.userId, "block": false})
     }
     else {
       // block
-      axios.post("http://localhost:3001/api/user/block", {"userId": user.userId, "block": true})
+      axios.post("http://localhost:3001/api/user/block", {"userId": profileUser.userId, "block": true})
     }
 
     setIsBlocked(!isBlocked) 

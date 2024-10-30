@@ -17,8 +17,8 @@ import { usePopup } from '../PopupContext';
 
 const Feed = () => { 
   const [posts, setPosts] = useState([]);
-  const { setUser } = useAuth();  
-  const { showSharePopup, updateShareCount } = usePopup();
+  const { user, setUser } = useAuth();  
+  const { showSharePopup, updateShareCount, updateLike } = usePopup();
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -37,7 +37,8 @@ const Feed = () => {
           displayName: userInfo.displayName,
           userName: userInfo.userName,
           userId : userInfo.userId,
-          pfp: userInfo.imageURL
+          pfp: userInfo.imageURL,
+          likedPosts: userInfo.likedPosts
         })
       }
       else {
@@ -49,9 +50,7 @@ const Feed = () => {
       navigate("/");
       console.log(err)
     })  
-    // TODO
-    // update api req
-    axios.get("http://localhost:3001/api/posts")
+    axios.get("http://localhost:3001/api/posts/feed")
     .then(response => {
       console.log("feed posts res:")
       console.log(response.data)
@@ -62,13 +61,56 @@ const Feed = () => {
     })
   }, [])
  
-  // TODO
+
   const handleShare = async (id) => {
     const success = await updateShareCount(id);
     if (success) {
-      // update share locally?
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post._id === id ? { ...post, shares: post.shares + 1 } : post
+        )
+      );
     } else {
       console.error('Error updating share count');
+    }
+  };
+
+  const handleLike = async (id) => {
+    var success = false
+    var likedPosts = user.likedPosts || [];
+    if (likedPosts.includes(id)) {
+      // post is already liked, we want to unlike
+      success = await updateLike(id, false);
+      if (success) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post._id === id ? { ...post, likes: post.likes - 1 } : post
+          )
+        );
+
+        likedPosts = likedPosts.filter(curId => curId !== id)
+
+      }
+
+    } else {
+      // post is not liked, want to like
+      success = await updateLike(id, true);
+      if (success) {
+        setPosts(prevPosts =>
+          prevPosts.map(post =>
+            post._id === id ? { ...post, likes: post.likes + 1 } : post
+          )
+        );
+        likedPosts.push(id)
+      }
+    }
+    setUser(prevUser => ({
+      ...prevUser,
+      likedPosts: likedPosts
+    }))
+
+    if (!success) {
+      console.error('Error updating like status');
     }
   };
 
@@ -100,7 +142,7 @@ const Feed = () => {
 
               <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
               <div className="views-num num">{post.views}</div>
-              <img src={likeIcon} alt="Like" className="like-icon post-icon"/> 
+              <img onClick={() => { handleLike(post._id) }} src={likeIcon} alt="Like" className="like-icon post-icon"/> 
               <div className="likes-num num"> {post.likes} </div>
               <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
               <div className="shares-num num"> {post.shares} </div>
