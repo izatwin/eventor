@@ -81,7 +81,7 @@ const DiscoverContent = () => {
           ) : (
             searchResults.map(result=>(
               <div className="profile-card" onClick={()=>{navigate(`/profile/${result._id}`)}}> 
-                <img src={profilePic} alt="PostProfile" className="post-profilepic" />
+                <img src={result.imageURL || profilePic} alt="PostProfile" className="post-profilepic" />
                 <div className="post-profile-info">
                   <div className="post-name">{result.displayName}</div>
                   <div className="post-username">{result.userName}</div>
