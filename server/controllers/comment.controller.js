@@ -1,5 +1,8 @@
 const Comment = require('../models/comment');
+const User = require("../models/user");
+const Post = require("../models/post");
 const Common = require(`./common.controller`)
+const mongoose = require("mongoose");
 
 // Create a save a new comment
 exports.create = async (req, res) => {
@@ -42,7 +45,7 @@ exports.create = async (req, res) => {
 
         await newComment.save();
 
-        post.unshift(newComment._id)
+        post.comments.unshift(newComment._id)
         await post.save();
 
         return res.send(newComment);
@@ -71,6 +74,38 @@ exports.findOne = async (req, res) => {
         }
 
         return res.send(comment)
+        
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error retrieving post with id=${postId}`,
+            error: err.message || 'Unexpected Error'
+        });
+    }
+}
+
+exports.findCommentsOnPost = async (req, res) => {
+    const authenticatedUser = await Common.authenticateUser(req);
+    if (!authenticatedUser) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    const postId = req.params.postId;
+
+    try {
+        const post = await Post.findById(postId).exec();
+        if (!post) {
+            return res.status(404).send({ message: `Post not found with id=${postId}` });
+        }
+        const commentIdsCorrectType = post.comments.map(id => new mongoose.Types.ObjectId(id))
+
+        const comments = await Comment.find({_id: { $in: commentIdsCorrectType}}).exec();
+        if (!comments) {
+            return res.status(404).send({ message: `Comment not found with id=${commentId}` });
+        }
+
+        return res.send(comments)
         
     } catch (err) {
         return res.status(500).send({
