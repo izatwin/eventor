@@ -100,7 +100,7 @@ exports.findCommentsOnPost = async (req, res) => {
         }
         const commentIdsCorrectType = post.comments.map(id => new mongoose.Types.ObjectId(id))
 
-        const comments = await Comment.find({_id: { $in: commentIdsCorrectType}}).exec();
+        const comments = await Comment.find({_id: { $in: commentIdsCorrectType}}).sort({ timestamp: -1 }).exec();
         if (!comments) {
             return res.status(404).send({ message: `Comment not found with id=${commentId}` });
         }
