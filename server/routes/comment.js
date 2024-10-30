@@ -3,8 +3,10 @@
 const router = require('express').Router();
 const commentController = require('../controllers/comment.controller');
 
-// Post /api/comment - create a new comment
+// Post /api/comments - create a new comment
 router.post('/', commentController.create);
+
+router.get('/post/:postId', commentController.findCommentsOnPost)
 
 router.get('/:id', commentController.findOne);
 
