@@ -6,10 +6,6 @@ import axios from 'axios'
 
 import profilePic from './icons/profile.png'; 
 
-import viewIcon from './icons/view.png'
-import likeIcon from './icons/like.png'
-import shareIcon from './icons/share.png'
-
 import { useAuth } from '../AuthContext'; 
 
 const DiscoverContent = () => { 
@@ -47,8 +43,7 @@ const DiscoverContent = () => {
   
   // TODO
   const handleQuery = async () => {
-    // api req
-    // setSearchResults()
+    setSearchResults((await axios.get(`http://localhost:3001/api/user/search/${query}`)).data)
   }
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
@@ -84,13 +79,15 @@ const DiscoverContent = () => {
             </div>
 
           ) : (
-            <div className="profile-card"> 
-              <img src={profilePic} alt="PostProfile" className="post-profilepic" />
-              <div className="post-profile-info">
-                <div className="post-name">displayName</div>
-                <div className="post-username">@username</div>
-              </div>      
-            </div>
+            searchResults.map(result=>(
+              <div className="profile-card" onClick={()=>{navigate(`/profile/${result._id}`)}}> 
+                <img src={profilePic} alt="PostProfile" className="post-profilepic" />
+                <div className="post-profile-info">
+                  <div className="post-name">{result.displayName}</div>
+                  <div className="post-username">{result.userName}</div>
+                </div>      
+              </div>
+            ))
           )}
       </div>
     </div>

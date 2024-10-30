@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import "./styles/PopupContext.css";
+import axios from 'axios'
 
 const PopupContext = createContext();
 
@@ -22,7 +23,18 @@ export const PopupProvider = ({ children }) => {
   // TODO 
   const updateShareCount= async (id) => {
     try {
-      // api req to update share
+      axios.post("http://localhost:3001/api/posts/action", {"postId": id, "actionType": "share"})
+      return true; // successfull
+    } catch (err) {
+      console.log(err)
+      return false;
+    }
+  }
+
+  // TODO 
+  const updateLike= async (id, shouldLike) => {
+    try {
+      axios.post("http://localhost:3001/api/posts/toggle-like", {"postId": id, "like": shouldLike})
       return true; // successfull
     } catch (err) {
       console.log(err)
@@ -31,7 +43,7 @@ export const PopupProvider = ({ children }) => {
   }
 
   return (
-    <PopupContext.Provider value={{ showSharePopup, updateShareCount}}>
+    <PopupContext.Provider value={{ showSharePopup, updateShareCount, updateLike}}>
       {children}
       {isSharePopupOpen && (
         <div className="share-popup-container">

@@ -98,8 +98,8 @@ exports.findOne = async (req, res) => {
         }
 
         // Check blocking conditions
-        const isBlockingThem = false
-        const isBlockedByThem = false
+        var isBlockingThem = false
+        var isBlockedByThem = false
         if (typeof authenticatedUser.blockedUsers !== 'undefined') {
             isBlockingThem = authenticatedUser.blockedUsers.includes(postAuthor._id.toString());
         }
@@ -352,20 +352,27 @@ exports.toggleLike = async (req, res) => {
             return res.status(404).send({ message: `Post not found with id=${postId}` });
         }
 
-        const likedPosts = myUser.likedPosts || [];
+        var likedPosts = myUser.likedPosts || [];
         const isAlreadyLiked = likedPosts.includes(postId);
+
+        console.log(likedPosts);
 
         if (like && !isAlreadyLiked) {
             // Increment like
             post.likes += 1;
-            myUser.likedPosts.push(postId);
+            likedPosts.push(postId);
         } else if (!like && isAlreadyLiked) {
             // Decrement like
             post.likes -= 1;
-            myUser.likedPosts = likedPosts.filter(id => id !== postId);
+            likedPosts = likedPosts.filter(id => id !== postId);
         } else {
             return res.status(400).send({ message: "Invalid operation." });
         }
+
+        myUser.likedPosts = likedPosts;
+        myUser.markModified('likedPosts');
+
+        console.log(myUser.likedPosts);
 
         await post.save();
         await myUser.save();

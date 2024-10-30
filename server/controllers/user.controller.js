@@ -841,8 +841,8 @@ exports.followUser = async (req, res) => {
 
 
         // Check if either user is blocking the other
-        const isBlockingThem = false
-        const isBlockedByThem = false
+        var isBlockingThem = false
+        var isBlockedByThem = false
         if (typeof myUser.blockedUsers !== 'undefined') {
             isBlockingThem = myUser.blockedUsers.includes(userToFollowId);
         }
@@ -937,11 +937,13 @@ exports.unfollowUser = async (req, res) => {
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
-    User.findById(id).select('_id displayName userName biography status imageURL')
+    User.findById(id).select('_id displayName userName biography status imageURL followers following')
         .then(data => {
-            if (!data)
+            if (!data) {
                 return res.status(404).send({ message: `User not found with id=${id}` });
-            else res.send(data);
+            }
+
+            res.send(data);
         })
         .catch(err => {
             return res.status(500).send({
@@ -992,7 +994,7 @@ exports.toggleBlockUser = async (req, res) => {
             return res.status(404).send({ message: `User with id=${userToBlockId} not found.` });
         }
 
-        const isAlreadyBlocking = myUser.blockedUsers.includes(userToBlockId);
+        const isAlreadyBlocking = myUser.blockedUsers.includes(userToBlockId) || false;
 
         if (block && !isAlreadyBlocking) {
             // Block user
@@ -1048,7 +1050,7 @@ exports.checkBlockStatus = async (req, res) => {
         });
     }
 
-    const targetUserId = req.params.userId;
+    const targetUserId = req.params.id;
     if (!targetUserId) {
         return res.status(400).send({
             message: "Missing userId to check block status."
