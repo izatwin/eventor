@@ -140,3 +140,19 @@
 7. Log back into your original account.
 8. Unblock the user.
 9. Confirm posts return to visibility but user is no longer followed.
+
+### Test 8: Viewing Another User's Posts in Feed
+
+#### Test 8.1: Verify Post Visibility and Order on User's Profile
+1. Log in to any valid account.
+2. Navigate to your personal profile page.
+3. Create multiple posts with varying timestamps.
+4. Log out and log in with another valid account.
+5. Navigate to the original account's profile.
+6. Verify that all posts are visible on the profile.
+7. Confirm that posts are displayed in chronological order with the newest post at the top.
+8. Refresh the page to ensure the order and visibility remain consistent.
+9. Log out and log back into the original account.
+10. Delete a recently created post.
+11. Log back into the second account.
+12. Refresh the profile page to confirm the post is no longer visible.
