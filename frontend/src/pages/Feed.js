@@ -51,7 +51,7 @@ const Feed = () => {
     })  
     // TODO
     // update api req
-    axios.get("http://localhost:3001/api/posts")
+    axios.get("http://localhost:3001/api/posts/feed")
     .then(response => {
       console.log("feed posts res:")
       console.log(response.data)
