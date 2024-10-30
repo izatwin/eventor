@@ -63,9 +63,15 @@ const PostContent = () => {
         console.log(err)
       })
 
-    // TODO 
-    // api req for comments
-    //setComments([{text: "I'm excited"}, {text: "Can i bring a friend?"}])
+    axios.get(`http://localhost:3001/api/comments/post/${_id}`)
+      .then(response => {
+        console.log(`Comments are: ${response.data}`)
+        setComments(response.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+
   }, [])
 
   const handleShare = async (id) => {
@@ -119,11 +125,11 @@ const PostContent = () => {
 
   const handleCommentChange = (e) => {
     setNewComment({ ...newComment, [e.target.name]: e.target.value });
-    console.log(newComment);
   }
 
   const handleComment = async () => {
-    // api req
+    const tempNewComment = (await axios.post(`http://localhost:3001/api/comments`, {"comment": newComment, "postId": post._id})).data
+    setComments((prevComments) => [tempNewComment, ...prevComments]);
   }
 
   return (
