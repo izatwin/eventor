@@ -37,7 +37,8 @@ const Feed = () => {
           displayName: userInfo.displayName,
           userName: userInfo.userName,
           userId : userInfo.userId,
-          pfp: userInfo.imageURL
+          pfp: userInfo.imageURL,
+          likedPosts: userInfo.likedPosts
         })
       }
       else {
