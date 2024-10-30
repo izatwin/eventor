@@ -11,7 +11,7 @@ import commentIcon from './icons/comment.png'
 import axios from 'axios'
 import { useState, useEffect } from 'react';
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../AuthContext'; 
 
 import viewIcon from './icons/view.png'
@@ -84,12 +84,23 @@ const ProfileContent= () => {
   }
 
   const [newEvent, setNewEvent] = useState(defaultNewEvent)
-  const [events, setEvents] = useState([]);
-
-
+  const [events, setEvents] = useState([])
+  const { profileId } = useParams();  
+  
+  const [profileUser, setProfileUser] = useState({
+    displayName: "",
+    userName: "",
+    userId : "",
+    status: "",
+    bio: "",
+    pfp: "",
+  });
+  
+  const [isOwnProfile, setIsOwnProfile] = useState(false)
+  
   useEffect(() => {
     
-    const validateAndGetPosts = async () => {
+    const validateAndGetProfileUser = async () => {
       try {
         const validateResponse = await axios.get("http://localhost:3001/api/user/validate") 
           console.log("validate response: ")
@@ -111,33 +122,22 @@ const ProfileContent= () => {
               likedPosts: userInfo.likedPosts
             })
             // TODO
-            // check if user.userName === current profile userName
-            // if they are not equal modify page accordingly
-            
-            // also checked if blocked <-> to limit view
-            // checks to see if user logged in is blocking userId in url
-            setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${userInfo.userId}`)).data['blockingThem'])
-            
-            console.log(isBlocked)
+            console.log("profileId: " + profileId) 
+            const profileUserResponse = (await axios.get(`http://localhost:3001/api/user/${profileId}`)).data;
+            console.log("pro res:")
+            console.log(profileUserResponse)
+            setProfileUser({
+              displayName: profileUserResponse.displayName,
+              userName: profileUserResponse.userName,
+              userId : profileUserResponse._id,
+              status: profileUserResponse.status,
+              bio: profileUserResponse.biography,
+              pfp: profileUserResponse.imageURL,
+            })
             setNewPost(prevPost => ({
               ...prevPost,
               userId: userInfo.userId,
             }));
-            /* postResponse is a list of post ids */
-            const postResponse = (await axios.get(`http://localhost:3001/api/user/${validateResponse.data["user-info"].userId}/posts/`)).data
-            console.log("post res: ")
-            console.log(postResponse) 
-            const postContents = []
-            /* make request to get the content of each post using id */ 
-            for (const currentPost of postResponse) {
-              postContents.push(((await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data))
-            }
-            
-            /* pass an array of posts to setPosts */
-            /* sort posts */
-            console.log("postContents:") 
-            console.log(postContents) 
-            setPosts(postContents)
           }
           else {
             navigate("/");
@@ -148,11 +148,44 @@ const ProfileContent= () => {
       }
     }
 
-    validateAndGetPosts();
+    validateAndGetProfileUser();
 
   }, [])
 
 
+  useEffect(()=> {
+    console.log("userid="+user.userId) 
+    console.log("profileuserid="+profileUser.userId) 
+    setIsOwnProfile(user.userId===profileUser.userId)
+    const checkBlockedAndGetPosts = async () => {
+      try {
+        setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${profileUser.userId}`)).data['blockingThem'])
+        
+        console.log(isBlocked)
+
+        /* postResponse is a list of post ids */
+        const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileUser.userId}/posts/`)).data
+        console.log("post res: ")
+        console.log(postResponse) 
+        const postContents = []
+        /* make request to get the content of each post using id */ 
+        for (const currentPost of postResponse) {
+          postContents.push(((await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data))
+        }
+        
+        /* pass an array of posts to setPosts */
+        /* sort posts */
+        console.log("postContents:") 
+        console.log(postContents) 
+        setPosts(postContents)
+      } catch (err) {
+          console.log("err");
+          console.log(err)
+      }
+    }
+    checkBlockedAndGetPosts();
+  }, [profileUser.userId])
+  
   const handleFollow = () => {
     // api req to follow/unfollow userId 
     if (isFollowing) {
@@ -182,9 +215,9 @@ const ProfileContent= () => {
   }
 
   useEffect(() => {
-    setBio(user.bio || "No bio yet!");
-    setStatus(user.status || "No status yet!");
-  }, [user.bio, user.status]);
+    setBio(profileUser.bio || "No bio yet!");
+    setStatus(profileUser.status || "No status yet!");
+  }, [profileUser.bio, profileUser.status]);
   
   const changeBio = (e) => {
     setBio(e.target.value);
@@ -492,31 +525,34 @@ const ProfileContent= () => {
           
           <div className="profile-upper-container">
             <img 
-              src={user.pfp || profilePic} 
+              src={profileUser.pfp || profilePic} 
               alt="Profile" 
               className="profile-picture" />
 
             <div className="profile-information">
-              <div className="p-name">{user.displayName}</div>
-              <div className="p-username">@{user.userName}</div>
+              <div className="p-name">{profileUser.displayName}</div>
+              <div className="p-username">@{profileUser.userName}</div>
             </div>
 
 
             <div className="profile-side"> 
 
               <p className="follower-count"> 0 followers </p>
-
-              <button 
-                onClick={handleFollow}
-                className="follow-btn"> 
-                {isFollowing ? 'Following' : 'Follow'}
-              </button>
-              
-              <button 
-                onClick={handleBlock}
-                className="block-btn"> 
-                {!isBlocked ? 'Block' : 'Unblock'}
-              </button>
+              {isOwnProfile && ( 
+                <div>
+                  <button 
+                    onClick={handleFollow}
+                    className="follow-btn"> 
+                    {isFollowing ? 'Following' : 'Follow'}
+                  </button>
+                    
+                  <button 
+                    onClick={handleBlock}
+                    className="block-btn"> 
+                    {!isBlocked ? 'Block' : 'Unblock'}
+                  </button>
+                </div>
+              )}
     
 
             </div>
@@ -531,16 +567,17 @@ const ProfileContent= () => {
               type="text" 
               onChange={changeStatus} 
               value={status} />
-
-            <div className="edit-card"> 
-              <img 
-                src={editingStatus ? checkIcon : editIcon } 
-                onClick={editingStatus ? handleStatusChange : handleStatusEdit } 
-                alt="Edit" 
-                className="edit-icon"
-              /> 
-              <p className="edit-text"> Edit Status </p>
-            </div>
+            {isOwnProfile && (
+              <div className="edit-card"> 
+                <img 
+                  src={editingStatus ? checkIcon : editIcon } 
+                  onClick={editingStatus ? handleStatusChange : handleStatusEdit } 
+                  alt="Edit" 
+                  className="edit-icon"
+                /> 
+                <p className="edit-text"> Edit Status </p>
+              </div>
+            )}
 
           </div>
 
@@ -551,6 +588,8 @@ const ProfileContent= () => {
 
           <div className="about-title-container">
             <h1 className="about-title"> About </h1>
+
+            {isOwnProfile && (
             <div className="edit-bio-card"> 
               <img 
                 src={editingBio ? checkIcon : editIcon} 
@@ -560,6 +599,8 @@ const ProfileContent= () => {
               /> 
               <p className="edit-bio-text"> Edit Bio </p>
             </div>
+            )}
+
           </div>
           
           <div className="about-text-container">
@@ -575,56 +616,66 @@ const ProfileContent= () => {
           </div>
 
         </div>
-
-        <div className="post-card">
-          
-          <div className="post-input">
-            <textarea 
-              name="content" 
-              className="post-text" 
-              value={newPost.content} 
-              type="text" 
-              onChange={handlePostChange} 
-              placeholder="What will you be hosting next?"/>
-          </div>
-
-          <div className="post-buttons">
-            <input
-              id="file-input"
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleImageChange}
-            />
-            <img 
-              src={imageIcon} 
-              onClick={handleUploadClick} 
-              alt="Image" 
-              className="image-icon"
-            /> 
-            <img 
-              src={calendarIcon} 
-              alt="Calendar" 
-              className="calendar-icon"
-            /> 
-            <button 
-              onClick={handlePost} 
-              className="post-btn"> 
-              Post 
-            </button> 
-          </div>
+        
+        { isOwnProfile && (
+          <div className="post-card">
             
-        </div>
+            <div className="post-input">
+              <textarea 
+                name="content" 
+                className="post-text" 
+                value={newPost.content} 
+                type="text" 
+                onChange={handlePostChange} 
+                placeholder="What will you be hosting next?"/>
+            </div>
+
+            <div className="post-buttons">
+              <input
+                id="file-input"
+                type="file"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+              />
+              <img 
+                src={imageIcon} 
+                onClick={handleUploadClick} 
+                alt="Image" 
+                className="image-icon"
+              /> 
+              <img 
+                src={calendarIcon} 
+                alt="Calendar" 
+                className="calendar-icon"
+              /> 
+              <button 
+                onClick={handlePost} 
+                className="post-btn"> 
+                Post 
+              </button> 
+            </div>
+              
+          </div>
+        )}
         
         
         <div className="profile-feed">
           {posts.length === 0 ? (
-
-            <div 
-              className="empty-message">
-              <h2> Nothing Here Yet </h2>
-              <p> Create a post for it to show up on your profile! </p>
-            </div>
+            isOwnProfile ? (
+              <div 
+                className="empty-message">
+                <h2> Nothing Here Yet </h2>
+                <p> Create a post for it to show up on your profile! </p>
+              </div>
+            ) : (
+              <div 
+                className="empty-message">
+                <h2> Nothing Here Yet </h2>
+                <p> Come back later! </p>
+              </div>
+            )
+          
 
           ) : (
             posts.map(post=>(
@@ -633,36 +684,37 @@ const ProfileContent= () => {
                 <div className="post-header"> 
 
                   <img
-                    src={user.pfp || profilePic} 
+                    src={profileUser.pfp || profilePic} 
                     alt="PostProfile" 
                     className="post-profilepic" 
                   />
                   
                   <div className="post-profile-info">
-                    <div className="post-name">{user.displayName}</div>
-                    <div className="post-username">@{user.userName}</div>
+                    <div className="post-name">{profileUser.displayName}</div>
+                    <div className="post-username">@{profileUser.userName}</div>
                   </div>      
-
-                   <div className="modify-post">
-                    <button 
-                      onClick={() => handleAddEventPopup(post)} 
-                      className="add-event-btn"> 
-                      Add Event 
-                    </button> 
-                    <img 
-                      src={editIcon} 
-                      onClick={() => handleEditPopup(post)} 
-                      alt="Edit" 
-                      className="edit-post-icon " 
-                    />
-                    <img 
-                      src={removeIcon} 
-                      onClick={() => handlePostDelete(post._id)}   
-                      alt="Remove" 
-                      className="remove-icon " 
-                    />
-              
-                  </div>
+                  
+                  {isOwnProfile && (
+                    <div className="modify-post">
+                      <button 
+                        onClick={() => handleAddEventPopup(post)} 
+                        className="add-event-btn"> 
+                        Add Event 
+                      </button> 
+                      <img 
+                        src={editIcon} 
+                        onClick={() => handleEditPopup(post)} 
+                        alt="Edit" 
+                        className="edit-post-icon " 
+                      />
+                      <img 
+                        src={removeIcon} 
+                        onClick={() => handlePostDelete(post._id)}   
+                        alt="Remove" 
+                        className="remove-icon " 
+                      />
+                    </div>
+                  )}
 
                 </div>
 
