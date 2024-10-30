@@ -100,7 +100,7 @@ const ProfileContent= () => {
   
   useEffect(() => {
     
-    const validateAndGetPosts = async () => {
+    const validateAndGetProfileUser = async () => {
       try {
         const validateResponse = await axios.get("http://localhost:3001/api/user/validate") 
           console.log("validate response: ")
@@ -134,29 +134,10 @@ const ProfileContent= () => {
               bio: profileUserResponse.biography,
               pfp: profileUserResponse.imageURL,
             })
-            // check if user.userId === profileUser.userId
-            // if they are not equal modify page accordingly
-            // also checked if blocked <-> to limit view
-
             setNewPost(prevPost => ({
               ...prevPost,
               userId: userInfo.userId,
             }));
-            /* postResponse is a list of post ids */
-            const postResponse = (await axios.get(`http://localhost:3001/api/user/${validateResponse.data["user-info"].userId}/posts/`)).data
-            console.log("post res: ")
-            console.log(postResponse) 
-            const postContents = []
-            /* make request to get the content of each post using id */ 
-            for (const currentPost of postResponse) {
-              postContents.push(((await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data))
-            }
-            
-            /* pass an array of posts to setPosts */
-            /* sort posts */
-            console.log("postContents:") 
-            console.log(postContents) 
-            setPosts(postContents)
           }
           else {
             navigate("/");
@@ -167,7 +148,7 @@ const ProfileContent= () => {
       }
     }
 
-    validateAndGetPosts();
+    validateAndGetProfileUser();
 
   }, [])
 
@@ -176,6 +157,33 @@ const ProfileContent= () => {
     console.log("userid="+user.userId) 
     console.log("profileuserid="+profileUser.userId) 
     setIsOwnProfile(user.userId===profileUser.userId)
+    const checkBlockedAndGetPosts = async () => {
+      try {
+        setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${profileUser.userId}`)).data['blockingThem'])
+        
+        console.log(isBlocked)
+
+        /* postResponse is a list of post ids */
+        const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileUser.userId}/posts/`)).data
+        console.log("post res: ")
+        console.log(postResponse) 
+        const postContents = []
+        /* make request to get the content of each post using id */ 
+        for (const currentPost of postResponse) {
+          postContents.push(((await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data))
+        }
+        
+        /* pass an array of posts to setPosts */
+        /* sort posts */
+        console.log("postContents:") 
+        console.log(postContents) 
+        setPosts(postContents)
+      } catch (err) {
+          console.log("err");
+          console.log(err)
+      }
+    }
+    checkBlockedAndGetPosts();
   }, [profileUser.userId])
   
   const handleFollow = () => {

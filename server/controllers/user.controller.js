@@ -1048,7 +1048,7 @@ exports.checkBlockStatus = async (req, res) => {
         });
     }
 
-    const targetUserId = req.params.userId;
+    const targetUserId = req.params.id;
     if (!targetUserId) {
         return res.status(400).send({
             message: "Missing userId to check block status."
