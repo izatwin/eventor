@@ -1,5 +1,5 @@
 import "../styles/Feed.css";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
@@ -8,6 +8,7 @@ import profilePic from './icons/profile.png';
 
 import viewIcon from './icons/view.png'
 import likeIcon from './icons/like.png'
+import likedIcon from './icons/liked.png'
 import shareIcon from './icons/share.png'
 import expandIcon from './icons/expand.png'
 import commentIcon from './icons/comment.png'
@@ -20,6 +21,7 @@ const Feed = () => {
   const { user, setUser } = useAuth();  
   const { showSharePopup, updateShareCount, updateLike } = usePopup();
   const [eventsById, setEventsById] = useState({});
+  const observer = useRef(null); 
 
   const navigate = useNavigate();
   
@@ -99,6 +101,39 @@ const Feed = () => {
     setPosts(updatedPosts);
   };
 
+  const trackViewCount = async (postId) => {
+    try {
+
+      await axios.post("http://localhost:3001/api/posts/action", {"postId": postId, "actionType": "view"})
+      console.log(`Post ${postId} is viewed.`);
+    } catch (error) {
+      console.error(`Error updating view count for post ${postId}:`, error);
+    }
+  };
+
+  useEffect(() => {
+    observer.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const postId = entry.target.dataset.postId;
+          trackViewCount(postId); 
+          observer.current.unobserve(entry.target); 
+        }
+      });
+    });
+
+    const postElements = document.querySelectorAll('.post');
+    postElements.forEach((postElement) => {
+      observer.current.observe(postElement);
+    });
+
+    return () => {
+      postElements.forEach((postElement) => {
+        observer.current.unobserve(postElement);
+      });
+    };
+  }, [posts]); 
+
   const handleShare = async (id) => {
     const success = await updateShareCount(id);
     if (success) {
@@ -165,9 +200,9 @@ const Feed = () => {
           ) : (
             posts.map(post=>{
               const postEvent = post.eventId && eventsById[post.eventId]
+              const isLiking = user.likedPosts.includes(post._id)
               return (
-                <div className="post" key={post._id}> 
-
+                <div className="post" key={post._id} data-post-id={post._id}>
                   <div className="post-header"> 
 
                   <img
@@ -254,7 +289,7 @@ const Feed = () => {
 
                   <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
                   <div className="views-num num">{post.views}</div>
-                  <img onClick={() => { handleLike(post._id) }} src={likeIcon} alt="Like" className="like-icon post-icon"/> 
+                  <img onClick={() => { handleLike(post._id) }} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon"/> 
                   <div className="likes-num num"> {post.likes} </div>
                   <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
                   <div className="shares-num num"> {post.shares} </div>
