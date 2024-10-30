@@ -9,13 +9,14 @@ import expandIcon from './icons/expand.png'
 import commentIcon from './icons/comment.png'
 
 import axios from 'axios'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../AuthContext'; 
 
 import viewIcon from './icons/view.png'
 import likeIcon from './icons/like.png'
+import likedIcon from './icons/liked.png'
 import shareIcon from './icons/share.png'
 import { usePopup } from '../PopupContext';
 
@@ -98,11 +99,13 @@ const ProfileContent= () => {
   });
   
   const [isOwnProfile, setIsOwnProfile] = useState(false)
+  const observer = useRef(null); 
   
   useEffect(() => {
     
     const validateAndGetProfileUser = async () => {
       try {
+        // validate the user
         const validateResponse = await axios.get("http://localhost:3001/api/user/validate") 
           console.log("validate response: ")
           console.log(validateResponse);
@@ -139,6 +142,40 @@ const ProfileContent= () => {
               ...prevPost,
               userId: userInfo.userId,
             }));
+            console.log("userId="+profileUserResponse._id)
+            console.log("profileId="+profileId)
+            setIsOwnProfile(profileUserResponse._id===profileId)
+            setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${profileId}`)).data['blockingThem'])
+            
+            console.log(isBlocked)
+
+            /* postResponse is a list of post ids */
+            const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileId}/posts/`)).data
+            console.log("post res: ")
+            console.log(postResponse) 
+            const postContents = []
+            /* make request to get the content of each post using id */ 
+            for (const currentPost of postResponse) {
+              const curPostData = (await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data
+              postContents.push(curPostData)
+
+              if (curPostData.eventId) {
+                if (!eventsById[curPostData.eventId]) {
+                  const event = (await axios.get(`http://localhost:3001/api/events/${curPostData.eventId}`)).data
+                  setEventsById(prevEvents => ({
+                    ...prevEvents,
+                    [curPostData.eventId]: event
+                  }));
+
+                }
+              }
+            }
+            
+            /* pass an array of posts to setPosts */
+            /* sort posts */
+            console.log("postContents:") 
+            console.log(postContents) 
+            setPosts(postContents)
           }
           else {
             navigate("/");
@@ -153,51 +190,6 @@ const ProfileContent= () => {
 
   }, [])
 
-
-  useEffect(()=> {
-    console.log("userid="+user.userId) 
-    console.log("profileuserid="+profileUser.userId) 
-    setIsOwnProfile(user.userId===profileUser.userId)
-    const checkBlockedAndGetPosts = async () => {
-      try {
-        setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${profileUser.userId}`)).data['blockingThem'])
-        
-        console.log(isBlocked)
-
-        /* postResponse is a list of post ids */
-        const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileUser.userId}/posts/`)).data
-        console.log("post res: ")
-        console.log(postResponse) 
-        const postContents = []
-        /* make request to get the content of each post using id */ 
-        for (const currentPost of postResponse) {
-          const curPostData = (await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data
-          postContents.push(curPostData)
-
-          if (curPostData.eventId) {
-            if (!eventsById[curPostData.eventId]) {
-              const event = (await axios.get(`http://localhost:3001/api/events/${curPostData.eventId}`)).data
-              setEventsById(prevEvents => ({
-                ...prevEvents,
-                [curPostData.eventId]: event
-              }));
-
-            }
-          }
-        }
-        
-        /* pass an array of posts to setPosts */
-        /* sort posts */
-        console.log("postContents:") 
-        console.log(postContents) 
-        setPosts(postContents)
-      } catch (err) {
-          console.log("err");
-          console.log(err)
-      }
-    }
-    checkBlockedAndGetPosts();
-  }, [profileUser.userId])
 
   const handleFollow = () => {
     // api req to follow/unfollow userId 
@@ -232,6 +224,38 @@ const ProfileContent= () => {
     setStatus(profileUser.status || "No status yet!");
   }, [profileUser.bio, profileUser.status]);
   
+  const trackViewCount = async (postId) => {
+    try {
+
+      await axios.post("http://localhost:3001/api/posts/action", {"postId": postId, "actionType": "view"})
+      console.log(`Post ${postId} is viewed.`);
+    } catch (error) {
+      console.error(`Error updating view count for post ${postId}:`, error);
+    }
+  };
+
+  useEffect(() => {
+    observer.current = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const postId = entry.target.dataset.postId;
+          trackViewCount(postId); 
+          observer.current.unobserve(entry.target); 
+        }
+      });
+    });
+
+    const postElements = document.querySelectorAll('.post');
+    postElements.forEach((postElement) => {
+      observer.current.observe(postElement);
+    });
+
+    return () => {
+      postElements.forEach((postElement) => {
+        observer.current.unobserve(postElement);
+      });
+    };
+  }, [posts]); 
   const changeBio = (e) => {
     setBio(e.target.value);
   }
@@ -555,7 +579,7 @@ const ProfileContent= () => {
             <div className="profile-side"> 
 
               <p className="follower-count"> 0 followers </p>
-              {isOwnProfile && ( 
+              {!isOwnProfile && ( 
                 <div>
                   <button 
                     onClick={handleFollow}
@@ -697,8 +721,9 @@ const ProfileContent= () => {
           ) : (
             posts.map(post=>{
               const postEvent = post.eventId && eventsById[post.eventId]
+              const isLiking = user.likedPosts.includes(post._id)
               return (
-                <div className="post" key={post._id}> 
+                <div className="post" key={post._id} data-post-id={post._id}>
 
                   <div className="post-header"> 
 
@@ -715,11 +740,13 @@ const ProfileContent= () => {
                   
                   {isOwnProfile && (
                     <div className="modify-post">
-                      <button 
-                        onClick={() => handleAddEventPopup(post)} 
-                        className="add-event-btn"> 
-                        Add Event 
-                      </button> 
+                      {!postEvent && ( 
+                        <button 
+                          onClick={() => handleAddEventPopup(post)} 
+                          className="add-event-btn"> 
+                          Add Event 
+                        </button> 
+                      )}
                       <img 
                         src={editIcon} 
                         onClick={() => handleEditPopup(post)} 
@@ -809,7 +836,7 @@ const ProfileContent= () => {
 
                   <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
                   <div className="views-num num">{post.views}</div>
-                  <img onClick={() => { handleLike(post._id) }} src={likeIcon} alt="Like" className="like-icon post-icon"/> 
+                  <img onClick={() => { handleLike(post._id) }} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon"/> 
                   <div className="likes-num num"> {post.likes} </div>
                   <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
                   <div className="shares-num num"> {post.shares} </div>
