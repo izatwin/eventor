@@ -27,6 +27,7 @@ const ProfileContent= () => {
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
   const [posts, setPosts] = useState([]);
+  const [eventsById, setEventsById] = useState({});
   const [isEditPopupOpen, setEditPopupOpen] = useState(false);
   const [isAddEventPopupOpen, setAddEventPopupOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
@@ -170,7 +171,19 @@ const ProfileContent= () => {
         const postContents = []
         /* make request to get the content of each post using id */ 
         for (const currentPost of postResponse) {
-          postContents.push(((await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data))
+          const curPostData = (await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data
+          postContents.push(curPostData)
+
+          if (curPostData.eventId) {
+            if (!eventsById[curPostData.eventId]) {
+              const event = (await axios.get(`http://localhost:3001/api/events/${curPostData.eventId}`)).data
+              setEventsById(prevEvents => ({
+                ...prevEvents,
+                [curPostData.eventId]: event
+              }));
+
+            }
+          }
         }
         
         /* pass an array of posts to setPosts */
@@ -185,7 +198,7 @@ const ProfileContent= () => {
     }
     checkBlockedAndGetPosts();
   }, [profileUser.userId])
-  
+
   const handleFollow = () => {
     // api req to follow/unfollow userId 
     if (isFollowing) {
@@ -385,6 +398,10 @@ const ProfileContent= () => {
     }
     axios.post("http://localhost:3001/api/events",  requestData )
     setEvents([newEvent]);
+    setEventsById(prevEvents => ({
+      ...prevEvents,
+      [currentPost._id]: newEvent
+    }));
     closeAddEventPopup();
   }  
 
@@ -678,10 +695,12 @@ const ProfileContent= () => {
           
 
           ) : (
-            posts.map(post=>(
-              <div className="post" key={post._id}> 
+            posts.map(post=>{
+              const postEvent = post.eventId && eventsById[post.eventId]
+              return (
+                <div className="post" key={post._id}> 
 
-                <div className="post-header"> 
+                  <div className="post-header"> 
 
                   <img
                     src={profileUser.pfp || profilePic} 
@@ -716,72 +735,77 @@ const ProfileContent= () => {
                     </div>
                   )}
 
-                </div>
-
-                <div className="post-content"> 
-                  {post.content}
-                </div>
-
-  
-
-                {newEvent.eventType !== "" && (
-                  <div className="event"> 
-                    <h1 
-                      className="event-name"> 
-                      {newEvent.eventName} 
-                    </h1>
-                    <p 
-                      className="event-description"> 
-                      {newEvent.eventDescription} 
-                    </p>
-                    <div 
-                      className="event-times"> 
-                      {newEvent.startTime}-{newEvent.endTime}
-                    </div> 
-                    <img
-                      src={newEvent.embeddedImage} 
-                      alt="event-embeddedImage" 
-                      className="event-embeddedImage" 
-                    />
-                    
-                    {newEvent.eventType === "NormalEvent" && (
-                      <p className="event-location"> Location: {newEvent.location} </p>
-                    )}
-                    {newEvent.eventType === "MusicReleaseEvent" && (
-                      <div>
-                        <h2 className="event-release-title"> <b> {newEvent.releaseTitle} </b> </h2>
-                        <p className="event-release-artist"> {newEvent.releaseArtist} </p>
-                        <p className="event-release-type"> [{newEvent.releaseType}] </p> 
-      
-                        {newEvent.songs.map((song, index) => (
-                            <div className="event-song" key={index}> 
-                              {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
-                            </div>
-                        ))}
-                        <br/>
-                        <i> Apple Music: </i> <a href={newEvent.appleMusicLink} style= {{color: 'black'}}> {newEvent.appleMusicLink} </a>  <br/>
-                        <i> Spotify: </i> <a href={newEvent.spotifyLink} style= {{color: 'black'}} > {newEvent.spotifyLink} </a> <br/> <br/>
-
-  
-                      </div>
-                    )}
-                    {newEvent.eventType === "TicketedEvent" && (
-                      <div>
-                        <i> Get Tickets: </i> <a href={newEvent.getTicketsLink} style= {{color: 'black'}}> {newEvent.getTicketsLink} </a>  <br/><br/>
-                        {newEvent.destinations.map((destination, index) => (
-                            <div className="event-destination"> 
-                              {index + 1}. {destination.location} ({destination.time})
-                            </div>
-                        ))}
-                        <br/>
-                      </div>
-                    )}
-                    
-                    
                   </div>
-                )}
-                
-                <div className="post-buttons">
+
+                  <div className="post-content"> 
+                    {post.content}
+                  </div>
+
+    
+
+                  {postEvent &&  (
+                    <div className="event"> 
+                      <h1 
+                        className="event-name"> 
+                        {postEvent.eventName} 
+                      </h1>
+                      <p 
+                        className="event-description"> 
+                        {postEvent.eventDescription} 
+                      </p>
+                      {(postEvent.startTime || postEvent.endTime) && (
+                        <div className="event-times"> 
+                          {postEvent.startTime ? new Date(postEvent.startTime).toLocaleString() : ""} 
+                          {postEvent.startTime && postEvent.endTime ? " - " : ""}
+                          {postEvent.endTime ? new Date(postEvent.endTime).toLocaleString() : ""}
+                        </div>
+                      )}                 
+                      {postEvent.embeddedImage && (
+                        <img
+                          src={postEvent.embeddedImage} 
+                          alt="Event Image" 
+                          className="event-embeddedImage" 
+                        />
+                      )}
+                      
+                      {postEvent.type === "NormalEvent" && (
+                        <p className="event-location"> Location: {postEvent.location} </p>
+                      )}
+                      
+                      {postEvent.type === "MusicReleaseEvent" && (
+                        <div>
+                          <h2 className="event-release-title"> <b> {postEvent.releaseTitle} </b> </h2>
+                          <p className="event-release-artist"> {postEvent.releaseArtist} </p>
+                          <p className="event-release-type"> [{postEvent.releaseType}] </p> 
+        
+                          {postEvent.songs.map((song, index) => (
+                              <div className="event-song" key={index}> 
+                                {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
+                              </div>
+                          ))}
+                          <br/>
+                          <i> Apple Music: </i> <a href={postEvent.appleMusicLink} style= {{color: 'black'}}> {postEvent.appleMusicLink} </a>  <br/>
+                          <i> Spotify: </i> <a href={postEvent.spotifyLink} style= {{color: 'black'}} > {postEvent.spotifyLink} </a> <br/> <br/>
+
+    
+                        </div>
+                      )}
+                      {postEvent.type === "TicketedEvent" && (
+                        <div>
+                          <i> Get Tickets: </i> <a href={postEvent.getTicketsLink} style= {{color: 'black'}}> {postEvent.getTicketsLink} </a>  <br/><br/>
+                          {postEvent.destinations.map((destination, index) => (
+                              <div className="event-destination"> 
+                                {index + 1}. {destination.location} ({destination.time})
+                              </div>
+                          ))}
+                          <br/>
+                        </div>
+                      )}
+                      
+                    </div>
+                  )}
+                  
+                  <div className="post-buttons">
 
                   <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
                   <div className="views-num num">{post.views}</div>
@@ -800,11 +824,11 @@ const ProfileContent= () => {
                       onClick={()=>{navigate(`/post/${post._id}`)}}/> 
                   </div>
 
-                </div>
+                  </div>
 
-              </div>
-              
-            ))
+                </div>
+              )
+            })
           )}
         </div>
         
@@ -920,7 +944,7 @@ const ProfileContent= () => {
 
                   <div className="time-fields">
                     <input 
-                      type="date" 
+                      type="datetime-local" 
                       name="startTime" 
                       className="input-field" 
                       value={newEvent.startTime}
@@ -928,7 +952,7 @@ const ProfileContent= () => {
                     />
                     <span className="time-separator">-</span>
                     <input 
-                      type="date" 
+                      type="datetime-local" 
                       name="endTime" 
                       className="input-field" 
                       value={newEvent.endTime}
