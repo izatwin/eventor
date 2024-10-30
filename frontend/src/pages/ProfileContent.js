@@ -196,11 +196,8 @@ const ProfileContent= () => {
           console.log(err)
       }
     }
-
-    validateAndGetPosts();
-
-  }, [])
-
+    checkBlockedAndGetPosts();
+  }, [profileUser.userId])
 
   const handleFollow = () => {
     // api req to follow/unfollow userId 
