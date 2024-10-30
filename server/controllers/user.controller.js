@@ -1099,7 +1099,7 @@ exports.searchUsers = async (req, res) => {
                 { userName: regex },
                 { displayName: regex }
             ]
-        }).select('_id displayName userName');
+        }).select('_id displayName userName imageURL');
 
         // Sort users by prioritizing matches on userName, then displayName
         const sortedUsers = users.sort((a, b) => {
