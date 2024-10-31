@@ -27,8 +27,10 @@ We use npm commands to start the server:
 ## Testing
 #### Manual
 There are several test-cases we have created for this project:
-[Sprint 1 Test Cases](/tests/Sprint_1_Test_cases.md)
-[Sprint 2 Test Cases](/tests/Sprint_2_Test_cases.md)
+
+[Sprint 1 Test Cases](/tests/Sprint_1_Test_Cases.md)
+
+[Sprint 2 Test Cases](/tests/Sprint_2_Test_Cases.md)
 #### Automated
 1. Install a recent version of python
 2. Navigate to eventor
