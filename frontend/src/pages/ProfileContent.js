@@ -86,7 +86,6 @@ const ProfileContent= () => {
   }
 
   const [newEvent, setNewEvent] = useState(defaultNewEvent)
-  const [events, setEvents] = useState([])
   const { profileId } = useParams();  
   
   const [profileUser, setProfileUser] = useState({
@@ -412,7 +411,6 @@ const ProfileContent= () => {
     })
   }
 
-  /* TODO: Function to add/create an event */
   const handleAddEvent = () => {
     // api request   
     console.log(newEvent)
@@ -421,12 +419,22 @@ const ProfileContent= () => {
       "eventType": newEvent.eventType,
       "eventData": newEvent
     }
-    axios.post("http://localhost:3001/api/events",  requestData )
-    setEvents([newEvent]);
-    setEventsById(prevEvents => ({
-      ...prevEvents,
-      [currentPost._id]: newEvent
-    }));
+    axios.post("http://localhost:3001/api/events", requestData)
+      .then((response) => {
+        setEventsById(prevEvents => ({
+          ...prevEvents,
+          [response.data["_id"]]: response.data
+        }));
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post._id === currentPost._id ? { ...post, "is_event": true, "eventId": response.data["_id"] } : post
+          )
+        );
+      })
+      .catch((err) => {
+        console.log(err)
+        showFailPopup("Error creating event.")
+      })
     closeAddEventPopup();
   }  
 
