@@ -22,40 +22,40 @@
 
 #### Test 2.1: Cancel Changes on Post
 1. Log in to any valid account.
-2. Navigate to a post with event and image.
-3. Edit the post (change body, remove event/image).
+2. Navigate to a post with event.
+3. Edit the post (change body, remove event).
 4. Refresh without saving.
 5. Ensure no changes are reflected.
 
 #### Test 2.2: Save Changes to Post Content
 1. Log in to any valid account.
-2. Edit an existing post by changing the message body and removing the event/image.
+2. Edit an existing post by changing the message body and removing the event.
 3. Save changes.
 4. Refresh and confirm changes persist.
 
-#### Test 2.3: Attach New Elements and Cancel
+#### Test 2.3: Attach New Event and Cancel
 1. Log in to any valid account.
-2. Edit a post and attach a new image and event.
+2. Edit a post and attach an event.
 3. Refresh without saving.
 4. Ensure changes aren't applied.
 
-#### Test 2.4: Attach New Elements and Save
+#### Test 2.4: Attach New Event and Save
 1. Log in to any valid account.
-2. Edit a post to attach a new image and event.
+2. Edit a post to attach a new event.
 3. Save changes.
 4. Refresh and confirm changes persist.
 
-#### Test 2.5: Change Attachments Without Saving
+#### Test 2.5: Replace Event Without Saving
 1. Log in to any valid account.
-2. Navigate to a post with an existing image and event.
-3. Change the image and delete the event, attaching new ones.
+2. Navigate to a post with an existing event.
+3. Change the delete the event and attach a new one.
 4. Refresh without saving.
 5. Ensure no changes are applied.
 
-#### Test 2.6: Save Changed Attachments
+#### Test 2.6: Replace Event and Save
 1. Log in to any valid account.
-2. Navigate to a post with an existing image and event.
-3. Change the image to a new one, delete the event and attach a new one.
+2. Navigate to a post with an existing event.
+3. Delete the event and attach a new one.
 4. Save changes.
 5. Refresh to confirm changes are applied.
 
