@@ -101,10 +101,8 @@ const Feed = () => {
     setPosts(updatedPosts);
   };
 
-const viewedPosts = new Set(); 
 
 const trackViewCount = async (postId) => {
-  if (viewedPosts.has(postId)) return; 
 
   try {
     await axios.post("http://localhost:3001/api/posts/action", {
@@ -112,7 +110,6 @@ const trackViewCount = async (postId) => {
       actionType: "view"
     });
     console.log(`Post ${postId} is viewed.`);
-    viewedPosts.add(postId); 
   } catch (error) {
     console.error(`Error updating view count for post ${postId}:`, error);
   }

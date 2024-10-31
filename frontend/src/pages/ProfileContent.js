@@ -959,7 +959,6 @@ const handleAddEvent = async () => {
                   <h2>Edit event</h2>
               
                   <form>
-
                     <input 
                       type="text" 
                       placeholder="Name" 
@@ -1299,7 +1298,10 @@ const handleAddEvent = async () => {
 
                 </form>
                 <button 
-                  onClick={ () => { 
+                  onClick={ () => {
+                    if (!newEvent.eventTitle) {
+                      return;
+                    }
                     setEventStep(prevEventStep => prevEventStep + "2")
                     }
                   } 
