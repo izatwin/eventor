@@ -101,38 +101,46 @@ const Feed = () => {
     setPosts(updatedPosts);
   };
 
-  const trackViewCount = async (postId) => {
-    try {
+const viewedPosts = new Set(); 
 
-      await axios.post("http://localhost:3001/api/posts/action", {"postId": postId, "actionType": "view"})
-      console.log(`Post ${postId} is viewed.`);
-    } catch (error) {
-      console.error(`Error updating view count for post ${postId}:`, error);
-    }
-  };
+const trackViewCount = async (postId) => {
+  if (viewedPosts.has(postId)) return; 
 
-  useEffect(() => {
-    observer.current = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const postId = entry.target.dataset.postId;
-          trackViewCount(postId); 
-          observer.current.unobserve(entry.target); 
-        }
-      });
+  try {
+    await axios.post("http://localhost:3001/api/posts/action", {
+      postId: postId, 
+      actionType: "view"
     });
+    console.log(`Post ${postId} is viewed.`);
+    viewedPosts.add(postId); 
+  } catch (error) {
+    console.error(`Error updating view count for post ${postId}:`, error);
+  }
+};
 
-    const postElements = document.querySelectorAll('.post');
+useEffect(() => {
+  observer.current = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const postId = entry.target.dataset.postId;
+        trackViewCount(postId); 
+        observer.current.unobserve(entry.target); 
+      }
+    });
+  });
+
+  const postElements = document.querySelectorAll('.post');
+  postElements.forEach((postElement) => {
+    observer.current.observe(postElement);
+  });
+
+  return () => {
     postElements.forEach((postElement) => {
-      observer.current.observe(postElement);
+      observer.current.unobserve(postElement);
     });
+  };
+}, []); 
 
-    return () => {
-      postElements.forEach((postElement) => {
-        observer.current.unobserve(postElement);
-      });
-    };
-  }, [posts]); 
 
   const handleShare = async (id) => {
     const success = await updateShareCount(id);

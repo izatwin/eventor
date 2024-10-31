@@ -1,4 +1,5 @@
 .profile-content-container {
+
   position: fixed;
   width: 50vw;
   height: 100vh;
@@ -317,7 +318,7 @@
   cursor: pointer;
 }
 
-.calendar-icon {
+.event-icon {
   width: 25px;
   height: 25px;
   margin-left: 10px;
@@ -435,6 +436,8 @@
   border-radius: 10px;
   width: 320px;
   max-width: 90%;
+  max-height: 90vh; 
+  overflow-y: auto; 
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
   display: flex;
@@ -442,7 +445,7 @@
 }
 
 .edit-post-textarea {
-  height: 100px;
+  min-height: 100px; 
   background: transparent; 
   resize: none; 
   outline: none; 
@@ -451,6 +454,8 @@
   font-family: Arial, sans-serif;
   font-size: 16px;
 }
+
+
 
 .save-button{
   margin-top: 10px;
