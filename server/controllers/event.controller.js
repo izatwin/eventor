@@ -99,7 +99,7 @@ exports.createEvent = async (req, res) => {
         post.eventId = event._id;
         await post.save();
 
-        res.status(201).send(event);
+        res.send(event);
     } catch (err) {
         res.status(500).send({
             message: "Error creating event.",
