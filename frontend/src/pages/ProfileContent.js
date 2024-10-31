@@ -50,6 +50,7 @@ const ProfileContent= () => {
   const { showSharePopup, updateShareCount, updateLike } = usePopup();
 
   const [isBlocked, setIsBlocked] = useState(false)
+  const [isBlocking, setIsBlocking] = useState(false)
 
   const defaultNewEvent = {
     eventType : "",
@@ -146,39 +147,47 @@ const ProfileContent= () => {
             console.log("userId="+userInfo.userId)
             console.log("profileId="+profileId)
             setIsOwnProfile(userInfo.userId===profileId)
-            setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${profileId}`)).data['blockingThem'])
+            const blockStatusResponse = (await axios.get(`http://localhost:3001/api/user/block-status/${profileId}`)).data
+            console.log("block-status response:")
+            console.log(blockStatusResponse) 
+            const isBlockingResponse = blockStatusResponse['blockingThem']
+            const isBlockedResponse = blockStatusResponse['blockingUs']
+            console.log("isBlocking="+isBlockingResponse)
+            console.log("isBlocked="+isBlockedResponse)
+            setIsBlocking(isBlockingResponse)
+            setIsBlocked(isBlockedResponse)
 
             setIsFollowing(userInfo.following.includes(profileId))
             
-            console.log(isBlocked)
+            if (isBlockedResponse || isBlockingResponse) {
+              /* postResponse is a list of post ids */
+              const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileId}/posts/`)).data
+              console.log("post res: ")
+              console.log(postResponse) 
+              const postContents = []
+              /* make request to get the content of each post using id */ 
+              for (const currentPost of postResponse) {
+                const curPostData = (await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data
+                postContents.push(curPostData)
 
-            /* postResponse is a list of post ids */
-            const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileId}/posts/`)).data
-            console.log("post res: ")
-            console.log(postResponse) 
-            const postContents = []
-            /* make request to get the content of each post using id */ 
-            for (const currentPost of postResponse) {
-              const curPostData = (await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data
-              postContents.push(curPostData)
+                if (curPostData.eventId) {
+                  if (!eventsById[curPostData.eventId]) {
+                    const event = (await axios.get(`http://localhost:3001/api/events/${curPostData.eventId}`)).data
+                    setEventsById(prevEvents => ({
+                      ...prevEvents,
+                      [curPostData.eventId]: event
+                    }));
 
-              if (curPostData.eventId) {
-                if (!eventsById[curPostData.eventId]) {
-                  const event = (await axios.get(`http://localhost:3001/api/events/${curPostData.eventId}`)).data
-                  setEventsById(prevEvents => ({
-                    ...prevEvents,
-                    [curPostData.eventId]: event
-                  }));
-
+                  }
                 }
               }
+
+              /* pass an array of posts to setPosts */
+              /* sort posts */
+              console.log("postContents:") 
+              console.log(postContents) 
+              setPosts(postContents)
             }
-            
-            /* pass an array of posts to setPosts */
-            /* sort posts */
-            console.log("postContents:") 
-            console.log(postContents) 
-            setPosts(postContents)
           }
           else {
             navigate("/");
@@ -219,7 +228,7 @@ const ProfileContent= () => {
 
   const handleBlock = () => {
     // api req to block/unblock userId 
-    if (isBlocked) {
+    if (isBlocking) {
       // unblock
       axios.post("http://localhost:3001/api/user/block", {"userId": profileUser.userId, "block": false})
     }
@@ -228,7 +237,7 @@ const ProfileContent= () => {
       axios.post("http://localhost:3001/api/user/block", {"userId": profileUser.userId, "block": true})
     }
 
-    setIsBlocked(!isBlocked) 
+    setIsBlocking(!isBlocking) 
 
   }
 
@@ -613,7 +622,7 @@ const ProfileContent= () => {
                   <button 
                     onClick={handleBlock}
                     className="block-btn"> 
-                    {!isBlocked ? 'Block' : 'Unblock'}
+                    {!isBlocking ? 'Block' : 'Unblock'}
                   </button>
                 </div>
               )}
@@ -725,160 +734,165 @@ const ProfileContent= () => {
         
         
         <div className="profile-feed">
-          {posts.length === 0 ? (
+          {isBlocking ? (
+            <div className="empty-message">
+              <h2 className="block-message">This User is Blocked</h2>
+              <p>You won't see posts from this user.</p>
+            </div>
+          ) : isBlocked ? (
+            <div className="empty-message">
+              <h2 className="block-message">This user has you blocked</h2>
+              <p>You do not have permission to view this user's post.</p>
+            </div>
+          ) : posts.length === 0 ? (
             isOwnProfile ? (
-              <div 
-                className="empty-message">
-                <h2> Nothing Here Yet </h2>
-                <p> Create a post for it to show up on your profile! </p>
+              <div className="empty-message">
+                <h2>Nothing Here Yet</h2>
+                <p>Create a post for it to show up on your profile!</p>
               </div>
             ) : (
-              <div 
-                className="empty-message">
-                <h2> Nothing Here Yet </h2>
-                <p> Come back later! </p>
+              <div className="empty-message">
+                <h2>Nothing Here Yet</h2>
+                <p>Come back later!</p>
               </div>
             )
-          
-
           ) : (
-            posts.map(post=>{
-              const postEvent = post.eventId && eventsById[post.eventId]
-              const isLiking = user.likedPosts.includes(post._id)
-              return (
-                <div className="post" key={post._id} data-post-id={post._id}>
+              posts.map((post) => {
+                const postEvent = post.eventId && eventsById[post.eventId]
+                const isLiking = user.likedPosts.includes(post._id)
+                return (
+                  <div className="post" key={post._id} data-post-id={post._id}>
 
-                  <div className="post-header"> 
+                    <div className="post-header"> 
 
-                  <img
-                    src={profileUser.pfp || profilePic} 
-                    alt="PostProfile" 
-                    className="post-profilepic" 
-                  />
-                  
-                  <div className="post-profile-info">
-                    <div className="post-name">{profileUser.displayName}</div>
-                    <div className="post-username">@{profileUser.userName}</div>
-                  </div>      
-                  
-                  {isOwnProfile && (
-                    <div className="modify-post">
-                      {!postEvent && ( 
-                        <button 
-                          onClick={() => handleAddEventPopup(post)} 
-                          className="add-event-btn"> 
-                          Add Event 
-                        </button> 
-                      )}
-                      <img 
-                        src={editIcon} 
-                        onClick={() => handleEditPopup(post)} 
-                        alt="Edit" 
-                        className="edit-post-icon " 
-                      />
-                      <img 
-                        src={removeIcon} 
-                        onClick={() => handlePostDelete(post._id)}   
-                        alt="Remove" 
-                        className="remove-icon " 
-                      />
-                    </div>
-                  )}
-
-                  </div>
-
-                  <div className="post-content"> 
-                    {post.content}
-                  </div>
-
-    
-
-                  {postEvent &&  (
-                    <div className="event"> 
-                      <h1 
-                        className="event-name"> 
-                        {postEvent.eventName} 
-                      </h1>
-                      <p 
-                        className="event-description"> 
-                        {postEvent.eventDescription} 
-                      </p>
-                      {(postEvent.startTime || postEvent.endTime) && (
-                        <div className="event-times"> 
-                          {postEvent.startTime ? new Date(postEvent.startTime).toLocaleString() : ""} 
-                          {postEvent.startTime && postEvent.endTime ? " - " : ""}
-                          {postEvent.endTime ? new Date(postEvent.endTime).toLocaleString() : ""}
-                        </div>
-                      )}                 
-                      {postEvent.embeddedImage && (
-                        <img
-                          src={postEvent.embeddedImage} 
-                          alt="Event Image" 
-                          className="event-embeddedImage" 
+                    <img
+                      src={profileUser.pfp || profilePic} 
+                      alt="PostProfile" 
+                      className="post-profilepic" 
+                    />
+                    
+                    <div className="post-profile-info">
+                      <div className="post-name">{profileUser.displayName}</div>
+                      <div className="post-username">@{profileUser.userName}</div>
+                    </div>      
+                    
+                    {isOwnProfile && (
+                      <div className="modify-post">
+                        {!postEvent && ( 
+                          <button 
+                            onClick={() => handleAddEventPopup(post)} 
+                            className="add-event-btn"> 
+                            Add Event 
+                          </button> 
+                        )}
+                        <img 
+                          src={editIcon} 
+                          onClick={() => handleEditPopup(post)} 
+                          alt="Edit" 
+                          className="edit-post-icon " 
                         />
-                      )}
-                      
-                      {postEvent.type === "NormalEvent" && (
-                        <p className="event-location"> Location: {postEvent.location} </p>
-                      )}
-                      
-                      {postEvent.type === "MusicReleaseEvent" && (
-                        <div>
-                          <h2 className="event-release-title"> <b> {postEvent.releaseTitle} </b> </h2>
-                          <p className="event-release-artist"> {postEvent.releaseArtist} </p>
-                          <p className="event-release-type"> [{postEvent.releaseType}] </p> 
-        
-                          {postEvent.songs.map((song, index) => (
-                              <div className="event-song" key={index}> 
-                                {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
-                              </div>
-                          ))}
-                          <br/>
-                          <i> Apple Music: </i> <a href={postEvent.appleMusicLink} style= {{color: 'black'}}> {postEvent.appleMusicLink} </a>  <br/>
-                          <i> Spotify: </i> <a href={postEvent.spotifyLink} style= {{color: 'black'}} > {postEvent.spotifyLink} </a> <br/> <br/>
+                        <img 
+                          src={removeIcon} 
+                          onClick={() => handlePostDelete(post._id)}   
+                          alt="Remove" 
+                          className="remove-icon " 
+                        />
+                      </div>
+                    )}
 
-    
-                        </div>
-                      )}
-                      {postEvent.type === "TicketedEvent" && (
-                        <div>
-                          <i> Get Tickets: </i> <a href={postEvent.getTicketsLink} style= {{color: 'black'}}> {postEvent.getTicketsLink} </a>  <br/><br/>
-                          {postEvent.destinations.map((destination, index) => (
-                              <div className="event-destination"> 
-                                {index + 1}. {destination.location} ({destination.time})
-                              </div>
-                          ))}
-                          <br/>
-                        </div>
-                      )}
-                      
                     </div>
-                  )}
-                  
-                  <div className="post-buttons">
 
-                  <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
-                  <div className="views-num num">{post.views}</div>
-                  <img onClick={() => { handleLike(post._id) }} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon"/> 
-                  <div className="likes-num num"> {post.likes} </div>
-                  <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
-                  <div className="shares-num num"> {post.shares} </div>
-                  
-                  <div className="expand-comment">
-                    <img src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
-                    <div className="comment-num num">{post.comments.length}</div>
-                    <img 
-                      src={expandIcon} 
-                      alt="Expand" 
-                      className="expand-icon post-icon"
-                      onClick={()=>{navigate(`/post/${post._id}`)}}/> 
+                    <div className="post-content"> 
+                      {post.content}
+                    </div>
+
+      
+
+                    {postEvent &&  (
+                      <div className="event"> 
+                        <h1 
+                          className="event-name"> 
+                          {postEvent.eventName} 
+                        </h1>
+                        <p 
+                          className="event-description"> 
+                          {postEvent.eventDescription} 
+                        </p>
+                        {(postEvent.startTime || postEvent.endTime) && (
+                          <div className="event-times"> 
+                            {postEvent.startTime ? new Date(postEvent.startTime).toLocaleString() : ""} 
+                            {postEvent.startTime && postEvent.endTime ? " - " : ""}
+                            {postEvent.endTime ? new Date(postEvent.endTime).toLocaleString() : ""}
+                          </div>
+                        )}                 
+                        {postEvent.embeddedImage && (
+                          <img
+                            src={postEvent.embeddedImage} 
+                            alt="Event Image" 
+                            className="event-embeddedImage" 
+                          />
+                        )}
+                        
+                        {postEvent.type === "NormalEvent" && (
+                          <p className="event-location"> Location: {postEvent.location} </p>
+                        )}
+                        
+                        {postEvent.type === "MusicReleaseEvent" && (
+                          <div>
+                            <h2 className="event-release-title"> <b> {postEvent.releaseTitle} </b> </h2>
+                            <p className="event-release-artist"> {postEvent.releaseArtist} </p>
+                            <p className="event-release-type"> [{postEvent.releaseType}] </p> 
+          
+                            {postEvent.songs.map((song, index) => (
+                                <div className="event-song" key={index}> 
+                                  {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
+                                </div>
+                            ))}
+                            <br/>
+                            <i> Apple Music: </i> <a href={postEvent.appleMusicLink} style= {{color: 'black'}}> {postEvent.appleMusicLink} </a>  <br/>
+                            <i> Spotify: </i> <a href={postEvent.spotifyLink} style= {{color: 'black'}} > {postEvent.spotifyLink} </a> <br/> <br/>
+
+      
+                          </div>
+                        )}
+                        {postEvent.type === "TicketedEvent" && (
+                          <div>
+                            <i> Get Tickets: </i> <a href={postEvent.getTicketsLink} style= {{color: 'black'}}> {postEvent.getTicketsLink} </a>  <br/><br/>
+                            {postEvent.destinations.map((destination, index) => (
+                                <div className="event-destination"> 
+                                  {index + 1}. {destination.location} ({destination.time})
+                                </div>
+                            ))}
+                            <br/>
+                          </div>
+                        )}
+                        
+                      </div>
+                    )}
+                    
+                    <div className="post-buttons">
+
+                    <img src={viewIcon} alt="View" className="view-icon post-icon"/> 
+                    <div className="views-num num">{post.views}</div>
+                    <img onClick={() => { handleLike(post._id) }} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon"/> 
+                    <div className="likes-num num"> {post.likes} </div>
+                    <img onClick={()=>{showSharePopup(post._id); handleShare(post._id)}} src={shareIcon} alt="Share" className="share-icon post-icon"/> 
+                    <div className="shares-num num"> {post.shares} </div>
+                    
+                    <div className="expand-comment">
+                      <img src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
+                      <div className="comment-num num">{post.comments.length}</div>
+                      <img 
+                        src={expandIcon} 
+                        alt="Expand" 
+                        className="expand-icon post-icon"
+                        onClick={()=>{navigate(`/post/${post._id}`)}}/> 
+                    </div>
+
+                    </div>
+
                   </div>
-
-                  </div>
-
-                </div>
-              )
-            })
+                )})
           )}
         </div>
         
