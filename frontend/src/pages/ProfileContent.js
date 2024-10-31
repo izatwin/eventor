@@ -1,8 +1,7 @@
 import "../styles/ProfileContent.css";
 import profilePic from './icons/profile.png'; 
 import editIcon from './icons/edit.png'
-import imageIcon from './icons/image.png'
-import calendarIcon from './icons/calendar.png'
+import eventIcon from './icons/event.png'
 import checkIcon from './icons/check.png'
 import removeIcon from './icons/remove.png'
 import expandIcon from './icons/expand.png'
@@ -159,7 +158,7 @@ const ProfileContent= () => {
 
             setIsFollowing(userInfo.following.includes(profileId))
             
-            if (isBlockedResponse || isBlockingResponse) {
+            if (!isBlockedResponse && !isBlockingResponse) {
               /* postResponse is a list of post ids */
               const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileId}/posts/`)).data
               console.log("post res: ")
@@ -246,37 +245,60 @@ const ProfileContent= () => {
     setStatus(profileUser.status || "No status yet!");
   }, [profileUser.bio, profileUser.status]);
   
-  const trackViewCount = async (postId) => {
-    try {
 
-      await axios.post("http://localhost:3001/api/posts/action", {"postId": postId, "actionType": "view"})
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
-  useEffect(() => {
-    observer.current = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const postId = entry.target.dataset.postId;
-          trackViewCount(postId); 
-          observer.current.unobserve(entry.target); 
-        }
-      });
+
+
+
+
+
+const viewedPosts = new Set(); 
+
+const trackViewCount = async (postId) => {
+  if (viewedPosts.has(postId)) return; 
+
+  try {
+    await axios.post("http://localhost:3001/api/posts/action", {
+      postId: postId, 
+      actionType: "view"
     });
+    console.log(`Post ${postId} is viewed.`);
+    viewedPosts.add(postId); 
+  } catch (error) {
+    console.error(`Error updating view count for post ${postId}:`, error);
+  }
+};
 
-    const postElements = document.querySelectorAll('.post');
+useEffect(() => {
+  observer.current = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const postId = entry.target.dataset.postId;
+        trackViewCount(postId); 
+        observer.current.unobserve(entry.target); 
+      }
+    });
+  });
+
+  const postElements = document.querySelectorAll('.post');
+  postElements.forEach((postElement) => {
+    observer.current.observe(postElement);
+  });
+
+  return () => {
     postElements.forEach((postElement) => {
-      observer.current.observe(postElement);
+      observer.current.unobserve(postElement);
     });
+  };
+}, []); 
 
-    return () => {
-      postElements.forEach((postElement) => {
-        observer.current.unobserve(postElement);
-      });
-    };
-  }, [posts]); 
+
+
+
+
+
+
+
   const changeBio = (e) => {
     setBio(e.target.value);
   }
@@ -355,22 +377,25 @@ const ProfileContent= () => {
     console.log(newPost);
   };
 
-  const handlePost = () => {
-    console.log(newPost)
-    axios.post("http://localhost:3001/api/posts", newPost)
-      .then(response => {
-        console.log("posting res: ")
-        console.log(response.data)
-        showSuccessPopup("Post created successfully!"); 
-        setNewPost({ ...newPost, content: "" });
-        setPosts((prevPosts) => [response.data, ...prevPosts]);
-      })
-      .catch (err => {
-        console.log(err)
-        showFailPopup("Error creating post!"); 
-        setNewPost({ ...newPost, content: "" })
-      });
-  }
+  const handlePost = async () => {
+    try {
+      console.log(newPost);
+      const response = await axios.post("http://localhost:3001/api/posts", newPost);
+      console.log("posting res: ");
+      console.log(response.data);
+      showSuccessPopup("Post created successfully!");
+      setNewPost({ ...newPost, content: "" });
+      setPosts((prevPosts) => [response.data, ...prevPosts]);
+      console.log("RETURNING: " + response.data['_id']);
+      return response.data['_id'];  
+    } catch (err) {
+      console.log(err);
+      showFailPopup("Error creating post!");
+      setNewPost({ ...newPost, content: "" });
+      throw err; 
+    }
+  };
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -385,14 +410,18 @@ const ProfileContent= () => {
   
 
   /* Function to handle a user requesting to edit their post */
-  const handleEditPopup = (post) => {
+  const handleEditPopup = (post, postEvent) => {
     setCurrentPost(post);  
+    console.log("POSTEVENT:")
+    console.log(postEvent)
+    setNewEvent(postEvent)
     setEditPopupOpen(true); 
   }
   
   const closeEditPopup = () => {
     setEditPopupOpen(false);
     setCurrentPost(null);    
+    setNewEvent(null);    
   };
 
   /* 
@@ -416,6 +445,10 @@ const ProfileContent= () => {
         post._id === _id ? { ...post, content: content } : post
       )
     );
+    
+    // TODO: UPDATE EVENT CALL
+    
+    closeEditPopup();
 
   }
 
@@ -432,32 +465,48 @@ const ProfileContent= () => {
     })
   }
 
-  const handleAddEvent = () => {
-    // api request   
-    console.log(newEvent)
-    const requestData = {
-      "postId": currentPost._id,
-      "eventType": newEvent.eventType,
-      "eventData": newEvent
+const handleAddEvent = async () => {
+  
+  let currPostId;
+  // check if the post is being added or created along side post
+  if (!currentPost) {
+    try {
+      currPostId = await handlePost();  
+      console.log('CURRPOSTID AFTER HANDLEPOST: ' + currPostId);
+    } catch (err) {
+      console.log("Error creating post for event:", err);
+      return; 
     }
-    axios.post("http://localhost:3001/api/events", requestData)
-      .then((response) => {
-        setEventsById(prevEvents => ({
-          ...prevEvents,
-          [response.data["_id"]]: response.data
-        }));
-        setPosts((prevPosts) =>
-          prevPosts.map((post) =>
-            post._id === currentPost._id ? { ...post, "is_event": true, "eventId": response.data["_id"] } : post
-          )
-        );
-      })
-      .catch((err) => {
-        console.log(err)
-        showFailPopup("Error creating event.")
-      })
-    closeAddEventPopup();
-  }  
+  } else {
+    currPostId = currentPost._id;
+  }
+
+  const requestData = {
+    postId: currPostId,
+    eventType: newEvent.eventType,
+    eventData: newEvent,
+  };
+
+  axios.post("http://localhost:3001/api/events", requestData)
+    .then((response) => {
+      setEventsById(prevEvents => ({
+        ...prevEvents,
+        [response.data["_id"]]: response.data
+      }));
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === currPostId ? { ...post, "is_event": true, "eventId": response.data["_id"] } : post
+        )
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+      showFailPopup("Error creating event.");
+    });
+
+  closeAddEventPopup();
+};
+
 
   const handleAddEventPopup = (post) => {
     setCurrentPost(post);  
@@ -704,24 +753,13 @@ const ProfileContent= () => {
             </div>
 
             <div className="post-buttons">
-              <input
-                id="file-input"
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleImageChange}
-              />
               <img 
-                src={imageIcon} 
-                onClick={handleUploadClick} 
-                alt="Image" 
-                className="image-icon"
+                src={eventIcon} 
+                alt="Event" 
+                className="event-icon"
+                onClick={() => handleAddEventPopup()} 
               /> 
-              <img 
-                src={calendarIcon} 
-                alt="Calendar" 
-                className="calendar-icon"
-              /> 
+
               <button 
                 onClick={handlePost} 
                 className="post-btn"> 
@@ -787,7 +825,7 @@ const ProfileContent= () => {
                         )}
                         <img 
                           src={editIcon} 
-                          onClick={() => handleEditPopup(post)} 
+                          onClick={() => handleEditPopup(post, postEvent)} 
                           alt="Edit" 
                           className="edit-post-icon " 
                         />
@@ -908,16 +946,251 @@ const ProfileContent= () => {
                 rows="5"
                 cols="30"
               />
-              <button 
-                onClick={handlePostEdit} 
-                className="save-button">
-                Save
-              </button>
+
               <button 
                 onClick={closeEditPopup} 
                 className="close-button">
                 x
               </button>
+              
+              {/* EDIT EVENT */}
+              {(newEvent?.type) && (
+                <div>
+                  <h2>Edit event</h2>
+              
+                  <form>
+
+                    <input 
+                      type="text" 
+                      placeholder="Name" 
+                      name="eventName" 
+                      className="input-field" 
+                      value={newEvent.eventName}
+                      onChange={handleEventInputChange}
+                    />
+                    <textarea 
+                      placeholder="Description"
+                      name="eventDescription" 
+                      className="input-field textarea-field" 
+                      value={newEvent.eventDescription}
+                      onChange={handleEventInputChange}
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Image URL" 
+                      name="embeddedImage" 
+                      className="input-field" 
+                      value={newEvent.embeddedImage}
+                      onChange={handleEventInputChange}
+                    />
+
+                    <div className="time-fields">
+                      <input 
+                        type="datetime-local" 
+                        name="startTime" 
+                        className="input-field" 
+                        value={newEvent.startTime}
+                        onChange={handleEventInputChange}
+                      />
+                      <span className="time-separator">-</span>
+                      <input 
+                        type="datetime-local" 
+                        name="endTime" 
+                        className="input-field" 
+                        value={newEvent.endTime}
+                        onChange={handleEventInputChange}
+                      />
+                    </div>
+
+                  </form>
+
+
+                </div>
+
+              )}
+
+              {newEvent?.type === "NormalEvent" && (
+
+                <div>
+                  <input 
+                    type="text" 
+                    placeholder="Address" 
+                    name="location" 
+                    className="input-field" 
+                    value={newEvent.location}
+                    onChange={handleEventInputChange}
+                  />
+                </div>
+
+              )}
+
+              {newEvent?.type === "MusicReleaseEvent" && (
+                <div> 
+
+                  <input 
+                    type="text" 
+                    placeholder="Release Title" 
+                    name="releaseTitle" 
+                    className="input-field" 
+                    value={newEvent.releaseTitle}
+                    onChange={handleEventInputChange}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="Release Artist" 
+                    name="releaseArtist" 
+                    className="input-field" 
+                    value={newEvent.releaseArtist}
+                    onChange={handleEventInputChange}
+                  />
+
+                   <input 
+                    type="text" 
+                    placeholder="Apple Music Link" 
+                    name="appleMusicLink" 
+                    className="input-field" 
+                    value={newEvent.appleMusicLink}
+                    onChange={handleEventInputChange}
+                  />
+                   <input 
+                    type="text" 
+                    placeholder="Spotify Link" 
+                    name="spotifyLink" 
+                    className="input-field" 
+                    value={newEvent.spotifyLink}
+                    onChange={handleEventInputChange}
+                  />
+                  <div className="select-release-type">
+                    <button 
+                      className={`release-type-btn ${newEvent.releaseType === 'single' ? 'selected' : ''}`}
+                      onClick={() => 
+                        setNewEvent((prevEvent) => ({
+                          ...prevEvent,
+                          releaseType: 'single' 
+                        }))
+                      }>
+                      Single 
+                    </button>
+                    
+                    <button 
+                      className={`release-type-btn ${newEvent.releaseType === 'ep' ? 'selected' : ''}`}
+                      onClick={() => 
+                        setNewEvent((prevEvent) => ({
+                          ...prevEvent,
+                          releaseType: 'ep' 
+                        }))
+                      }>
+                      EP 
+                    </button>
+                    
+                    <button 
+                      className={`release-type-btn ${newEvent.releaseType === 'album' ? 'selected' : ''}`}
+                      onClick={() => 
+                        setNewEvent((prevEvent) => ({
+                          ...prevEvent,
+                          releaseType: 'album' 
+                        }))
+                      }>
+                      Album 
+                    </button>
+
+                  </div>
+
+                
+                  <h4>Songs</h4>
+                  <div className="add-event-input"> 
+                    {newEvent.songs.map((song, index) => (
+                      <div key={index} className="song-input-group">
+                        <h5> {index + 1} </h5>
+                        <input 
+                          type="text" 
+                          placeholder="Title" 
+                          name="songTitle" 
+                          value={song.songTitle}
+                          onChange={(e) => handleSongChange(index, e)}
+                          className="input-field" 
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Artist" 
+                          name="songArtist" 
+                          value={song.songArtist}
+                          onChange={(e) => handleSongChange(index, e)}
+                          className="input-field" 
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Duration" 
+                          name="songDuration" 
+                          value={song.songDuration}
+                          onChange={(e) => handleSongChange(index, e)}
+                          className="input-field" 
+                        />
+                      </div>
+                    ))}
+
+                  </div>
+
+                  <button
+                    onClick={addSong} 
+                    className="add-button"> 
+                    + 
+                  </button>
+
+                </div>
+
+              )}
+
+              {newEvent?.type === "TicketedEvent" && (
+                <div>
+                  <input 
+                    type="text" 
+                    placeholder="Ticket Link" 
+                    name="getTicketsLink" 
+                    className="input-field" 
+                    value={newEvent.getTicketsLink}
+                    onChange={handleEventInputChange}
+                  />
+
+
+                  <h4>Destinations</h4>
+
+                  <div className="add-event-input"> 
+                    {newEvent.destinations.map((destination, index) => (
+                      <div key={index} className="destination-input-group">
+                        <h5> {index + 1} </h5>
+                        <input 
+                          type="text" 
+                          placeholder="Location" 
+                          name="location" 
+                          value={destination.location}
+                          onChange={(e) => handleDestinationChange(index, e)}
+                          className="input-field" 
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Time" 
+                          name="time" 
+                          value={destination.time}
+                          onChange={(e) => handleDestinationChange(index, e)}
+                          className="input-field" 
+                        />
+                      </div>
+                    ))}
+
+                  </div>
+
+                  <button onClick={addDestination} className="add-button"> + </button>
+                  
+                </div>
+              )}
+              <button 
+                onClick={handlePostEdit} 
+                className="save-button">
+                Save
+              </button>
+
+
             </div>
           </div>
         )}

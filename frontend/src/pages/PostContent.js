@@ -61,9 +61,6 @@ useEffect(() => {
       console.log(postResponse.data);
       setPost(postResponse.data);
 
-      // Increment view count
-      await axios.post("http://localhost:3001/api/posts/action", {"postId": _id, "actionType": "view"});
-
       // Get event of post if it exists
       if (postResponse.data["eventId"]) {
         const eventResponse = await axios.get(`http://localhost:3001/api/events/${postResponse.data["eventId"]}`);
@@ -120,6 +117,10 @@ useEffect(() => {
 
   fetchData();
 }, []);
+  
+  useEffect(()=>{
+    axios.post("http://localhost:3001/api/posts/action", {"postId": _id, "actionType": "view"});
+  }, [])
 
   const handleShare = async (id) => {
     const success = await updateShareCount(id);
