@@ -2,9 +2,19 @@
 Social media site for finding events
 
 ## Starting up locally
+
 ### Requirements: 
 - MongoDB (docker or otherwise)
 - Nodejs (v20)
+
+## Clone the Repo and setup environment
+1. Run `git clone <url>`
+2. Navigate to eventor repo and create the .env file:
+	1. Insert into the file:
+		```
+	   PORT=3001
+	   DB_CONNECTION="mongodb://127.0.0.1/my_database"
+	   ```
 #### Mongodb
 While developing locally, we can use a local docker container of mongodb.
 
