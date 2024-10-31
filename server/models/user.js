@@ -115,6 +115,7 @@ UserSchema.methods.getInfoForClient = function () {
     infoForClient.posts = this.posts;
     infoForClient.likedPosts = this.likedPosts;
     infoForClient.blockedUsers = this.blockedUsers;
+    infoForClient.following = this.following
 
     return infoForClient;
 }

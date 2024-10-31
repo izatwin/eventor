@@ -146,6 +146,8 @@ const ProfileContent= () => {
             console.log("profileId="+profileId)
             setIsOwnProfile(userInfo.userId===profileId)
             setIsBlocked((await axios.get(`http://localhost:3001/api/user/block-status/${profileId}`)).data['blockingThem'])
+
+            setIsFollowing(userInfo.following.includes(profileId))
             
             console.log(isBlocked)
 
