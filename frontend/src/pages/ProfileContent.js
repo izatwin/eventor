@@ -228,9 +228,8 @@ const ProfileContent= () => {
     try {
 
       await axios.post("http://localhost:3001/api/posts/action", {"postId": postId, "actionType": "view"})
-      console.log(`Post ${postId} is viewed.`);
     } catch (error) {
-      console.error(`Error updating view count for post ${postId}:`, error);
+      console.error(error);
     }
   };
 

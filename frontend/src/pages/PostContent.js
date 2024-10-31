@@ -1,5 +1,5 @@
 import "../styles/PostContent.css";
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 
 import { useNavigate, useParams } from "react-router-dom";
 import axios from 'axios'
@@ -8,6 +8,7 @@ import profilePic from './icons/profile.png';
 
 import viewIcon from './icons/view.png'
 import likeIcon from './icons/like.png'
+import likedIcon from './icons/liked.png'
 import shareIcon from './icons/share.png'
 
 import { useAuth } from '../AuthContext';
@@ -24,55 +25,101 @@ const PostContent = () => {
     isRoot: true,
   })
   const [comments, setComments] = useState([])
+  const [poster, setPoster] = useState([])
+  const [commenters, setCommenters] = useState([])
+  const [postEvent, setPostEvent] = useState(null)
 
-
-  useEffect(() => {
-    axios.get("http://localhost:3001/api/user/validate")
-      .then(response => {
-        console.log(response);
-        if (response.status === 200) {
-          console.log("here");
-          const userInfo = response.data['user-info'];
-          console.log(userInfo);
-          setUser({
-            email: userInfo.email,
-            displayName: userInfo.displayName,
-            userName: userInfo.userName,
-            userId: userInfo.userId,
-            pfp: userInfo.imageURL,
-            likedPosts: userInfo.likedPosts
-          })
-        }
-        else {
-          navigate("/");
-        }
-      })
-      .catch(err => {
-
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const userResponse = await axios.get("http://localhost:3001/api/user/validate");
+      console.log(userResponse);
+      if (userResponse.status === 200) {
+        console.log("here");
+        const userInfo = userResponse.data['user-info'];
+        console.log(userInfo);
+        setUser({
+          email: userInfo.email,
+          displayName: userInfo.displayName,
+          userName: userInfo.userName,
+          userId: userInfo.userId,
+          pfp: userInfo.imageURL,
+          likedPosts: userInfo.likedPosts
+        });
+      } else {
         navigate("/");
-        console.log(err)
-      })
-    console.log(`id: ${_id}`)
-    axios.get(`http://localhost:3001/api/posts/${_id}`)
-      .then(response => {
-        console.log("feed posts res:")
-        console.log(response.data)
-        setPost(response.data)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+      }
+    } catch (err) {
+      navigate("/");
+      console.log(err);
+    }
 
-    axios.get(`http://localhost:3001/api/comments/post/${_id}`)
-      .then(response => {
-        console.log(`Comments are: ${response.data}`)
-        setComments(response.data)
-      })
-      .catch(err => {
-        console.log(err)
-      })
+    console.log(`id: ${_id}`);
+    try {
+      const postResponse = await axios.get(`http://localhost:3001/api/posts/${_id}`);
+      console.log("feed posts res:");
+      console.log(postResponse.data);
+      setPost(postResponse.data);
 
-  }, [])
+      // Increment view count
+      await axios.post("http://localhost:3001/api/posts/action", {"postId": _id, "actionType": "view"});
+
+      // Get event of post if it exists
+      if (postResponse.data["eventId"]) {
+        const eventResponse = await axios.get(`http://localhost:3001/api/events/${postResponse.data["eventId"]}`);
+        setPostEvent(eventResponse.data)
+      }
+
+      // Get the poster information
+      try {
+        const posterResponse = await axios.get(`http://localhost:3001/api/user/${postResponse.data["user"]}`);
+        console.log("poster res:");
+        console.log(posterResponse.data);
+        const posterResponseInfo = posterResponse.data;
+        setPoster({
+          displayName: posterResponseInfo.displayName,
+          userName: posterResponseInfo.userName,
+          userId: posterResponseInfo._id,
+          status: posterResponseInfo.status,
+          bio: posterResponseInfo.biography,
+          pfp: posterResponseInfo.imageURL,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+    try {
+      const commentsResponse = await axios.get(`http://localhost:3001/api/comments/post/${_id}`);
+      console.log(`Comments are:`, commentsResponse.data);
+      setComments(commentsResponse.data);
+
+      for (const comment of commentsResponse.data) {
+        console.log("comment:", comment);
+
+        try {
+          const commenterResponse = await axios.get(`http://localhost:3001/api/user/${comment.user}`);
+          console.log("commenter response:", commenterResponse.data);
+
+          if (!commenters[commenterResponse.data["_id"]]) {
+            setCommenters(prevCommenters => ({
+              ...prevCommenters,
+              [commenterResponse.data["_id"]]: commenterResponse.data
+            }));
+          }
+        } catch (err) {
+          console.log("Error fetching user data:", err);
+        }
+      }
+    } catch (err) {
+      console.log("Error fetching comments:", err);
+    }
+  };
+
+  fetchData();
+}, []);
 
   const handleShare = async (id) => {
     const success = await updateShareCount(id);
@@ -129,73 +176,183 @@ const PostContent = () => {
 
   const handleComment = async () => {
     const tempNewComment = (await axios.post(`http://localhost:3001/api/comments`, {"comment": newComment, "postId": post._id})).data
+    console.log("tempNEWCOMMENT:")
+    console.log(tempNewComment)
     setComments((prevComments) => [tempNewComment, ...prevComments]);
+    setNewComment({
+      text: "",
+      isRoot: true
+    })
+    axios.get(`http://localhost:3001/api/user/${tempNewComment.user}`)
+      .then(response => {
+        console.log("commenter response:", response.data);
+
+        if (!commenters[response.data["_id"]]) {
+          setCommenters(prevCommenters => ({
+            ...prevCommenters,
+            [response.data["_id"]]: response.data
+          }));
+        }
+      })
+      .catch(err => {
+        console.log("Error fetching user data:", err);
+      });
+
   }
+
+
+  const isLiking = user?.likedPosts?.includes(post._id);
 
   return (
     <div className="post-content-container">
       <div className="post-content-content">
-        <div className="post" key={post._id}>
+        <div className="scrollable-container">
+          <div className="post" key={post._id}>
+            <div className="post-header">
 
-          <div className="post-header">
+              <img src={poster.pfp ? poster.pfp : profilePic} alt="PostProfile" className="post-profilepic" />
 
-            <img src={profilePic} alt="PostProfile" className="post-profilepic" />
+              <div className="post-profile-info">
+                <div className="post-name">{poster.displayName}</div>
+                <div className="post-username">@{poster.userName}</div>
+              </div>
 
-            <div className="post-profile-info">
-              <div className="post-name">displayName</div>
-              <div className="post-username">@username</div>
             </div>
 
+            <div className="post-content">
+              {post.content}
+            </div>
+            {postEvent ? (
+              <div className="event"> 
+                <h1 
+                  className="event-name"> 
+                  {postEvent.eventName} 
+                </h1>
+                <p 
+                  className="event-description"> 
+                  {postEvent.eventDescription} 
+                </p>
+                {(postEvent.startTime || postEvent.endTime) && (
+                  <div className="event-times"> 
+                    {postEvent.startTime ? new Date(postEvent.startTime).toLocaleString() : ""} 
+                    {postEvent.startTime && postEvent.endTime ? " - " : ""}
+                    {postEvent.endTime ? new Date(postEvent.endTime).toLocaleString() : ""}
+                  </div>
+                )}                 
+                {postEvent.embeddedImage && (
+                  <img
+                    src={postEvent.embeddedImage} 
+                    alt="Event Image" 
+                    className="event-embeddedImage" 
+                  />
+                )}
+                
+                {postEvent.type === "NormalEvent" && (
+                  <p className="event-location"> Location: {postEvent.location} </p>
+                )}
+                
+                {postEvent.type === "MusicReleaseEvent" && (
+                  <div>
+                    <h2 className="event-release-title"> <b> {postEvent.releaseTitle} </b> </h2>
+                    <p className="event-release-artist"> {postEvent.releaseArtist} </p>
+                    <p className="event-release-type"> [{postEvent.releaseType}] </p> 
+
+                    {postEvent.songs.map((song, index) => (
+                        <div className="event-song" key={index}> 
+                          {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
+                        </div>
+                    ))}
+                    <br/>
+                    <i> Apple Music: </i> <a href={postEvent.appleMusicLink} style= {{color: 'black'}}> {postEvent.appleMusicLink} </a>  <br/>
+                    <i> Spotify: </i> <a href={postEvent.spotifyLink} style= {{color: 'black'}} > {postEvent.spotifyLink} </a> <br/> <br/>
+
+
+                  </div>
+                )}
+                {postEvent.type === "TicketedEvent" && (
+                  <div>
+                    <i> Get Tickets: </i> <a href={postEvent.getTicketsLink} style= {{color: 'black'}}> {postEvent.getTicketsLink} </a>  <br/><br/>
+                    {postEvent.destinations.map((destination, index) => (
+                        <div className="event-destination"> 
+                          {index + 1}. {destination.location} ({destination.time})
+                        </div>
+                    ))}
+                    <br/>
+                  </div>
+                )}
+                
+              </div>
+            ) : null}
+
+            <div className="post-buttons">
+              
+              <img src={viewIcon} alt="View" className="view-icon post-icon" />
+              <div className="views-num num">{post.views}</div>
+              <img onClick={() => { handleLike(post._id) }} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon" />
+              <div className="likes-num num"> {post.likes} </div>
+              <img onClick={() => { showSharePopup(post._id); handleShare(post._id) }} src={shareIcon} alt="Share" className="share-icon post-icon" />
+              <div className="shares-num num"> {post.shares} </div>
+            </div>
           </div>
 
-          <div className="post-content">
-            {post.content}
-          </div>
-
-          <div className="post-buttons">
-
-            <img src={viewIcon} alt="View" className="view-icon post-icon" />
-            <div className="views-num num">{post.views}</div>
-            <img onClick={() => { handleLike(post._id) }} src={likeIcon} alt="Like" className="like-icon post-icon" />
-            <div className="likes-num num"> {post.likes} </div>
-            <img onClick={() => { showSharePopup(post._id); handleShare(post._id) }} src={shareIcon} alt="Share" className="share-icon post-icon" />
-            <div className="shares-num num"> {post.shares} </div>
-          </div>
-        </div>
-
-        <div className="comment-card">
-          
-          <div className="comment-input">
-            <textarea 
-              name="text" 
-              className="comment-text" 
-              value={newComment.text} 
-              type="text" 
-              onChange={handleCommentChange} 
-              placeholder="What do you think?"/>
-          </div>
-
-          <div className="comment-buttons">
-            <button 
-              onClick={handleComment} 
-              className="comment-btn"> 
-              Comment 
-            </button> 
-          </div>
-          
-
+          <div className="comment-card">
             
-        </div>
-        <div className="comment-section">
-
-        {comments.map(comment=>(
-          <div className="comment"> 
-            <div className="comment-content">
-              {comment.text}
+            <div className="comment-input">
+              <textarea 
+                name="text" 
+                className="comment-text" 
+                value={newComment.text} 
+                type="text" 
+                onChange={handleCommentChange} 
+                placeholder="What do you think?"/>
             </div>
-          </div>
-        ))}
 
+            <div className="comment-buttons">
+              <button 
+                onClick={handleComment} 
+                className="comment-btn"> 
+                Comment 
+              </button> 
+            </div>
+            
+
+              
+          </div>
+          <div className="comment-section">
+            {comments.length === 0 ? (
+                <div 
+                  className="empty-message">
+                  <h2> Nothing Here Yet </h2>
+                  <p> Add a comment to this post!</p>
+                </div>
+            ) : (
+              comments.map(comment => {
+                const commentUser = commenters[comment.user]; 
+                return (
+                  <div className="comment" key={comment._id}> 
+                    <div className="post-header">
+                      <img 
+                        src={commentUser?.imageURL ? commentUser.imageURL : profilePic} 
+                        alt="PostProfile" 
+                        className="post-profilepic" 
+                      />
+
+                      <div className="post-profile-info">
+                        <div className="post-name">{commentUser?.displayName}</div>
+                        <div className="post-username">@{commentUser?.userName}</div>
+                      </div>
+                    </div>
+
+                    <div className="comment-content">
+                      {comment.text}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+
+
+          </div>
         </div>
       </div>
     </div>
