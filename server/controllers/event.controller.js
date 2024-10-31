@@ -119,7 +119,9 @@ exports.editEvent = async (req, res) => {
         }
 
         const eventId = req.params.id;
-        const updates = req.body;
+        const updates = req.body.event;
+        const postId = req.body.postId;
+        console.log(updates)
 
         const event = await BaseEvent.findById(eventId);
         if (!event) {
@@ -128,7 +130,7 @@ exports.editEvent = async (req, res) => {
             });
         }
 
-        const post = await Post.findById(event.post);
+        const post = await Post.findById(postId);
         if (post.user.toString() !== authenticatedUser._id.toString()) {
             return res.status(403).send({
                 message: "You are not allowed to edit someone else's event."
