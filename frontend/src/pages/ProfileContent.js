@@ -95,6 +95,7 @@ const ProfileContent= () => {
     status: "",
     bio: "",
     pfp: "",
+    followers: []
   });
   
   const [isOwnProfile, setIsOwnProfile] = useState(false)
@@ -136,6 +137,7 @@ const ProfileContent= () => {
               status: profileUserResponse.status,
               bio: profileUserResponse.biography,
               pfp: profileUserResponse.imageURL,
+              followers: profileUserResponse.followers,
             })
             setNewPost(prevPost => ({
               ...prevPost,
@@ -196,9 +198,19 @@ const ProfileContent= () => {
     // api req to follow/unfollow userId 
     if (isFollowing) {
       axios.post("http://localhost:3001/api/user/unfollow", {"userId": profileUser.userId})
+      setProfileUser(prevProfileUser => ({
+        ...prevProfileUser,
+        followers: prevProfileUser.followers.filter(followerId => followerId !== user.userId)
+      }));
     }
     else {
       axios.post("http://localhost:3001/api/user/follow", {"userId": profileUser.userId})
+      setProfileUser(prevProfileUser => ({
+        ...prevProfileUser,
+        followers: prevProfileUser.followers.includes(user.userId)
+          ? prevProfileUser.followers 
+          : [...prevProfileUser.followers, user.userId] 
+      }));
     }
 
     setIsFollowing(!isFollowing) 
@@ -587,7 +599,9 @@ const ProfileContent= () => {
 
             <div className="profile-side"> 
 
-              <p className="follower-count"> 0 followers </p>
+              <p className="follower-count"> 
+                {profileUser && profileUser.followers ? profileUser.followers.length : 0} followers 
+              </p>
               {!isOwnProfile && ( 
                 <div>
                   <button 
