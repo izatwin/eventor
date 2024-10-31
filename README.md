@@ -1,9 +1,6 @@
 # eventor
 Social media site for finding events
 
-
-
-
 ## Starting up locally
 ### Requirements: 
 - MongoDB (docker or otherwise)
@@ -26,3 +23,20 @@ We use npm commands to start the server:
 1. Navigate to the root eventor folder
 2. run `npm run dev`
 3. Open [Eventor](http://localhost:3000/)!
+
+## Testing
+#### Manual
+There are several test-cases we have created for this project:
+[Sprint 1 Test Cases](/tests/Sprint_1_Test_cases.md)
+[Sprint 2 Test Cases](/tests/Sprint_2_Test_cases.md)
+#### Automated
+1. Install a recent version of python
+2. Navigate to eventor
+3. Optional: Create a virtual environment
+	1. in Eventor, run `python -m venv .venv`
+	2. Activate the environment: `.venv/scripts/activate`
+		1. or `source .venv/bin/activate` on linux
+4. Install the requirements `pip install -r ./tests/requirements.txt`
+5. An account must have already been created for the tests, and your email and password filled in in each test file
+6. Run `pytest` and see the results!
+	1. If you get `KeyError: "email"` Please check to make sure you have made an account and put the email and password in each python file.
