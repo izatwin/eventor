@@ -447,6 +447,19 @@ useEffect(() => {
     );
     
     // TODO: UPDATE EVENT CALL
+
+    if (currentPost.eventId && currentPost.eventId === newEvent._id) {
+      axios.put(`http://localhost:3001/api/events/${newEvent._id}`, {"event": newEvent, "postId": currentPost._id})
+        .then((response) => {
+          setEventsById(prevEvents => ({
+            ...prevEvents,
+            [response.data["_id"]]: response.data
+          }));
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
     
     closeEditPopup();
 
