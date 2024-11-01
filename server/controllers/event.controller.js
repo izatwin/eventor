@@ -137,10 +137,10 @@ exports.editEvent = async (req, res) => {
             });
         }
 
-        Object.assign(event, updates);
-        await event.save();
+        // Object.assign(event, updates);
+        const updatedEvent = await BaseEvent.findByIdAndUpdate(eventId, updates, { runValidators: true, new: true });
 
-        res.status(200).send(event);
+        res.status(200).send(updatedEvent);
     } catch (err) {
         res.status(500).send({
             message: "Error updating event.",
