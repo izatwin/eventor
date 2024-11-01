@@ -208,27 +208,30 @@ const ProfileContent= () => {
   }, [])
 
 
-  const handleFollow = () => {
+  const handleFollow = async () => {
     // api req to follow/unfollow userId 
-    if (isFollowing) {
-      axios.post("http://localhost:3001/api/user/unfollow", {"userId": profileUser.userId})
-      setProfileUser(prevProfileUser => ({
-        ...prevProfileUser,
-        followers: prevProfileUser.followers.filter(followerId => followerId !== user.userId)
-      }));
-    }
-    else {
-      axios.post("http://localhost:3001/api/user/follow", {"userId": profileUser.userId})
-      setProfileUser(prevProfileUser => ({
-        ...prevProfileUser,
-        followers: prevProfileUser.followers.includes(user.userId)
-          ? prevProfileUser.followers 
-          : [...prevProfileUser.followers, user.userId] 
-      }));
-    }
+    try {
+      if (isFollowing) {
+        axios.post("http://localhost:3001/api/user/unfollow", {"userId": profileUser.userId})
+        setProfileUser(prevProfileUser => ({
+          ...prevProfileUser,
+          followers: prevProfileUser.followers.filter(followerId => followerId !== user.userId)
+        }));
+      }
+      else {
+        axios.post("http://localhost:3001/api/user/follow", {"userId": profileUser.userId})
+        setProfileUser(prevProfileUser => ({
+          ...prevProfileUser,
+          followers: prevProfileUser.followers.includes(user.userId)
+            ? prevProfileUser.followers 
+            : [...prevProfileUser.followers, user.userId] 
+        }));
+      }
 
-    setIsFollowing(!isFollowing) 
-
+      setIsFollowing(!isFollowing) 
+    } catch (error) {
+      showFailPopup("Error following/unfollowing user")
+    }
   }
 
   const handleBlock = () => {
