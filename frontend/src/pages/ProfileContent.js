@@ -512,9 +512,10 @@ useEffect(() => {
       showFailPopup("Error deleting post");
     })
   }
+
   const handleEventDelete = (id) => {
     // api request
-    axios.delete(`http://localhost:3001/api/events/${id}`)
+    axios.delete(`http://localhost:3001/api/events/${id}`, {"postId": currentPost._id})
     .then((response) => {
       setEventsById((prevEvents) => prevEvents.filter((event) => event._id !== id));
       showSuccessPopup("Event deleted successfully!")
