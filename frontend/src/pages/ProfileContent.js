@@ -100,7 +100,13 @@ const ProfileContent= () => {
   
   const [isOwnProfile, setIsOwnProfile] = useState(false)
   const observer = useRef(null); 
-  
+
+  const formatDateTimeLocal = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().slice(0, 16); 
+  };
+
   useEffect(() => {
     
     const validateAndGetProfileUser = async () => {
@@ -535,7 +541,17 @@ const handleAddEvent = async () => {
   };
 
   const handleEventInputChange = (e) => {
+    console.log("e.target.name: " + e.target.name + "e.target.value: " + e.target.value);
     setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
+  };
+
+  const handleEventDateChange = (e) => {
+    const { name, value } = e.target;
+    
+    setNewEvent((prevEvent) => ({
+      ...prevEvent,
+      [name]: new Date(value).toISOString(), 
+    }));
   };
 
   const addSong= () => {
@@ -673,22 +689,25 @@ const handleAddEvent = async () => {
               <p className="follower-count"> 
                 {profileUser && profileUser.followers ? profileUser.followers.length : 0} followers 
               </p>
-              {!isOwnProfile && ( 
+              {!isOwnProfile && (
                 <div>
-                  <button 
-                    onClick={handleFollow}
-                    className="follow-btn"> 
-                    {isFollowing ? 'Following' : 'Follow'}
-                  </button>
-                    
+                  {!isBlocked && !isBlocking && (
+                    <div>
+                      <button 
+                        onClick={handleFollow}
+                        className="follow-btn"> 
+                        {isFollowing ? 'Following' : 'Follow'}
+                      </button>
+                    </div>
+                  )}
+                                      
                   <button 
                     onClick={handleBlock}
                     className="block-btn"> 
                     {!isBlocking ? 'Block' : 'Unblock'}
                   </button>
                 </div>
-              )}
-    
+              )} 
 
             </div>
          </div> 
@@ -995,22 +1014,21 @@ const handleAddEvent = async () => {
                       value={newEvent.embeddedImage}
                       onChange={handleEventInputChange}
                     />
-
                     <div className="time-fields">
                       <input 
                         type="datetime-local" 
                         name="startTime" 
                         className="input-field" 
-                        value={newEvent.startTime}
-                        onChange={handleEventInputChange}
+                        value={formatDateTimeLocal(newEvent.startTime)}
+                        onChange={handleEventDateChange}
                       />
                       <span className="time-separator">-</span>
                       <input 
                         type="datetime-local" 
                         name="endTime" 
                         className="input-field" 
-                        value={newEvent.endTime}
-                        onChange={handleEventInputChange}
+                        value={formatDateTimeLocal(newEvent.endTime)}
+                        onChange={handleEventDateChange}
                       />
                     </div>
 

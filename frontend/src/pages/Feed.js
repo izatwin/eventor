@@ -102,12 +102,17 @@ const Feed = () => {
   };
 
 
+const viewedPosts = new Set();
+
 const trackViewCount = async (postId) => {
+  if (viewedPosts.has(postId)) return; 
+
+  viewedPosts.add(postId);
 
   try {
     await axios.post("http://localhost:3001/api/posts/action", {
-      postId: postId, 
-      actionType: "view"
+      postId: postId,
+      actionType: "view",
     });
     console.log(`Post ${postId} is viewed.`);
   } catch (error) {
@@ -116,19 +121,23 @@ const trackViewCount = async (postId) => {
 };
 
 useEffect(() => {
-  observer.current = new IntersectionObserver((entries) => {
+  const observerCallback = (entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const postId = entry.target.dataset.postId;
-        trackViewCount(postId); 
-        observer.current.unobserve(entry.target); 
+        trackViewCount(postId);
+        observer.current.unobserve(entry.target);
       }
     });
-  });
+  };
+
+  observer.current = new IntersectionObserver(observerCallback);
 
   const postElements = document.querySelectorAll('.post');
   postElements.forEach((postElement) => {
-    observer.current.observe(postElement);
+    if (!viewedPosts.has(postElement.dataset.postId)) {
+      observer.current.observe(postElement);
+    }
   });
 
   return () => {
@@ -137,6 +146,8 @@ useEffect(() => {
     });
   };
 }, [posts]); 
+
+
 
 
   const handleShare = async (id) => {
