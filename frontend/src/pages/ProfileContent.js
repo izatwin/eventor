@@ -205,7 +205,7 @@ const ProfileContent= () => {
 
     validateAndGetProfileUser();
 
-  }, [])
+  }, [profileId])
 
 
   const handleFollow = async () => {
