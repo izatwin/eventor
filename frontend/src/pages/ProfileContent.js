@@ -468,9 +468,7 @@ useEffect(() => {
   }
 
   const handlePostEdit = () => {
-    if (!newEvent.eventName) {
-      return;
-    }
+
     const { _id, content } = currentPost;
     axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content})
 
@@ -482,20 +480,21 @@ useEffect(() => {
     );
     
     // TODO: UPDATE EVENT CALL
-
-    if (currentPost.eventId && currentPost.eventId === newEvent._id) {
-      axios.put(`http://localhost:3001/api/events/${newEvent._id}`, {"event": newEvent, "postId": currentPost._id})
-        .then((response) => {
-          setEventsById(prevEvents => ({
-            ...prevEvents,
-            [response.data["_id"]]: response.data
-          }));
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+    if (newEvent === null || newEvent === undefined) {
+    } else {
+      if (currentPost.eventId && currentPost.eventId === newEvent._id) {
+        axios.put(`http://localhost:3001/api/events/${newEvent._id}`, {"event": newEvent, "postId": currentPost._id})
+          .then((response) => {
+            setEventsById(prevEvents => ({
+              ...prevEvents,
+              [response.data["_id"]]: response.data
+            }));
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      }
     }
-    
     closeEditPopup();
 
   }
@@ -1106,7 +1105,7 @@ const handleEventDateChange = (e) => {
                 </div>
 
               )}
-              {newEvent === null && (
+              {newEvent === null || newEvent === undefined && (
                 <button 
                   onClick={() => {
                     setEditPopupOpen(false);
