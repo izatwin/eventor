@@ -102,50 +102,47 @@ const Feed = () => {
   };
 
 
-const viewedPosts = new Set();
+const viewedPosts = new Set(); 
 
 const trackViewCount = async (postId) => {
-  if (viewedPosts.has(postId)) return; 
-
-  viewedPosts.add(postId);
-
+  if (viewedPosts.has(postId)) {
+    console.log("returning")
+    return;
+  }
   try {
     await axios.post("http://localhost:3001/api/posts/action", {
-      postId: postId,
-      actionType: "view",
+      postId: postId, 
+      actionType: "view"
     });
     console.log(`Post ${postId} is viewed.`);
+    viewedPosts.add(postId); 
   } catch (error) {
     console.error(`Error updating view count for post ${postId}:`, error);
   }
 };
 
 useEffect(() => {
-  const observerCallback = (entries) => {
+  const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const postId = entry.target.dataset.postId;
-        trackViewCount(postId);
-        observer.current.unobserve(entry.target);
+        trackViewCount(postId); 
       }
     });
-  };
-
-  observer.current = new IntersectionObserver(observerCallback);
+  });
 
   const postElements = document.querySelectorAll('.post');
   postElements.forEach((postElement) => {
-    if (!viewedPosts.has(postElement.dataset.postId)) {
-      observer.current.observe(postElement);
-    }
+    observer.observe(postElement);
   });
 
   return () => {
     postElements.forEach((postElement) => {
-      observer.current.unobserve(postElement);
+      observer.unobserve(postElement);
     });
   };
-}, [posts]); 
+}, [posts.length]);  
+
 
 
 

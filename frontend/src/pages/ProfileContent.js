@@ -101,12 +101,6 @@ const ProfileContent= () => {
   const [isOwnProfile, setIsOwnProfile] = useState(false)
   const observer = useRef(null); 
 
-  const formatDateTimeLocal = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toISOString().slice(0, 16); 
-  };
-
   useEffect(() => {
     
     const validateAndGetProfileUser = async () => {
@@ -278,13 +272,23 @@ const handleFollow = async () => {
 const viewedPosts = new Set(); 
 
 const trackViewCount = async (postId) => {
-  if (viewedPosts.has(postId)) return; 
-
+  console.log(viewedPosts)
+  if (viewedPosts.has(postId)) {
+    console.log("returning")
+    return;
+  }
   try {
     await axios.post("http://localhost:3001/api/posts/action", {
       postId: postId, 
       actionType: "view"
     });
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId
+            ? { ...post, views: post.views === 0 ? 1 : post.views + 1 } 
+            : post
+        )
+      );
     console.log(`Post ${postId} is viewed.`);
     viewedPosts.add(postId); 
   } catch (error) {
@@ -293,27 +297,32 @@ const trackViewCount = async (postId) => {
 };
 
 useEffect(() => {
-  observer.current = new IntersectionObserver((entries) => {
+
+  const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
         const postId = entry.target.dataset.postId;
-        trackViewCount(postId); 
-        observer.current.unobserve(entry.target); 
+        if (viewedPosts.has(postId)) {
+          console.log("returning")
+        }
+        else {
+          trackViewCount(postId); 
+        }
       }
     });
   });
 
   const postElements = document.querySelectorAll('.post');
   postElements.forEach((postElement) => {
-    observer.current.observe(postElement);
+    observer.observe(postElement);
   });
 
   return () => {
     postElements.forEach((postElement) => {
-      observer.current.unobserve(postElement);
+      observer.unobserve(postElement);
     });
   };
-}, []); 
+}, [posts.length]); 
 
 
 
@@ -459,6 +468,9 @@ useEffect(() => {
   }
 
   const handlePostEdit = () => {
+    if (!newEvent.eventName) {
+      return;
+    }
     const { _id, content } = currentPost;
     axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content})
 
@@ -498,6 +510,18 @@ useEffect(() => {
     .catch((err) => {
       console.log(err);
       showFailPopup("Error deleting post");
+    })
+  }
+  const handleEventDelete = (id) => {
+    // api request
+    axios.delete(`http://localhost:3001/api/events/${id}`)
+    .then((response) => {
+      setEventsById((prevEvents) => prevEvents.filter((event) => event._id !== id));
+      showSuccessPopup("Event deleted successfully!")
+    })
+    .catch((err) => {
+      console.log(err);
+      showFailPopup("Error deleting event");
     })
   }
 
@@ -561,15 +585,20 @@ const handleAddEvent = async () => {
     console.log("e.target.name: " + e.target.name + "e.target.value: " + e.target.value);
     setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
   };
+const formatDateTimeLocal = (date) => {
+  const d = new Date(date);
+  return d.toISOString().slice(0, 16);
+};
 
-  const handleEventDateChange = (e) => {
-    const { name, value } = e.target;
-    
-    setNewEvent((prevEvent) => ({
-      ...prevEvent,
-      [name]: new Date(value).toISOString(), 
-    }));
-  };
+const handleEventDateChange = (e) => {
+  const { name, value } = e.target;
+
+   
+  setNewEvent((prevEvent) => ({
+    ...prevEvent,
+    [name]: value, 
+  }));
+};
 
   const addSong= () => {
 
@@ -627,7 +656,6 @@ const handleAddEvent = async () => {
     var success = false
     var likedPosts = user.likedPosts || [];
     if (likedPosts.includes(id)) {
-      // post is already liked, we want to unlike
       success = await updateLike(id, false);
       if (success) {
         setPosts(prevPosts =>
@@ -641,7 +669,6 @@ const handleAddEvent = async () => {
       }
 
     } else {
-      // post is not liked, want to like
       success = await updateLike(id, true);
       if (success) {
         setPosts(prevPosts =>
@@ -1006,7 +1033,12 @@ const handleAddEvent = async () => {
               {(newEvent?.type) && (
                 <div>
                   <h2>Edit event</h2>
-              
+                  <img 
+                    src={removeIcon} 
+                    onClick={() => handleEventDelete(newEvent._id)}   
+                    alt="Remove" 
+                    className="remove-icon " 
+                  />
                   <form>
                     <input 
                       type="text" 
