@@ -45,27 +45,20 @@
 3. Save changes.
 4. Refresh and confirm changes persist.
 
-#### Test 2.5: Replace Event Without Saving
-1. Log in to any valid account.
-2. Navigate to a post with an existing event.
-3. Change the delete the event and attach a new one.
-4. Refresh without saving.
-5. Ensure no changes are applied.
-
-#### Test 2.6: Replace Event and Save
+#### Test 2.5: Replace Event and Save
 1. Log in to any valid account.
 2. Navigate to a post with an existing event.
 3. Delete the event and attach a new one.
 4. Save changes.
 5. Refresh to confirm changes are applied.
 
-#### Test 2.7: Edit Event Details Without Saving
+#### Test 2.6: Edit Event Details Without Saving
 1. Log in to any valid account.
 2. Edit all fields of an attached event in a post.
 3. Refresh without saving.
 4. Ensure no changes are reflected.
 
-#### Test 2.8: Save Edited Event Details
+#### Test 2.7: Save Edited Event Details
 1. Log in to any valid account.
 2. Edit all fields of an attached event in a post.
 3. Save changes.
