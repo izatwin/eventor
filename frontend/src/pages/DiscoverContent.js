@@ -8,6 +8,7 @@ import profilePic from './icons/profile.png';
 
 import { useAuth } from '../AuthContext'; 
 
+
 const DiscoverContent = () => { 
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -38,18 +39,43 @@ const DiscoverContent = () => {
       navigate("/");
       console.log(err)
     })  
-
+    
   }, [])
   
   // TODO
   const handleQuery = async () => {
-    setSearchResults((await axios.get(`http://localhost:3001/api/user/search/${query}`)).data)
+    if (!query) {
+      showFailPopup("Search cannot be empty")
+    } else if (query.length > 100) {
+      showFailPopup("Search query cannot exceed 100 characters");
+    } else {
+      axios.post(`http://localhost:3001/api/user/search`, {"query": query})
+      .then((response) => {
+        if (response.data.length < 1) {
+          showFailPopup("No Results")
+        } else {
+          setSearchResults(response.data)
+        }
+      })
+      setSearchResults((await axios.post(`http://localhost:3001/api/user/search`, {"query": query})).data)
+    }
   }
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
   }
   
-
+  const [popupMessage, setPopupMessage] = useState("")
+  
+  const showFailPopup = (message) => {
+    var popup = document.getElementById("fail");
+    setPopupMessage(message)
+    popup.classList.add("show");
+  
+    setTimeout(function() {
+        popup.classList.remove("show"); 
+    }, 1000);
+  }
+  
   return (
     <div className="discover-content-container">
 
@@ -89,8 +115,14 @@ const DiscoverContent = () => {
               </div>
             ))
           )}
+
+        <div className="postPopups">
+          <div className="popup" id="success">{popupMessage}</div>
+          <div className="popup" id="fail">{popupMessage}</div>
+        </div>
       </div>
     </div>
+    
   );
 };
 
