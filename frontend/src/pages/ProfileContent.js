@@ -515,9 +515,14 @@ useEffect(() => {
 
   const handleEventDelete = (id) => {
     // api request
-    axios.delete(`http://localhost:3001/api/events/${id}`, {"postId": currentPost._id})
+    console.log("CURRPOSTID:" + currentPost._id)
+    axios.post(`http://localhost:3001/api/events/delete/${id}`, {"postId": currentPost._id})
     .then((response) => {
-      setEventsById((prevEvents) => prevEvents.filter((event) => event._id !== id));
+      setEventsById((prevEvents) => {
+        const { [id]: _, ...remainingEvents } = prevEvents; 
+        return remainingEvents; 
+      });
+      setEditPopupOpen(false); 
       showSuccessPopup("Event deleted successfully!")
     })
     .catch((err) => {
@@ -1101,7 +1106,17 @@ const handleEventDateChange = (e) => {
                 </div>
 
               )}
-
+              {newEvent === null && (
+                <button 
+                  onClick={() => {
+                    setEditPopupOpen(false);
+                    handleAddEventPopup(currentPost)} 
+                  }
+                  className="add-event-btn"> 
+                  Add Event 
+              </button> 
+              )}
+              
               {newEvent?.type === "NormalEvent" && (
 
                 <div>
