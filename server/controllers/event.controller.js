@@ -121,7 +121,6 @@ exports.editEvent = async (req, res) => {
         const eventId = req.params.id;
         const updates = req.body.event;
         const postId = req.body.postId;
-        console.log(updates)
 
         const event = await BaseEvent.findById(eventId);
         if (!event) {
@@ -160,6 +159,7 @@ exports.deleteEvent = async (req, res) => {
         }
 
         const eventId = req.params.id;
+        const postId = req.body.postId;
         const event = await BaseEvent.findById(eventId);
 
         if (!event) {
@@ -168,7 +168,12 @@ exports.deleteEvent = async (req, res) => {
             });
         }
 
-        const post = await Post.findById(event.post);
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).send({
+                message: "Post not found."
+            });
+        }
         if (post.user.toString() !== authenticatedUser._id.toString()) {
             return res.status(403).send({
                 message: "You are not allowed to delete someone else's event."
