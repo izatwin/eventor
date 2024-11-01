@@ -35,7 +35,7 @@ const BaseEvent = mongoose.model("Event", baseEventSchema);
 
 // Normal Event discriminator
 const NormalEvent = BaseEvent.discriminator('NormalEvent', new Schema({
-    location: { type: String, required: true }
+    location: { type: String, required: false }
 }));
 
 // Music Release Event discriminator

@@ -1312,7 +1312,7 @@ const handleAddEvent = async () => {
                 </form>
                 <button 
                   onClick={ () => {
-                    if (!newEvent.eventTitle) {
+                    if (!newEvent.eventName) {
                       return;
                     }
                     setEventStep(prevEventStep => prevEventStep + "2")

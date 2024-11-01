@@ -136,7 +136,7 @@ useEffect(() => {
       observer.current.unobserve(postElement);
     });
   };
-}, []); 
+}, [posts]); 
 
 
   const handleShare = async (id) => {
