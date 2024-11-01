@@ -60,6 +60,14 @@ const DiscoverContent = () => {
       setSearchResults((await axios.post(`http://localhost:3001/api/user/search`, {"query": query})).data)
     }
   }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleQuery()
+    }
+  };
+
+
   const handleQueryChange = (e) => {
     setQuery(e.target.value);
   }
@@ -88,6 +96,7 @@ const DiscoverContent = () => {
           name="query"
           value={query}
           onChange={handleQueryChange}
+          onKeyDown={handleKeyDown}
         />
         <button 
           className="search-button"
