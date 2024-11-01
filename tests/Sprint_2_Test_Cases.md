@@ -42,15 +42,17 @@
 
 #### Test 2.4: Edit Event Details Without Saving
 1. Log in to any valid account.
-2. Edit all fields of an attached event in a post.
-3. Refresh without saving.
-4. Ensure no changes are reflected.
+2. Navigate to a post that does have an attached event.
+3. Edit all fields of an attached event in a post.
+4. Refresh without saving.
+5. Ensure no changes are reflected.
 
 #### Test 2.5: Save Edited Event Details
 1. Log in to any valid account.
-2. Edit all fields of an attached event in a post.
-3. Save changes.
-4. Refresh and confirm changes are applied.
+2. Navigate to a post that does have an attached event.
+3. Edit all fields of an attached event in a post.
+4. Save changes.
+5. Refresh and confirm changes are applied.
 
 ### Interaction Tests
 
@@ -127,7 +129,7 @@
 #### Test 8.1: Verify Post Visibility and Order on User's Profile
 1. Log in to any valid account.
 2. Navigate to your personal profile page.
-3. Create multiple posts with varying timestamps.
+3. Create multiple posts on your profile.
 4. Log out and log in with another valid account.
 5. Navigate to the original account's profile.
 6. Verify that all posts are visible on the profile.
