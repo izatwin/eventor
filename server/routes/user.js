@@ -40,9 +40,9 @@ router.post('/follow', userController.followUser);
 
 router.post('/unfollow', userController.unfollowUser);
 
-router.get('/:id', userController.findOne);
+router.post('/search', userController.searchUsers);
 
-router.get('/search/:query', userController.searchUsers);
+router.get('/:id', userController.findOne);
 
 router.post('/block', userController.toggleBlockUser);
 

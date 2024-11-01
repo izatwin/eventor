@@ -1079,9 +1079,15 @@ exports.checkBlockStatus = async (req, res) => {
     }
 };
 
+const escapeRegExp = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes special characters
+};
+
+
 // Searching
 exports.searchUsers = async (req, res) => {
-    const { query } = req.params;
+    const query = req.body.query;
+    const safeQuery = escapeRegExp(query)
 
     if (!query) {
         return res.status(400).send({
@@ -1091,7 +1097,7 @@ exports.searchUsers = async (req, res) => {
 
     try {
         // Use a regular expression to perform a case-insensitive search
-        const regex = new RegExp(query, 'i');
+        const regex = new RegExp(safeQuery, 'i');
 
         // Find users with matching userName or displayName
         const users = await User.find({
