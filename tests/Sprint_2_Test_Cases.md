@@ -156,3 +156,37 @@
 10. Delete a recently created post.
 11. Log back into the second account.
 12. Refresh the profile page to confirm the post is no longer visible.
+
+
+### Test 9: Comments
+
+#### Test 9.1: Create Comments
+1. Log in to any valid account.
+2. Navigate to a post you have access to view.
+3. Enter a comment into the comment field and submit.
+4. Refresh the page.
+5. Verify the comment appears below the post and includes your username.
+6. Ensure the comment count has incremented on the post.
+
+#### Test 9.2: Delete Personal Comments
+1. Log in to any valid account.
+2. Navigate to a post where you have previously left a comment.
+3. Find your comment under the post.
+4. Click the delete option/icon associated with your comment.
+5. Refresh the page.
+6. Verify the comment is no longer visible.
+7. Ensure the comment count decrements accordingly.
+
+#### Test 9.3: Can't Delete Other's Comments on Other's Posts
+1. Log in to any valid account.
+2. Navigate to a post where another user has left comments.
+3. Ensure there's no delete option available.
+
+#### Test 9.4: Can Delete Other's Comments on Your Posts
+1. Log in to any valid account.
+2. Navigate to a post you created that has comments from other users.
+3. Locate a comment made by another user on your post.
+4. Select the delete option/icon associated with that comment.
+5. Refresh the post.
+6. Verify that the comment has been successfully removed.
+7. Ensure the comment count on the post reflects the deletion.
