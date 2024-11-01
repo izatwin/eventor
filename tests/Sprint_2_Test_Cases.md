@@ -173,3 +173,59 @@
 2. Navigate to a post where anyone has previously left a comment.
 3. Navigate to the comment section of the post.
 4. Ensure that the comment appears.
+
+
+#### Test 10: User Account Deletion
+
+##### Instructions:
+1. Create account (see Test 1)
+2. Navigate to the "Profile page"
+3. Click the hamburger button, then settings
+4. Click Delete Account
+5. Enter password, then click submit
+##### Expected Results
+1. Page is refreshed to login page
+2. User may not login with the previous user credentials
+
+#### Test 11: User Account Deletion - Wrong password
+
+##### Instructions:
+1. Create account (see Test 1)
+2. Click the hamburger button (middle left), then settings
+3. Click Delete Account
+4. Enter wrong password, then click submit
+##### Expected Results
+1. Password field is cleared, account is not deleted.
+
+#### Test 12: Set profile picture
+##### Instructions:
+1. Login to previously created account (see Test 1)
+2. Create a post (see test \<not created yet\>)
+3. Click the hamburger button (middle left), then settings
+4. Click "Profile Picture"
+5. input an image URL, and then Save
+6. Click Profile (middle left button, human shape)
+##### Expected Results
+1. Profile should show the picture you chose.
+2. Profile picture should show in the bottom left corner.
+3. Posts on profile should show the profile picture.
+
+#### Test 13: Set Bio
+##### Instructions:
+1. Login to previously created account (see Test 1)
+2. Click Profile (middle left button, human shape)
+4. Click Edit Bio
+5. Edit the bio string with changes.
+6. Reload the page.
+##### Expected Results
+1. Profile should show the edited Bio
+
+#### Test 14: Set Status
+##### Instructions:
+1. Login to previously created account (see Test 1)
+2. Click Profile (middle left button, human shape)
+4. Click Edit Status
+5. Edit the status string with changes.
+6. Reload the page.
+##### Expected Results
+1. Profile should show the edited status
