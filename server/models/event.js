@@ -54,8 +54,8 @@ const MusicReleaseEvent = BaseEvent.discriminator('MusicReleaseEvent', new Schem
 
 // Ticketed Event discriminator
 const TicketedEvent = BaseEvent.discriminator('TicketedEvent', new Schema({
-    getTicketsLink: { type: String, required: true },
-    destinations: { type: [destinationSchema], required: true }
+    getTicketsLink: { type: String, required: false },
+    destinations: { type: [destinationSchema], required: false }
 }));
 
 module.exports = BaseEvent;
