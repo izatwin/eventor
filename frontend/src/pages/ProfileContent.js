@@ -208,31 +208,45 @@ const ProfileContent= () => {
   }, [])
 
 
-  const handleFollow = async () => {
-    // api req to follow/unfollow userId 
-    try {
-      if (isFollowing) {
-        axios.post("http://localhost:3001/api/user/unfollow", {"userId": profileUser.userId})
+const handleFollow = async () => {
+  // API request to follow/unfollow userId 
+  try {
+    if (isFollowing) {
+      const response = await axios.post("http://localhost:3001/api/user/unfollow", {
+        userId: profileUser.userId,
+      });
+
+      if (response.status === 200) {
         setProfileUser(prevProfileUser => ({
           ...prevProfileUser,
-          followers: prevProfileUser.followers.filter(followerId => followerId !== user.userId)
+          followers: prevProfileUser.followers.filter(followerId => followerId !== user.userId),
         }));
+        setIsFollowing(false); 
       }
-      else {
-        axios.post("http://localhost:3001/api/user/follow", {"userId": profileUser.userId})
+    } else {
+      const response = await axios.post("http://localhost:3001/api/user/follow", {
+        userId: profileUser.userId,
+      });
+
+      if (response.status === 200) {
         setProfileUser(prevProfileUser => ({
           ...prevProfileUser,
           followers: prevProfileUser.followers.includes(user.userId)
-            ? prevProfileUser.followers 
-            : [...prevProfileUser.followers, user.userId] 
+            ? prevProfileUser.followers
+            : [...prevProfileUser.followers, user.userId],
         }));
+        setIsFollowing(true); 
       }
-
-      setIsFollowing(!isFollowing) 
-    } catch (error) {
-      showFailPopup("Error following/unfollowing user")
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 403) {
+      showFailPopup("You are not allowed to follow/unfollow this user.");
+    } else {
+      showFailPopup("Error following/unfollowing user.");
     }
   }
+};
+
 
   const handleBlock = () => {
     // api req to block/unblock userId 
