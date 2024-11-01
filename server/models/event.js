@@ -8,21 +8,21 @@ const baseOptions = {
 
 // Define a sub-schema for Song
 const songSchema = new Schema({
-    songTitle: { type: String, required: true },
-    songArtist: { type: String, required: true },
-    songDuration: { type: Number, required: true }, // duration in seconds
+    songTitle: { type: String, required: false },
+    songArtist: { type: String, required: false },
+    songDuration: { type: Number, required: false }, // duration in seconds
 }, { _id: false });
 
 // Define a sub-schema for Destination
 const destinationSchema = new Schema({
-    location: { type: String, required: true },
+    location: { type: String, required: false },
     time: { type: Number, required: false }, // unix timestamp, optional
 }, { _id: false });
 
 // Base event schema
 const baseEventSchema = new Schema({
     eventName: { type: String, required: true },
-    eventDescription: { type: String, required: true },
+    eventDescription: { type: String, required: false },
     startTime: { type: Date, required: false },
     endTime: { type: Date, required: false },
     embeddedImage: { type: String, required: false },
@@ -40,14 +40,14 @@ const NormalEvent = BaseEvent.discriminator('NormalEvent', new Schema({
 
 // Music Release Event discriminator
 const MusicReleaseEvent = BaseEvent.discriminator('MusicReleaseEvent', new Schema({
-    releaseTitle: { type: String, required: true },
-    releaseArtist: { type: String, required: true },
+    releaseTitle: { type: String, required: false },
+    releaseArtist: { type: String, required: false },
     releaseType: {
         type: String,
         enum: ['single', 'ep', 'album'],
-        required: true
+        required: false
     },
-    songs: { type: [songSchema], required: true, default: [] },
+    songs: { type: [songSchema], required: false, default: [] },
     appleMusicLink: { type: String, required: false },
     spotifyLink: { type: String, required: false }
 }));
