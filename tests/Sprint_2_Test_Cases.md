@@ -13,8 +13,8 @@
 2. Navigate to your personal profile page.
 3. Start a new post creation.
 4. Enter a valid message body.
-5. Attach an event with a name and fill all necessary fields.
-6. Ensure event visual is part of the post.
+5. Attach a normal event with a name and fill all necessary fields.
+6. Ensure event image is part of the post.
 7. Publish the post.
 8. Refresh the page; verify post with all details.
 
@@ -36,7 +36,7 @@
 #### Test 2.3: Attach New Event and Save
 1. Log in to any valid account.
 2. Navigate to a post that doesn't have an attached event.
-3. Edit the post to attach a new event.
+3. Edit the post to attach a new normal event.
 4. Save changes.
 5. Refresh and confirm changes persist.
 
