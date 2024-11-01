@@ -586,10 +586,23 @@ const handleAddEvent = async () => {
     console.log("e.target.name: " + e.target.name + "e.target.value: " + e.target.value);
     setNewEvent({ ...newEvent, [e.target.name]: e.target.value });
   };
-const formatDateTimeLocal = (date) => {
-  const d = new Date(date);
-  return d.toISOString().slice(0, 16);
-};
+  const formatDateTimeLocal = (dateString) => {
+    if (!dateString) return "";
+  
+    const date = new Date(dateString);
+    
+    // Get the local date components
+    const localDate = new Date(date.getTime());
+    
+    // Format to YYYY-MM-DDTHH:MM
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(localDate.getDate()).padStart(2, '0');
+    const hours = String(localDate.getHours()).padStart(2, '0');
+    const minutes = String(localDate.getMinutes()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
 
 const handleEventDateChange = (e) => {
   const { name, value } = e.target;
@@ -1070,7 +1083,7 @@ const handleEventDateChange = (e) => {
                         name="startTime" 
                         className="input-field" 
                         value={formatDateTimeLocal(newEvent.startTime)}
-                        onChange={handleEventDateChange}
+                        onChange={handleEventInputChange}
                       />
                       <span className="time-separator">-</span>
                       <input 
@@ -1078,7 +1091,7 @@ const handleEventDateChange = (e) => {
                         name="endTime" 
                         className="input-field" 
                         value={formatDateTimeLocal(newEvent.endTime)}
-                        onChange={handleEventDateChange}
+                        onChange={handleEventInputChange}
                       />
                     </div>
 
