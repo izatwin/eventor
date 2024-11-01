@@ -13,6 +13,6 @@ router.post('/', eventController.createEvent);
 router.put('/:id', eventController.editEvent);
 
 // Delete an event
-router.delete('/:id', eventController.deleteEvent);
+router.post('/delete/:id', eventController.deleteEvent);
 
 module.exports = router;
