@@ -91,3 +91,12 @@
   margin-top: 15px; 
   margin-left: 7%; 
 }
+
+.buttons {
+  display: flex;
+  text-align: left;  
+  margin-bottom: 5px;
+  margin-left: 7%;
+}
+
+

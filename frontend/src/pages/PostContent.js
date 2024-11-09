@@ -10,6 +10,7 @@ import viewIcon from './icons/view.png'
 import likeIcon from './icons/like.png'
 import likedIcon from './icons/liked.png'
 import shareIcon from './icons/share.png'
+import commentIcon from './icons/comment.png'
 
 import { useAuth } from '../AuthContext';
 import { usePopup } from '../PopupContext';
@@ -204,6 +205,11 @@ useEffect(() => {
 
   const isLiking = user?.likedPosts?.includes(post._id);
 
+  const handleLikeComment = async (id) => {
+  
+  }
+
+
   return (
     <div className="post-content-container">
       <div className="post-content-content">
@@ -285,7 +291,7 @@ useEffect(() => {
               </div>
             ) : null}
 
-            <div className="post-buttons">
+            <div className="post-buttons buttons">
               
               <img src={viewIcon} alt="View" className="view-icon post-icon" />
               <div className="views-num num">{post.views}</div>
@@ -347,6 +353,15 @@ useEffect(() => {
                     <div className="comment-content">
                       {comment.text}
                     </div>
+
+                    <div className="comment-buttons buttons">
+                      <img onClick={() => handleLikeComment} src={likeIcon} alt="Like" className="like-icon post-icon" />
+                      <div className="likes-num num"> {0} </div>
+                      <img src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
+                      <div className="comment-num num">{0}</div>
+                    </div>
+
+
                   </div>
                 );
               })
