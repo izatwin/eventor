@@ -9,14 +9,12 @@ import profilePic from './icons/profile.png';
 import Post from '../components/Post';
 
 import { useAuth } from '../AuthContext';
-import { usePopup } from '../PopupContext';
 
 const PostContent = () => {
   const [post, setPost] = useState([]);
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const { _id } = useParams();
-  const { showSharePopup, updateShareCount, updateLike } = usePopup();
   const [newComment, setNewComment] = useState({
     text: "",
     isRoot: true,
@@ -25,6 +23,7 @@ const PostContent = () => {
   const [poster, setPoster] = useState([])
   const [commenters, setCommenters] = useState([])
   const [postEvent, setPostEvent] = useState(null)
+  const [loading, setLoading] = useState(true); 
 
 useEffect(() => {
   const fetchData = async () => {
@@ -56,7 +55,7 @@ useEffect(() => {
       const postResponse = await axios.get(`http://localhost:3001/api/posts/${_id}`);
       console.log("feed posts res:");
       console.log(postResponse.data);
-      setPost(postResponse.data);
+      setPost([postResponse.data]);
 
       // Get event of post if it exists
       if (postResponse.data["eventId"]) {
@@ -110,6 +109,8 @@ useEffect(() => {
     } catch (err) {
       console.log("Error fetching comments:", err);
     }
+
+    setLoading(false);
   };
 
   fetchData();
@@ -119,61 +120,12 @@ useEffect(() => {
     axios.post("http://localhost:3001/api/posts/action", {"postId": _id, "actionType": "view"});
   }, [])
 
-  const handleShare = async (id) => {
-    const success = await updateShareCount(id);
-    if (success) {
-      setPost((prevPost) => ({
-        ...prevPost,
-        shares: prevPost.shares + 1
-      }));
-
-    } else {
-      console.error('Error updating share count');
-    }
-  };
-
-  const handleLike = async (id) => {
-    var success = false
-    var likedPosts = user.likedPosts || [];
-    if (likedPosts.includes(id)) {
-      // post is already liked, we want to unlike
-      success = await updateLike(id, false);
-      if (success) {
-        setPost((prevPost) => ({
-          ...prevPost,
-          likes: prevPost.likes - 1
-        }));
-        likedPosts = likedPosts.filter(curId => curId !== id)
-        
-      }
-
-    } else {
-      // post is not liked, want to like
-      success = await updateLike(id, true);
-      if (success) {
-        setPost((prevPost) => ({
-          ...prevPost,
-          likes: prevPost.likes + 1
-        }));
-        likedPosts.push(id)
-      }
-    }
-    setUser(prevUser => ({
-      ...prevUser,
-      likedPosts: likedPosts
-    }))
-
-    if (!success) {
-      console.error('Error updating like status');
-    }
-  };
-
   const handleCommentChange = (e) => {
     setNewComment({ ...newComment, [e.target.name]: e.target.value });
   }
 
   const handleComment = async () => {
-    const tempNewComment = (await axios.post(`http://localhost:3001/api/comments`, {"comment": newComment, "postId": post._id})).data
+    const tempNewComment = (await axios.post(`http://localhost:3001/api/comments`, {"comment": newComment, "postId": post[0]._id})).data
     console.log("tempNEWCOMMENT:")
     console.log(tempNewComment)
     setComments((prevComments) => [tempNewComment, ...prevComments]);
@@ -198,14 +150,22 @@ useEffect(() => {
 
   }
 
-
-  const isLiking = user?.likedPosts?.includes(post._id);
-
   return (
     <div className="post-content-container">
       <div className="post-content-content">
         <div className="scrollable-container">
-          <Post key={post._id} post={post} poster={poster} postEvent={postEvent} setPosts={setPosts}/>
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <Post
+              key={post[0]._id}
+              post={post[0]}
+              poster={poster}
+              postEvent={postEvent}
+              setPost={setPost}
+            />
+
+          )}
           <div className="comment-card">
             
             <div className="comment-input">

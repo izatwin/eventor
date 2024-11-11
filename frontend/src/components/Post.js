@@ -8,10 +8,10 @@ import profilePic from '../pages/icons/profile.png';
 import { useAuth } from '../AuthContext';
 import { usePopup } from '../PopupContext';
 
-const { showSharePopup, updateShareCount, updateLike } = usePopup();
 
 
-export default function Post({ post, poster, postEvent, setPosts}) {
+export default function Post({ post, poster, postEvent, setPost}) {
+    const { showSharePopup, updateShareCount, updateLike } = usePopup();
     const { user, setUser } = useAuth();
     const isLiking = user?.likedPosts?.includes(post._id);
     
@@ -21,7 +21,7 @@ export default function Post({ post, poster, postEvent, setPosts}) {
         if (likedPosts.includes(id)) {
             success = await updateLike(id, false);
             if (success) {
-                setPosts(prevPosts =>
+                setPost(prevPosts =>
                     prevPosts.map(post =>
                         post._id === id ? { ...post, likes: post.likes - 1 } : post
                     )
@@ -34,7 +34,7 @@ export default function Post({ post, poster, postEvent, setPosts}) {
         } else {
             success = await updateLike(id, true);
             if (success) {
-                setPosts(prevPosts =>
+                setPost(prevPosts =>
                     prevPosts.map(post =>
                         post._id === id ? { ...post, likes: post.likes + 1 } : post
                     )
@@ -55,7 +55,7 @@ export default function Post({ post, poster, postEvent, setPosts}) {
     const handleShare = async (id) => {
         const success = await updateShareCount(id);
         if (success) {
-            setPosts(prevPosts =>
+            setPost(prevPosts =>
                 prevPosts.map(post =>
                     post._id === id ? { ...post, shares: post.shares + 1 } : post
                 )
