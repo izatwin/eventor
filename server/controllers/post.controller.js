@@ -490,3 +490,67 @@ exports.getFeed = async (req, res) => {
             console.error(error);
         });
 }
+
+// Searching
+exports.searchPosts = async (req, res) => {
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Request body cannot be empty."
+        });
+    }
+
+    const query = req.body.query;
+    const category = req.body.category;
+
+    if (!(query && category)) {
+        return res.status(400).send({
+            message: "Query and category parameters are required for searching."
+        });
+    }
+
+    const safeQuery = escapeRegExp(query);
+    const regex = new RegExp(safeQuery, 'i');
+
+    try {
+        let foundPosts = [];
+
+        if (category === 'postContent') {
+            // Search the posts based on their content
+            foundPosts = await Post.find({
+                content: { $regex: regex }
+            }).exec();
+        } else if (category === 'eventTitle' || category === 'eventLocation') {
+            // Search for posts with events
+            const eventField = category === 'eventTitle' ? 'eventName' : 'location';
+
+            // Get all posts with events matching the category and query
+            const postsWithEvents = await Post.find({
+                is_event: true,
+                eventId: { $exists: true }
+            }).exec();
+
+            // Retrieve eventIds from the posts to perform a search on events
+            const eventIds = postsWithEvents.map(post => post.eventId);
+
+            // Find events that match the category criteria
+            const foundEvents = await BaseEvent.find({
+                _id: { $in: eventIds },
+                [eventField]: { $regex: regex }
+            }).exec();
+
+            // Find the corresponding posts for matched events
+            foundPosts = postsWithEvents.filter(post => foundEvents.some(event => event._id.equals(post.eventId)));
+        } else {
+            return res.status(400).send({
+                message: "Invalid category for search. Use 'postContent', 'eventTitle', or 'eventLocation'."
+            });
+        }
+
+        return res.status(200).send(foundPosts);
+    } catch (err) {
+        return res.status(500).send({
+            message: "Error occurred during search.",
+            error: err.message || "Unexpected Error"
+        });
+    }
+};

@@ -20,4 +20,6 @@ router.post('/toggle-like', postController.toggleLike);
 
 router.post('/action', postController.viewOrSharePost);
 
+router.post('/search', postController.searchPosts);
+
 module.exports = router;
