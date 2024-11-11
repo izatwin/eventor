@@ -71,7 +71,7 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
 
 
     return (
-        <div className="post" key={post._id}>
+        <div className="post" key={post._id} data-post-id={post._id}>
             <div className="post-header">
 
                 <img src={poster.pfp ? poster.pfp : profilePic} alt="PostProfile" className="post-profilepic" />
