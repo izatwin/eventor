@@ -2,6 +2,9 @@ import viewIcon from '../pages/icons/view.png'
 import likeIcon from '../pages/icons/like.png'
 import likedIcon from '../pages/icons/liked.png'
 import shareIcon from '../pages/icons/share.png'
+import checkIcon from '../pages/icons/check.png'
+import removeIcon from '../pages/icons/remove.png'
+import editIcon from '../pages/icons/edit.png'
 
 import profilePic from '../pages/icons/profile.png';
 
@@ -10,7 +13,7 @@ import { usePopup } from '../PopupContext';
 
 
 
-export default function Post({ post, poster, postEvent, setPost}) {
+export default function Post({ post, poster, postEvent, setPost, handleAddEventPopup, handleEditPopup, handlePostDelete}) {
     const { showSharePopup, updateShareCount, updateLike } = usePopup();
     const { user, setUser } = useAuth();
     const isLiking = user?.likedPosts?.includes(post._id);
@@ -77,6 +80,30 @@ export default function Post({ post, poster, postEvent, setPost}) {
                     <div className="post-name">{poster.displayName}</div>
                     <div className="post-username">@{poster.userName}</div>
                 </div>
+
+                {false && (
+                      <div className="modify-post">
+                        {!postEvent && ( 
+                          <button 
+                            onClick={() => handleAddEventPopup(post)} 
+                            className="add-event-btn"> 
+                            Add Event 
+                          </button> 
+                        )}
+                        <img 
+                          src={editIcon} 
+                          onClick={() => handleEditPopup(post, postEvent)} 
+                          alt="Edit" 
+                          className="edit-post-icon " 
+                        />
+                        <img 
+                          src={removeIcon} 
+                          onClick={() => handlePostDelete(post._id)}   
+                          alt="Remove" 
+                          className="remove-icon " 
+                        />
+                      </div>
+                    )}
 
             </div>
 
