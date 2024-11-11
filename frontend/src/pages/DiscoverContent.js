@@ -11,8 +11,14 @@ const DiscoverContent = () => {
   const [suggestions, setSuggestions] = useState([]);  
   const { setUser } = useAuth();  
   const navigate = useNavigate();
-  const categories = ["Events", "Location", "People", "Posts"];  
-  
+  const categories = ["Post Content", "Event Title", "Event Location"] 
+  const [category, setCategory] = useState("")
+  const categoryMapping = {
+    "Post Content": "postContent",
+    "Event Title": "eventTitle",
+    "Event Location": "eventLocation",
+  };
+
   useEffect(() => {
     axios.get("http://localhost:3001/api/user/validate") 
     .then(response => {
@@ -36,23 +42,29 @@ const DiscoverContent = () => {
   }, [setUser, navigate]);
   
   const handleQuery = async () => {
-    setQuery(""); 
     if (!query) {
       showFailPopup("Search cannot be empty");
     } else if (query.length > 100) {
       showFailPopup("Search query cannot exceed 100 characters");
     } else {
       try {
-        const response = await axios.post(`http://localhost:3001/api/user/search`, { "query": query });
-        if (response.data.length < 1) {
-          showFailPopup("No Results");
-        } else {
-          setSearchResults(response.data);
+        if (category) {
+          const response = await axios.post(`http://localhost:3001/api/posts/search`, { query: query, category: categoryMapping[category]});
+        }
+        else {
+          const response = await axios.post(`http://localhost:3001/api/user/search`, { "query": query });
+          if (response.data.length < 1) {
+            showFailPopup("No Results");
+          } else {
+            setSearchResults(response.data);
+          }
         }
       } catch (error) {
         console.error(error);
       }
     }
+    setQuery(""); 
+    setCategory("");
   };
 
   const handleKeyDown = (event) => {
@@ -66,16 +78,25 @@ const DiscoverContent = () => {
     setQuery(userInput);
 
     if (userInput) {
-      const newSuggestions = categories.map(category => (
-        <span>
-          <strong>{userInput}</strong> in {category}
-        </span>
-      ));
+      const newSuggestions = categories.map(category => `${userInput} in ${category}`);
       setSuggestions(newSuggestions);  
     } else {
       setSuggestions([]); 
     }
   };
+  
+  const handleOptionSelect = (suggestion) => {
+    console.log("option")
+    const category = suggestion.split(" in ")[1]; 
+    setCategory(category); 
+  }
+  
+  // triggered after handleOptionSelect()
+  useEffect(() => {
+    if (category) {
+      handleQuery(); 
+    }
+  }, [category]);
 
   const [popupMessage, setPopupMessage] = useState("");
   
@@ -117,7 +138,7 @@ const DiscoverContent = () => {
             <div
               key={index}
               className="suggestion-item"
-              onClick={() => handleQuery()}  
+              onClick={() => handleOptionSelect(suggestion)}  
             >
               {suggestion}
             </div>
