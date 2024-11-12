@@ -5,6 +5,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from 'axios'
 
 import profilePic from './icons/profile.png';
+import likeIcon from './icons/like.png'
+import commentIcon from './icons/comment.png'
+
 
 import Post from '../components/Post';
 
