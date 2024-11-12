@@ -670,57 +670,6 @@ const handleEventDateChange = (e) => {
     }));
   };
 
-  // TODO
-  const handleShare = async (id) => {
-    const success = await updateShareCount(id);
-    if (success) {
-      setPosts(prevPosts =>
-        prevPosts.map(post =>
-          post._id === id ? { ...post, shares: post.shares + 1 } : post
-        )
-      );
-    } else {
-      console.error('Error updating share count');
-    }
-  };
-
-  const handleLike = async (id) => {
-    var success = false
-    var likedPosts = user.likedPosts || [];
-    if (likedPosts.includes(id)) {
-      success = await updateLike(id, false);
-      if (success) {
-        setPosts(prevPosts =>
-          prevPosts.map(post =>
-            post._id === id ? { ...post, likes: post.likes - 1 } : post
-          )
-        );
-
-        likedPosts = likedPosts.filter(curId => curId !== id)
-
-      }
-
-    } else {
-      success = await updateLike(id, true);
-      if (success) {
-        setPosts(prevPosts =>
-          prevPosts.map(post =>
-            post._id === id ? { ...post, likes: post.likes + 1 } : post
-          )
-        );
-        likedPosts.push(id)
-      }
-    }
-    setUser(prevUser => ({
-      ...prevUser,
-      likedPosts: likedPosts
-    }))
-
-    if (!success) {
-      console.error('Error updating like status');
-    }
-  };
-
   const [popupMessage, setPopupMessage] = useState("")
   
   const showSuccessPopup = (message) => {
@@ -913,6 +862,7 @@ const handleEventDateChange = (e) => {
                 handleAddEventPopup={handleAddEventPopup}
                 handleEditPopup={handleEditPopup}
                 handlePostDelete={handlePostDelete}
+                isProfile={true}
               />
             ))
           )}
