@@ -24,6 +24,12 @@ const PostContent = () => {
   const [commenters, setCommenters] = useState([])
   const [postEvent, setPostEvent] = useState(null)
   const [loading, setLoading] = useState(true); 
+  const [isReplyPopupOpen, setReplyPopupOpen] = useState(false);
+  const [currentComment, setCurrentComment] = useState(null);
+  const [replyComment, setReplyComment] = useState({
+    text: "",
+    isRoot: false,
+  })
 
 useEffect(() => {
   const fetchData = async () => {
@@ -124,6 +130,10 @@ useEffect(() => {
     setNewComment({ ...newComment, [e.target.name]: e.target.value });
   }
 
+const handleReplyChange = (e) => {
+    setReplyComment({ ...replyComment, [e.target.name]: e.target.value });
+  }
+
   const handleComment = async () => {
     const tempNewComment = (await axios.post(`http://localhost:3001/api/comments`, {"comment": newComment, "postId": post[0]._id})).data
     console.log("tempNEWCOMMENT:")
@@ -148,6 +158,27 @@ useEffect(() => {
         console.log("Error fetching user data:", err);
       });
 
+  }
+
+
+
+  const handleLikeComment = async (id) => {
+  
+  }
+  
+  const handleReplyPopup = (comment) => {
+    console.log("red")
+    setCurrentComment(comment);
+    setReplyPopupOpen(true);
+  }
+  
+  const closeReplyPopup = () => {
+    setCurrentComment(null);
+    setReplyPopupOpen(false)
+  }
+
+  const handleReplyComment = () => {
+  
   }
 
   return (
@@ -217,6 +248,15 @@ useEffect(() => {
                     <div className="comment-content">
                       {comment.text}
                     </div>
+
+                    <div className="comment-buttons buttons">
+                      <img onClick={() => handleLikeComment()} src={likeIcon} alt="Like" className="like-icon post-icon" />
+                      <div className="likes-num num"> {0} </div>
+                      <img onClick={()=>{handleReplyPopup(comment)}}src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
+                      <div className="comment-num num">{0}</div>
+                    </div>
+
+
                   </div>
                 );
               })
@@ -225,6 +265,27 @@ useEffect(() => {
 
           </div>
         </div>
+
+        {isReplyPopupOpen && (
+          <div className="reply-popup">
+            <div className="reply-content">
+              <h2>Reply</h2>
+              <textarea 
+                name="text"
+                value={replyComment?.text || ''} 
+                className="reply-textarea"
+                onChange={handleReplyChange}  
+                placeholder="Enter your reply"
+                rows="5"
+                cols="30"
+              />
+
+              <button onClick={handleReplyComment} className="reply-button">Reply</button>
+              <button onClick={()=> {closeReplyPopup()}} className="close-button">x</button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

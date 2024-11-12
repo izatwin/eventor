@@ -178,7 +178,7 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
                 </div>
             ) : null}
 
-            <div className="post-buttons">
+            <div className="post-buttons buttons">
 
                 <img src={viewIcon} alt="View" className="view-icon post-icon" />
                 <div className="views-num num">{post.views}</div>
