@@ -2,22 +2,28 @@ import viewIcon from '../pages/icons/view.png'
 import likeIcon from '../pages/icons/like.png'
 import likedIcon from '../pages/icons/liked.png'
 import shareIcon from '../pages/icons/share.png'
-import checkIcon from '../pages/icons/check.png'
 import removeIcon from '../pages/icons/remove.png'
 import editIcon from '../pages/icons/edit.png'
+import expandIcon from '../pages/icons/expand.png'
+import commentIcon from '../pages/icons/comment.png'
 
 import profilePic from '../pages/icons/profile.png';
 
 import { useAuth } from '../AuthContext';
 import { usePopup } from '../PopupContext';
 
+import { useNavigate, useParams } from "react-router-dom";
 
 
-export default function Post({ post, poster, postEvent, setPost, handleAddEventPopup, handleEditPopup, handlePostDelete}) {
+
+
+export default function Post({ post, poster, postEvent, setPost, handleAddEventPopup, handleEditPopup, handlePostDelete, isProfile }) {
+    const navigate = useNavigate();
+
     const { showSharePopup, updateShareCount, updateLike } = usePopup();
     const { user, setUser } = useAuth();
     const isLiking = user?.likedPosts?.includes(post._id);
-    
+
     const handleLike = async (id) => {
         var success = false
         var likedPosts = user.likedPosts || [];
@@ -81,29 +87,29 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
                     <div className="post-username">@{poster.userName}</div>
                 </div>
 
-                {false && (
-                      <div className="modify-post">
-                        {!postEvent && ( 
-                          <button 
-                            onClick={() => handleAddEventPopup(post)} 
-                            className="add-event-btn"> 
-                            Add Event 
-                          </button> 
+                {isProfile && (
+                    <div className="modify-post">
+                        {!postEvent && (
+                            <button
+                                onClick={() => handleAddEventPopup(post)}
+                                className="add-event-btn">
+                                Add Event
+                            </button>
                         )}
-                        <img 
-                          src={editIcon} 
-                          onClick={() => handleEditPopup(post, postEvent)} 
-                          alt="Edit" 
-                          className="edit-post-icon " 
+                        <img
+                            src={editIcon}
+                            onClick={() => handleEditPopup(post, postEvent)}
+                            alt="Edit"
+                            className="edit-post-icon "
                         />
-                        <img 
-                          src={removeIcon} 
-                          onClick={() => handlePostDelete(post._id)}   
-                          alt="Remove" 
-                          className="remove-icon " 
+                        <img
+                            src={removeIcon}
+                            onClick={() => handlePostDelete(post._id)}
+                            alt="Remove"
+                            className="remove-icon "
                         />
-                      </div>
-                    )}
+                    </div>
+                )}
 
             </div>
 
@@ -180,6 +186,16 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
                 <div className="likes-num num"> {post.likes} </div>
                 <img onClick={() => { showSharePopup(post._id); handleShare(post._id) }} src={shareIcon} alt="Share" className="share-icon post-icon" />
                 <div className="shares-num num"> {post.shares} </div>
+
+                <div className="expand-comment">
+                    <img src={commentIcon} alt="Comment" className="comment-icon post-icon" />
+                    <div className="comment-num num">{post.comments.length}</div>
+                    <img
+                        src={expandIcon}
+                        alt="Expand"
+                        className="expand-icon post-icon"
+                        onClick={() => { navigate(`/post/${post._id}`) }} />
+                </div>
             </div>
         </div>
     );
