@@ -111,6 +111,7 @@
   justify-content: center;
   align-items: center;
 }
+
 .reply-content{
   background: white;
   padding: 20px;
@@ -126,12 +127,13 @@
   min-height: 100px; 
   background: transparent; 
   resize: none; 
-  outline: none; 
   width: 100%;
   box-sizing: border-box;
   font-family: Arial, sans-serif;
   font-size: 16px;
   margin-bottom: 5px;
+  outline: none; 
+  border: none;
 }
 
 .reply-button {

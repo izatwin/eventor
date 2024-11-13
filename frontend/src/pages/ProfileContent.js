@@ -1049,13 +1049,13 @@ const handleEventDateChange = (e) => {
               
               {/* EDIT EVENT */}
               {(newEvent?.type) && (
-                <div>
+                <div className="edit-event-content">
                   <h2>Edit event</h2>
                   <img 
                     src={removeIcon} 
                     onClick={() => handleEventDelete(newEvent._id)}   
                     alt="Remove" 
-                    className="remove-icon " 
+                    className="remove-event-icon " 
                   />
                   <form>
                     <input 
@@ -1106,19 +1106,21 @@ const handleEventDateChange = (e) => {
 
               )}
               {newEvent === null || newEvent === undefined && (
-                <button 
-                  onClick={() => {
-                    setEditPopupOpen(false);
-                    handleAddEventPopup(currentPost)} 
-                  }
-                  className="add-event-btn"> 
-                  Add Event 
-              </button> 
+                <div className="edit-event-content">
+                  <button 
+                    onClick={() => {
+                      setEditPopupOpen(false);
+                      handleAddEventPopup(currentPost)} 
+                    }
+                    className="add-event-btn"> 
+                    Add Event 
+                  </button> 
+                </div>
               )}
               
               {newEvent?.type === "NormalEvent" && (
 
-                <div>
+                <div className="edit-event-content">
                   <input 
                     type="text" 
                     placeholder="Address" 
@@ -1132,7 +1134,8 @@ const handleEventDateChange = (e) => {
               )}
 
               {newEvent?.type === "MusicReleaseEvent" && (
-                <div> 
+
+                <div className="edit-event-content">
 
                   <input 
                     type="text" 
@@ -1249,7 +1252,7 @@ const handleEventDateChange = (e) => {
               )}
 
               {newEvent?.type === "TicketedEvent" && (
-                <div>
+                <div className="edit-event-content">
                   <input 
                     type="text" 
                     placeholder="Ticket Link" 
