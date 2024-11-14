@@ -1,5 +1,5 @@
 import "../styles/DiscoverContent.css";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import profilePic from './icons/profile.png'; 
@@ -11,8 +11,10 @@ const DiscoverContent = () => {
   const [suggestions, setSuggestions] = useState([]);  
   const { setUser } = useAuth();  
   const navigate = useNavigate();
-  const categories = ["Post Content", "Event Title", "Event Location"] 
+  const categories = ["Users", "Post Content", "Event Title", "Event Location"] 
   const [category, setCategory] = useState("")
+  const dropdownRef = useRef(null);  // Add a ref for the dropdown
+
   const categoryMapping = {
     "Post Content": "postContent",
     "Event Title": "eventTitle",
@@ -47,17 +49,19 @@ const DiscoverContent = () => {
     } else if (query.length > 100) {
       showFailPopup("Search query cannot exceed 100 characters");
     } else {
+      console.log("query: " + query)
       try {
-        if (category) {
-          const response = await axios.post(`http://localhost:3001/api/posts/search`, { query: query, category: categoryMapping[category]});
+        let response;
+        if (category === "Users") {
+           response = await axios.post(`http://localhost:3001/api/user/search`, { "query": query });
         }
-        else {
-          const response = await axios.post(`http://localhost:3001/api/user/search`, { "query": query });
-          if (response.data.length < 1) {
-            showFailPopup("No Results");
-          } else {
-            setSearchResults(response.data);
-          }
+        else { 
+          //response = await axios.post(`http://localhost:3001/api/posts/search`, { query: query, category: categoryMapping[category]});
+        }
+        if (response === undefined || response.data.length < 1) {
+          showFailPopup("No Results");
+        } else {
+          setSearchResults(response.data);
         }
       } catch (error) {
         console.error(error);
@@ -110,6 +114,28 @@ const DiscoverContent = () => {
     }, 1000);
   };
   
+  // Closes the dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setSuggestions([]);
+      }
+    };
+    
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+ 
+  // Reopens the drowdown when clicking in the search bar
+  const handleFocus = () => {
+    if (query) {
+      const newSuggestions = categories.map(category => `${query} in ${category}`);
+      setSuggestions(newSuggestions);
+    }
+  };
+
   return (
     <div className="discover-content-container">
       <div className="discover-title">Discover</div>
@@ -123,6 +149,7 @@ const DiscoverContent = () => {
           value={query}
           onChange={handleQueryChange}  
           onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
         />
         <button 
           className="search-button"
@@ -133,7 +160,7 @@ const DiscoverContent = () => {
       </div>
 
       {query && suggestions.length > 0 && ( 
-        <div className="suggestions-dropdown">
+        <div className="suggestions-dropdown" ref={dropdownRef} >
           {suggestions.map((suggestion, index) => (
             <div
               key={index}
