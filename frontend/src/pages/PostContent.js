@@ -177,6 +177,11 @@ const handleReplyChange = (e) => {
   
   const closeReplyPopup = () => {
     setCurrentComment(null);
+    setReplyComment({
+      text: "",
+      isRoot: false
+    })
+
     setReplyPopupOpen(false)
   }
 
