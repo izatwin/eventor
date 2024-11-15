@@ -92,6 +92,10 @@
   margin-left: 7%; 
 }
 
+.comment-reply {
+  padding-left: 5%;
+}
+
 .buttons {
   display: flex;
   text-align: left;  
