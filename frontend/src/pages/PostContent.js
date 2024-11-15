@@ -33,6 +33,7 @@ const PostContent = () => {
     text: "",
     isRoot: false,
   })
+  const [replies, setReplies] = useState({})
 
 useEffect(() => {
   const fetchData = async () => {
@@ -94,14 +95,17 @@ useEffect(() => {
     }
 
     try {
+      // get comments
       const commentsResponse = await axios.get(`http://localhost:3001/api/comments/post/${_id}`);
       console.log(`Comments are:`, commentsResponse.data);
       setComments(commentsResponse.data);
 
+      // loop through each comment
       for (const comment of commentsResponse.data) {
         console.log("comment:", comment);
-
+      
         try {
+          // get commenter of comment
           const commenterResponse = await axios.get(`http://localhost:3001/api/user/${comment.user}`);
           console.log("commenter response:", commenterResponse.data);
 
@@ -113,6 +117,36 @@ useEffect(() => {
           }
         } catch (err) {
           console.log("Error fetching user data:", err);
+        }
+
+        // get replies of comment
+        if (comment.comments && comment.comments.length > 0) {
+          for (const replyId of comment.comments) {
+            try {
+              const replyResponse = await axios.get(`http://localhost:3001/api/comments/${replyId}`);
+              console.log("Reply response:", replyResponse.data);
+
+              setReplies(prevReplies => {
+                const existingReplies = prevReplies[comment._id] || [];
+                
+                const isDuplicate = existingReplies.some(reply => reply._id === replyResponse.data._id);
+
+                // if not a duplicate add to replies
+                if (!isDuplicate) {
+                  return {
+                    ...prevReplies,
+                    [comment._id]: [...existingReplies, replyResponse.data]
+                  };
+                }
+
+                // If a duplicate, skip
+                return prevReplies;
+              });            
+
+            } catch (err) {
+              console.log("Error fetching reply:", err);
+            }
+          }
         }
       }
     } catch (err) {
@@ -238,6 +272,7 @@ const handleReplyChange = (e) => {
             ) : (
               comments.map(comment => {
                 const commentUser = commenters[comment.user]; 
+                const commentReplies = replies[comment._id] || []
                 return (
                   <div className="comment" key={comment._id}> 
                     <div className="post-header">
@@ -264,9 +299,43 @@ const handleReplyChange = (e) => {
                       <div className="comment-num num">{0}</div>
                     </div>
 
+                    {/* Render replies of comment */}
+                    {commentReplies.length > 0 && (
+                      <div className="replies-section">
+                        {commentReplies.map(reply => {
+                          const replyUser = commenters[reply.user];
+                          return (
+                            <div className="comment-reply" key={reply._id}>
+                              <div className="post-header">
+                                <img 
+                                  src={replyUser?.imageURL ? replyUser.imageURL : profilePic} 
+                                  alt="PostProfile" 
+                                  className="post-profilepic" 
+                                />
+                                <div className="post-profile-info">
+                                  <div className="post-name">{replyUser?.displayName}</div>
+                                  <div className="post-username">@{replyUser?.userName}</div>
+                                </div>
+                              </div>
+
+                              <div className="comment-content">{reply.text}</div>
+
+                              <div className="comment-buttons buttons">
+                                <img onClick={() => handleLikeComment()} src={likeIcon} alt="Like" className="like-icon post-icon" />
+                                <div className="likes-num num"> {0} </div>
+                              </div>
+
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
 
                   </div>
+
                 );
+                
               })
             )}
 
