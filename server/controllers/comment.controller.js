@@ -202,3 +202,63 @@ exports.delete = (req, res) => {
             })
         })
 }
+
+// Like or Unlike a post
+exports.toggleLike = async (req, res) => {
+    const authenticatedUser = await Common.authenticateUser(req);
+    if (!authenticatedUser) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    if (!req.body) {
+        return res.status(400).send({
+            message: "Request body cannot be empty."
+        });
+    }
+
+    const commentId = req.body.commentId;
+    const like = req.body.like; // Expect a boolean to indicate like or unlike
+
+
+    try {
+        const comment = await Comment.findById(commentId).exec();
+        if (!comment) {
+            return res.status(404).send({ message: `Comment not found with id=${commentId}` });
+        }
+
+        var likedComments = authenticatedUser.likedComments || [];
+        const isAlreadyLiked = likedComments.includes(commentId);
+
+        console.log(likedComments);
+
+        if (like && !isAlreadyLiked) {
+            // Increment like
+            comment.likes += 1;
+            likedComments.push(commentId);
+        } else if (!like && isAlreadyLiked) {
+            // Decrement like
+            comment.likes -= 1;
+            likedComments = likedComments.filter(id => id !== commentId);
+        } else {
+            return res.status(400).send({ message: "Invalid operation." });
+        }
+
+        authenticatedUser.likedComments = likedComments;
+        authenticatedUser.markModified('likedComments');
+
+        console.log(authenticatedUser.likedComments);
+
+        await comment.save();
+        await authenticatedUser.save();
+
+        return res.status(200).send({ message: "Comment like status updated." });
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error updating like status for comment with id=${commentId}`,
+            error: err.message || "Unexpected Error"
+        });
+    }
+};
