@@ -155,19 +155,19 @@ exports.update = (req, res) => {
         })
     }
 
-    const id = req.param.id;
+    const commentId = req.params.id;
 
-    Comment.findByIdAndUpdate(id, req.body, { runValidators: true })
+    Comment.findByIdAndUpdate(commentId, req.body, { runValidators: true })
         .then(data => {
             if (!data) {
                 res.status(404).send({
-                    message: `Cannot find Comment with id=${id}.`
+                    message: `Cannot find Comment with id=${commentId}.`
                 });
             } else res.send({ message: "Comment updated successfully." })
         })
         .catch(err => {
             res.status(500).send({
-                message: `Error updating comment with id=${id}`,
+                message: `Error updating comment with id=${commentId}`,
                 error: err
             });
         });
