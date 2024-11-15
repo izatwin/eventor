@@ -1,14 +1,14 @@
 
 ### Comment
 
-| Type   | Path                       | Request Body                                                            | Response Body                                                               |
-| ------ | -------------------------- | :---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| POST   | /api/comments/             | {"postId": ObjectId,<br>"comment": {"text": string,<br>"isRoot": bool}} | { COMMENT }                                                                 |
-| GET    | /api/comments/post/:postId | NONE                                                                    | { <br>  \[COMMENT\]<br>}<br>                                                |
-| GET    | /api/comments/:id          | NONE                                                                    | { COMMENT }                                                                 |
-| DELETE | /api/comments/:id          | NONE                                                                    | Status Code: 200 / 404 / 500                                                |
-| PUT    | /api/comments/:id          | {any updateable field}                                                  | { COMMENT }<br><br>Status Code: 200 / 409 / 498<br>                         |
-| POST   | /api/addChild/:id          | {"childId": \<childId\>}                                                | {message: "Child comment added to parent successfully",<br>parent: COMMENT} |
+| Type   | Path                       | Request Body                                                            | Response Body                                       |
+| ------ | -------------------------- | :---------------------------------------------------------------------- | --------------------------------------------------- |
+| POST   | /api/comments/             | {"postId": ObjectId,<br>"comment": {"text": string,<br>"isRoot": bool}} | { COMMENT }                                         |
+| GET    | /api/comments/post/:postId | NONE                                                                    | { <br>  \[COMMENT\]<br>}<br>                        |
+| GET    | /api/comments/:id          | NONE                                                                    | { COMMENT }                                         |
+| DELETE | /api/comments/:id          | NONE                                                                    | Status Code: 200 / 404 / 500                        |
+| PUT    | /api/comments/:id          | {any updateable field}                                                  | { COMMENT }<br><br>Status Code: 200 / 409 / 498<br> |
+| POST   | /api/comments/addChild/:id | {"childId": \<childId\>}                                                | { COMMENT }                                         |
 **COMMENT** = {
 "timestamp" : Date \<timestamp of the comment\> (server created),
 "user": String \<user who made the comment\> (server created),
@@ -68,9 +68,9 @@ Used for the client to update a comment. One can have all the fields in the body
 ---
 #### add_child_comment_to_root
 
-| TYPE | PATH              | REQUEST BODY                  | RESPONSE BODY                                                               |
-| ---- | ----------------- | ----------------------------- | --------------------------------------------------------------------------- |
-| POST | /api/addChild/:id | {<br>"childId": ObjectId<br>} | {message: "Child comment added to parent successfully",<br>parent: COMMENT} |
+| TYPE | PATH              | REQUEST BODY                  | RESPONSE BODY |
+| ---- | ----------------- | ----------------------------- | ------------- |
+| POST | /api/addChild/:id | {<br>"childId": ObjectId<br>} | { COMMENT }   |
 
 Used to add a comment to another comment.
 The id in the url is the parent comment, the id in the body is the child comment.

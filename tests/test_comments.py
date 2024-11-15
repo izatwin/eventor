@@ -83,7 +83,7 @@ def test_delete_comment(new_comment, create_session):
     assert response2.status_code == 404
 
 def test_update_comment(new_comment, create_session):
-    update_body = {"text": "this comment is different", "isRoot": True}
+    update_body = {"text": "this comment is different", "isRoot": False}
     response1 = create_session.put(BASE_URL + f'/comments/{new_comment}', json=update_body)
     assert response1.status_code == 200
 
@@ -92,3 +92,43 @@ def test_update_comment(new_comment, create_session):
 
     assert response2.json()["text"] == update_body["text"]
     assert response2.json()["isRoot"] == update_body["isRoot"]
+
+def test_add_child_comments(new_comment, create_session, created_post_id):
+    
+    for i in range(10):
+        child_comment = {"postId": created_post_id, "comment": {"text": f"child_comment{i}_here", "isRoot": False}}
+
+        response1 = create_session.post(BASE_URL + '/comments/', json=child_comment)
+        assert response1.status_code ==  200
+
+        assert response1.json()["text"] == child_comment["comment"]["text"]
+
+        child_comment_id = response1.json()["_id"]
+        payload = {"childId": child_comment_id}
+
+        response2 = create_session.post(BASE_URL + f'/comments/addChild/{new_comment}', json=payload)
+        assert response2.status_code == 200
+
+        assert child_comment_id in response2.json()["comments"]
+    
+    response3 = create_session.get(BASE_URL + f'/comments/{new_comment}')
+    assert response3.status_code == 200
+
+    assert len(response3.json()["comments"]) == 10
+
+def test_add_child_to_nonroot(new_comment, create_session, created_post_id):
+    update_body = {"text": "this comment is different", "isRoot": False}
+    response1 = create_session.put(BASE_URL + f'/comments/{new_comment}', json=update_body)
+    assert response1.status_code == 200
+
+    child_comment = {"postId": created_post_id, "comment": {"text": f"child_comment_here", "isRoot": False}}
+
+    response2 = create_session.post(BASE_URL + '/comments/', json=child_comment)
+    assert response2.status_code ==  200
+    assert response2.json()["text"] == child_comment["comment"]["text"]
+
+    child_comment_id = response2.json()["_id"]
+    payload = {"childId": child_comment_id}
+
+    response3 = create_session.post(BASE_URL + f'/comments/addChild/{new_comment}', json=payload)
+    assert response3.status_code == 403
