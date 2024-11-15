@@ -91,7 +91,8 @@ const UserSchema = new Schema({
 
     userCredentials: UserCredentialsSchema,
     posts: [{ type: Schema.Types.ObjectId, ref: "Post", required: false }],
-    likedPosts: [{ type: Schema.Types.String, ref: "Post", required: false }],
+    likedPosts: [{ type: Schema.Types.ObjectId, ref: "Post", required: false }],
+    likedComments: [{ type: Schema.Types.ObjectId, ref: "Comment", required: false }],
 
     followers: [{ type: Schema.Types.String, ref: "User", required: false }],
     following: [{ type: Schema.Types.String, ref: "User", required: false }],
@@ -114,6 +115,7 @@ UserSchema.methods.getInfoForClient = function () {
     infoForClient.imageURL = this.imageURL;
     infoForClient.posts = this.posts;
     infoForClient.likedPosts = this.likedPosts;
+    infoForClient.likedComments = this.likedComments;
     infoForClient.blockedUsers = this.blockedUsers;
     infoForClient.following = this.following
 

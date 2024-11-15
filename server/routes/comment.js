@@ -16,4 +16,6 @@ router.put("/:id", commentController.update);
 
 router.post('/addChild/:id', commentController.addComment);
 
+router.post('/toggle-like', commentController.toggleLike);
+
 module.exports = router

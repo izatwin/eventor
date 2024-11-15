@@ -1,5 +1,6 @@
 const Post = require("../models/post");
 const User = require("../models/user");
+const Comment = require("../models/comment")
 const BaseEvent = require("../models/event")
 const mongoose = require("mongoose");
 
@@ -296,6 +297,9 @@ exports.delete = async (req, res) => {
             authenticatedUser.posts.splice(postIndex, 1);
             await authenticatedUser.save();
         }
+
+        // Delete any comments that are also with the post
+        await Comment.deleteMany({ _id: { $in: post.comments}})
 
         await Post.findByIdAndDelete(id);
 
