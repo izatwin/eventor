@@ -7,7 +7,8 @@ import axios from 'axios'
 import profilePic from './icons/profile.png';
 import likeIcon from './icons/like.png'
 import commentIcon from './icons/comment.png'
-
+import removeIcon from '../pages/icons/remove.png'
+import editIcon from '../pages/icons/edit.png'
 
 import Post from '../components/Post';
 
@@ -198,7 +199,7 @@ const handleReplyChange = (e) => {
   }
 
 
-
+  // TODO
   const handleLikeComment = async (id) => {
   
   }
@@ -219,9 +220,20 @@ const handleReplyChange = (e) => {
     setReplyPopupOpen(false)
   }
 
+  // TODO
   const handleReplyComment = () => {
   
   }
+
+  // TODO
+  const handleCommentDelete = () => {
+    
+  }
+
+  const handleEditPopup = () => {
+    
+  }
+
 
   return (
     <div className="post-content-container">
@@ -273,6 +285,10 @@ const handleReplyChange = (e) => {
               comments.map(comment => {
                 const commentUser = commenters[comment.user]; 
                 const commentReplies = replies[comment._id] || []
+                console.log("comment: " + commentUser?.userName + "=== user: " + user.userName)
+                console.log("post: " + JSON.stringify(post[0]) + "=== user: " + user.userName)
+                
+                const canModify = commentUser?.userName === user.userName || post[0].user === user.userId
                 return (
                   <div className="comment" key={comment._id}> 
                     <div className="post-header">
@@ -286,7 +302,26 @@ const handleReplyChange = (e) => {
                         <div className="post-name">{commentUser?.displayName}</div>
                         <div className="post-username">@{commentUser?.userName}</div>
                       </div>
+                      { canModify && (
+                      <div className="modify-comment">
+
+                          <img
+                              src={editIcon}
+                              onClick={() => handleEditPopup(post, postEvent)}
+                              alt="Edit"
+                              className="edit-post-icon "
+                          />
+                          <img
+                              src={removeIcon}
+                              onClick={() => handleCommentDelete(post._id)}
+                              alt="Remove"
+                              className="remove-icon "
+                          />
+                      </div>
+                      )}
+
                     </div>
+
 
                     <div className="comment-content">
                       {comment.text}
