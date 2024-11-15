@@ -128,18 +128,25 @@ exports.addComment = async (req, res) => {
     try {
         const childComment = await Comment.findById(childId).exec();
         if (!childComment) {
-            return res.status(404).send({ message: `Cannot find child comment with id=${childId}` });
+            return res.status(402).send({ message: `Cannot find child comment with id=${childId}` });
         }
 
-        const parentComment = await Comment.findByIdAndUpdate(parentId, { $push: { comments: childComment._id } }, { new: true }).exec();
+        const parentComment = await Comment.findById(parentId).exec();
+        
         if (!parentComment) {
-            return res.status(404).send({ message: `Cannot find parent comment with id=${parentId}` });
+            return res.status(403).send({ message: `Cannot find parent comment with id=${parentId}` });
         }
 
-        return res.send({
-            message: "Child comment added to parent successfully",
-            parent: parentComment
-        });
+        if (!parentComment.isRoot) {
+            return res.status(403).send({message: 'Cannot add child to nonroot comment'})
+        }
+
+        parentComment.comments.push(childComment._id);
+        const updatedComment = await parentComment.save();
+
+        return res.send(
+            updatedComment
+        );
     } catch (err) {
         return res.status(500).send({
             message: `Error adding child comment id=${childId} to parent comment id=${parentId}`,
