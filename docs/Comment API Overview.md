@@ -9,6 +9,7 @@
 | DELETE | /api/comments/:id          | NONE                                                                    | Status Code: 200 / 404 / 500                        |
 | PUT    | /api/comments/:id          | {any updateable field}                                                  | { COMMENT }<br><br>Status Code: 200 / 409 / 498<br> |
 | POST   | /api/comments/addChild/:id | {"childId": \<childId\>}                                                | { COMMENT }                                         |
+| POST   | /api/comments/toggle-like  | { "commentId": string,<br>"like": boolean }                             | Status Code: 200                                    |
 **COMMENT** = {
 "timestamp" : Date \<timestamp of the comment\> (server created),
 "user": String \<user who made the comment\> (server created),
@@ -76,6 +77,15 @@ Used to add a comment to another comment.
 The id in the url is the parent comment, the id in the body is the child comment.
 
 The server will return the parent comment in the response body.
+
+---
+#### toggle-like
+
+| TYPE | PATH                      | REQUEST BODY                                | RESPONSE BODY    |
+| ---- | ------------------------- | ------------------------------------------- | ---------------- |
+| POST | /api/comments/toggle-like | { "commentId": string,<br>"like": boolean } | Status Code: 200 |
+
+Likes or unlikes a comment, and updates the like count and the user's list of liked comments accordingly.
 
 
 ### Notes
