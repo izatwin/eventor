@@ -229,7 +229,8 @@ const handleReplyChange = (e) => {
   const handleCommentDelete = () => {
     
   }
-
+ 
+  // TODO
   const handleEditPopup = () => {
     
   }
@@ -285,10 +286,10 @@ const handleReplyChange = (e) => {
               comments.map(comment => {
                 const commentUser = commenters[comment.user]; 
                 const commentReplies = replies[comment._id] || []
-                console.log("comment: " + commentUser?.userName + "=== user: " + user.userName)
-                console.log("post: " + JSON.stringify(post[0]) + "=== user: " + user.userName)
                 
-                const canModify = commentUser?.userName === user.userName || post[0].user === user.userId
+                const canDelete = commentUser?.userName === user.userName || post[0].user === user.userId
+                const canEdit = commentUser?.userName === user.userName 
+
                 return (
                   <div className="comment" key={comment._id}> 
                     <div className="post-header">
@@ -302,23 +303,27 @@ const handleReplyChange = (e) => {
                         <div className="post-name">{commentUser?.displayName}</div>
                         <div className="post-username">@{commentUser?.userName}</div>
                       </div>
-                      { canModify && (
                       <div className="modify-comment">
 
+                        {(canEdit && ( 
                           <img
                               src={editIcon}
                               onClick={() => handleEditPopup(post, postEvent)}
                               alt="Edit"
                               className="edit-post-icon "
                           />
+                        ))}
+
+                        {(canDelete && (
                           <img
                               src={removeIcon}
                               onClick={() => handleCommentDelete(post._id)}
                               alt="Remove"
                               className="remove-icon "
                           />
+                        ))}
+
                       </div>
-                      )}
 
                     </div>
 
