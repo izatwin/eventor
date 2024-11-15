@@ -132,3 +132,24 @@ def test_add_child_to_nonroot(new_comment, create_session, created_post_id):
 
     response3 = create_session.post(BASE_URL + f'/comments/addChild/{new_comment}', json=payload)
     assert response3.status_code == 403
+
+def test_like_comment(new_comment, create_session):
+    response1 = create_session.get(BASE_URL + f"/comments/{new_comment}")
+    assert response1.status_code == 200
+
+    current_likes = response1.json()["likes"]
+
+    like_payload = {"commentId": new_comment, "like": True}
+    response2 = create_session.post(BASE_URL + "/comments/toggle-like", json=like_payload)
+    assert response2.status_code == 200
+
+    response3 = create_session.get(BASE_URL + f"/comments/{new_comment}")
+    assert response3.json()["likes"] == current_likes + 1
+
+    unlike_payload = {"commentId": new_comment, "like": False}
+    response4 = create_session.post(BASE_URL + "/comments/toggle-like", json=unlike_payload)
+    assert response4.status_code == 200
+
+    response5 = create_session.get(BASE_URL + f"/comments/{new_comment}")
+    assert response5.json()["likes"] == current_likes
+
