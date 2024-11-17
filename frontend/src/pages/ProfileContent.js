@@ -4,8 +4,6 @@ import editIcon from './icons/edit.png'
 import eventIcon from './icons/event.png'
 import checkIcon from './icons/check.png'
 import removeIcon from './icons/remove.png'
-import expandIcon from './icons/expand.png'
-import commentIcon from './icons/comment.png'
 
 import axios from 'axios'
 import { useState, useEffect, useRef } from 'react';
@@ -13,7 +11,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../AuthContext'; 
 
-import { usePopup } from '../PopupContext';
 import Post from '../components/Post';
 
 
@@ -25,7 +22,6 @@ const ProfileContent= () => {
   const [editingBio, setEditingBio] = useState(false);
   const [posts, setPosts] = useState([]);
   const [eventsById, setEventsById] = useState({});
-  const [profilesById, setProfilesById] = useState({})
   const [isEditPopupOpen, setEditPopupOpen] = useState(false);
   const [isAddEventPopupOpen, setAddEventPopupOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
@@ -43,8 +39,6 @@ const ProfileContent= () => {
   const [status, setStatus] = useState("")
   
   const [eventStep, setEventStep] = useState("select-type")
-    
-  const { showSharePopup, updateShareCount, updateLike } = usePopup();
 
   const [isBlocked, setIsBlocked] = useState(false)
   const [isBlocking, setIsBlocking] = useState(false)
@@ -159,29 +153,11 @@ const ProfileContent= () => {
             if (!isBlockedResponse && !isBlockingResponse) {
               /* postResponse is a list of post ids */
               const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileId}/posts/`)).data
-              console.log("post res: ")
-              console.log(postResponse) 
               const postContents = []
               /* make request to get the content of each post using id */ 
               for (const currentPost of postResponse) {
                 const curPostData = (await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data
                 postContents.push(curPostData)
-
-                const posterResponse = await axios.get(`http://localhost:3001/api/user/${curPostData["user"]}`);
-                console.log("poster res:");
-                console.log(posterResponse.data);
-                const posterResponseInfo = posterResponse.data;
-                setProfilesById(prevProfiles => ({
-                  ...prevProfiles,
-                  [curPostData.user]: {
-                    displayName: posterResponseInfo.displayName,
-                    userName: posterResponseInfo.userName,
-                    userId: posterResponseInfo._id,
-                    status: posterResponseInfo.status,
-                    bio: posterResponseInfo.biography,
-                    pfp: posterResponseInfo.imageURL,
-                  }
-                }));
 
                 if (curPostData.eventId) {
                   if (!eventsById[curPostData.eventId]) {
@@ -197,8 +173,6 @@ const ProfileContent= () => {
 
               /* pass an array of posts to setPosts */
               /* sort posts */
-              console.log("postContents:") 
-              console.log(postContents) 
               setPosts(postContents)
             }
           }
@@ -856,7 +830,7 @@ const handleEventDateChange = (e) => {
               <Post
                 key={post._id}
                 post={post}
-                poster={profilesById[post.user]}
+                poster={profileUser}
                 postEvent={post.eventId && eventsById[post.eventId]}
                 setPost={setPosts}
                 handleAddEventPopup={handleAddEventPopup}

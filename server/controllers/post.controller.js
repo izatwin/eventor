@@ -323,7 +323,7 @@ exports.toggleLike = async (req, res) => {
         });
     }
 
-    const postId = req.body.postId;
+    const postId = new mongoose.Types.ObjectId(req.body.postId);
     const like = req.body.like; // Expect a boolean to indicate like or unlike
 
     let authenticated = false;
@@ -361,8 +361,6 @@ exports.toggleLike = async (req, res) => {
         var likedPosts = myUser.likedPosts || [];
         const isAlreadyLiked = likedPosts.includes(postId);
 
-        console.log(likedPosts);
-
         if (like && !isAlreadyLiked) {
             // Increment like
             post.likes += 1;
@@ -370,16 +368,13 @@ exports.toggleLike = async (req, res) => {
         } else if (!like && isAlreadyLiked) {
             // Decrement like
             post.likes -= 1;
-            likedPosts = likedPosts.filter(id => id !== postId);
+            likedPosts = likedPosts.filter(id => !id.equals(postId));
         } else {
             return res.status(400).send({ message: "Invalid operation." });
         }
 
         myUser.likedPosts = likedPosts;
         myUser.markModified('likedPosts');
-
-        console.log(myUser.likedPosts);
-
         await post.save();
         await myUser.save();
 
