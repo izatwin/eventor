@@ -24,3 +24,7 @@ exports.authenticateUser = async (req) => {
 
     return authenticated ? authenticatedUser : null;
 }
+
+exports.escapeRegExp = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes special characters
+};
