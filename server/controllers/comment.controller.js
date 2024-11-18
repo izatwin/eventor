@@ -218,7 +218,7 @@ exports.toggleLike = async (req, res) => {
         });
     }
 
-    const commentId = req.body.commentId;
+    const commentId = new mongoose.Types.ObjectId(req.body.commentId);
     const like = req.body.like; // Expect a boolean to indicate like or unlike
 
 
@@ -240,7 +240,7 @@ exports.toggleLike = async (req, res) => {
         } else if (!like && isAlreadyLiked) {
             // Decrement like
             comment.likes -= 1;
-            likedComments = likedComments.filter(id => id !== commentId);
+            likedComments = likedComments.filter(id => !id.equals(commentId));
         } else {
             return res.status(400).send({ message: "Invalid operation." });
         }
