@@ -2,6 +2,8 @@ const BaseEvent = require("../models/event");
 const User = require("../models/user")
 const Post = require("../models/post");
 
+const textfilter = require("../modules/textfilter.js");
+
 // Common function to authenticate the user
 async function authenticateUser(req) {
     let authenticatedUser = null;
@@ -81,6 +83,14 @@ exports.createEvent = async (req, res) => {
             });
         }
 
+        // Check for profanity
+        for (field in req.body) {
+            if (textfilter.containsProfanity(value)) {
+                res.status(422).json({ message: err.message || "Event content contains profanity." });
+                return;
+            }
+        }
+
         let event;
         if (eventType === 'NormalEvent') {
             event = new BaseEvent.discriminators.NormalEvent({ ...eventData, post: postId });
@@ -134,6 +144,14 @@ exports.editEvent = async (req, res) => {
             return res.status(403).send({
                 message: "You are not allowed to edit someone else's event."
             });
+        }
+
+        // Check for profanity
+        for (field in req.body) {
+            if (textfilter.containsProfanity(value)) {
+                res.status(422).json({ message: err.message || "Event content contains profanity." });
+                return;
+            }
         }
 
         // Object.assign(event, updates);

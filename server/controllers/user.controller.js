@@ -4,6 +4,7 @@ const Common = require(`./common.controller`)
 const crypto = require("crypto");
 
 const sendmail = require("../modules/sendmail.js");
+const textfilter = require("../modules/textfilter.js");
 
 var emailVerifications = {};
 class verificationStatus {
@@ -174,6 +175,15 @@ exports.signup = async (req, res) => {
     }
     // TODO sanity checks (type, format)
 
+    // Check for profanity
+    if (textfilter.containsProfanity(userName)) {
+        res.status(422).json({ message: err.message || "UserName contains profanity." });
+        return;
+    }
+    if (textfilter.containsProfanity(displayName)) {
+        res.status(422).json({ message: err.message || "DisplayName contains profanity." });
+        return;
+    }
 
     let myVerificationStatus = emailVerifications[email];
     if (!myVerificationStatus) {
@@ -564,6 +574,12 @@ exports.updateUsername = async (req, res) => {
         return;
     }
 
+    // Profanity Filter
+    if (textfilter.containsProfanity(newUsername)) {
+        res.status(422).json({ message: err.message || "UserName contains profanity." });
+        return;
+    }
+
     const existingUser = await User.findOne({ "userName": newUsername }).exec();
     if (existingUser) {
         res.status(409).send({
@@ -626,6 +642,12 @@ exports.updateDisplayName = async (req, res) => {
         return;
     }
 
+    // Profanity Filter
+    if (textfilter.containsProfanity(newDisplay)) {
+        res.status(422).json({ message: err.message || "DisplayName contains profanity." });
+        return;
+    }
+
     myUser.displayName = newDisplay;
 
     myUser.save(myUser)
@@ -671,6 +693,12 @@ exports.setBiography = async (req, res) => {
         }
 
         if (req.body.biography) {
+            // Profanity Filtering
+            if (textfilter.containsProfanity(req.body.biography)) {
+                res.status(422).json({ message: err.message || "Biography contains profanity." });
+                return;
+            }
+
             curUser.biography = req.body.biography
             curUser.save()
             return res.send({ user: curUser.getInfoForClient() })
@@ -697,6 +725,12 @@ exports.setStatus = async (req, res) => {
         }
 
         if (req.body.status) {
+            // Profanity Filtering
+            if (textfilter.containsProfanity(req.body.status)) {
+                res.status(422).json({ message: err.message || "Biography contains profanity." });
+                return;
+            }
+
             curUser.status = req.body.status
             curUser.save()
             return res.send({ user: curUser.getInfoForClient() })

@@ -35,130 +35,132 @@ const PostContent = () => {
     isRoot: false,
   })
   const [replies, setReplies] = useState({})
+  const [isEditPopupOpen, setEditPopupOpen] = useState(false);
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const userResponse = await axios.get("http://localhost:3001/api/user/validate");
-      console.log(userResponse);
-      if (userResponse.status === 200) {
-        console.log("here");
-        const userInfo = userResponse.data['user-info'];
-        console.log(userInfo);
-        setUser({
-          email: userInfo.email,
-          displayName: userInfo.displayName,
-          userName: userInfo.userName,
-          userId: userInfo.userId,
-          pfp: userInfo.imageURL,
-          likedPosts: userInfo.likedPosts
-        });
-      } else {
-        navigate("/");
-      }
-    } catch (err) {
-      navigate("/");
-      console.log(err);
-    }
 
-    console.log(`id: ${_id}`);
-    try {
-      const postResponse = await axios.get(`http://localhost:3001/api/posts/${_id}`);
-      console.log("feed posts res:");
-      console.log(postResponse.data);
-      setPost([postResponse.data]);
-
-      // Get event of post if it exists
-      if (postResponse.data["eventId"]) {
-        const eventResponse = await axios.get(`http://localhost:3001/api/events/${postResponse.data["eventId"]}`);
-        setPostEvent(eventResponse.data)
-      }
-
-      // Get the poster information
+  useEffect(() => {
+    const fetchData = async () => {
       try {
-        const posterResponse = await axios.get(`http://localhost:3001/api/user/${postResponse.data["user"]}`);
-        console.log("poster res:");
-        console.log(posterResponse.data);
-        const posterResponseInfo = posterResponse.data;
-        setPoster({
-          displayName: posterResponseInfo.displayName,
-          userName: posterResponseInfo.userName,
-          userId: posterResponseInfo._id,
-          status: posterResponseInfo.status,
-          bio: posterResponseInfo.biography,
-          pfp: posterResponseInfo.imageURL,
-        });
+        const userResponse = await axios.get("http://localhost:3001/api/user/validate");
+        console.log(userResponse);
+        if (userResponse.status === 200) {
+          console.log("here");
+          const userInfo = userResponse.data['user-info'];
+          console.log(userInfo);
+          setUser({
+            email: userInfo.email,
+            displayName: userInfo.displayName,
+            userName: userInfo.userName,
+            userId: userInfo.userId,
+            pfp: userInfo.imageURL,
+            likedPosts: userInfo.likedPosts
+          });
+        } else {
+          navigate("/");
+        }
+      } catch (err) {
+        navigate("/");
+        console.log(err);
+      }
+
+      console.log(`id: ${_id}`);
+      try {
+        const postResponse = await axios.get(`http://localhost:3001/api/posts/${_id}`);
+        console.log("feed posts res:");
+        console.log(postResponse.data);
+        setPost([postResponse.data]);
+
+        // Get event of post if it exists
+        if (postResponse.data["eventId"]) {
+          const eventResponse = await axios.get(`http://localhost:3001/api/events/${postResponse.data["eventId"]}`);
+          setPostEvent(eventResponse.data)
+        }
+
+        // Get the poster information
+        try {
+          const posterResponse = await axios.get(`http://localhost:3001/api/user/${postResponse.data["user"]}`);
+          console.log("poster res:");
+          console.log(posterResponse.data);
+          const posterResponseInfo = posterResponse.data;
+          setPoster({
+            displayName: posterResponseInfo.displayName,
+            userName: posterResponseInfo.userName,
+            userId: posterResponseInfo._id,
+            status: posterResponseInfo.status,
+            bio: posterResponseInfo.biography,
+            pfp: posterResponseInfo.imageURL,
+          });
+        } catch (err) {
+          console.log(err);
+        }
       } catch (err) {
         console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
 
-    try {
-      // get comments
-      const commentsResponse = await axios.get(`http://localhost:3001/api/comments/post/${_id}`);
-      console.log(`Comments are:`, commentsResponse.data);
-      setComments(commentsResponse.data);
+      try {
+        // get comments
+        const commentsResponse = await axios.get(`http://localhost:3001/api/comments/post/${_id}`);
+        console.log(`Comments are:`, commentsResponse.data);
+        setComments(commentsResponse.data);
 
-      // loop through each comment
-      for (const comment of commentsResponse.data) {
-        console.log("comment:", comment);
-      
-        try {
-          // get commenter of comment
-          const commenterResponse = await axios.get(`http://localhost:3001/api/user/${comment.user}`);
-          console.log("commenter response:", commenterResponse.data);
+        // loop through each comment
+        for (const comment of commentsResponse.data) {
+          console.log("comment:", comment);
+        
+          try {
+            // get commenter of comment
+            const commenterResponse = await axios.get(`http://localhost:3001/api/user/${comment.user}`);
+            console.log("commenter response:", commenterResponse.data);
 
-          if (!commenters[commenterResponse.data["_id"]]) {
-            setCommenters(prevCommenters => ({
-              ...prevCommenters,
-              [commenterResponse.data["_id"]]: commenterResponse.data
-            }));
+            if (!commenters[commenterResponse.data["_id"]]) {
+              setCommenters(prevCommenters => ({
+                ...prevCommenters,
+                [commenterResponse.data["_id"]]: commenterResponse.data
+              }));
+            }
+          } catch (err) {
+            console.log("Error fetching user data:", err);
           }
-        } catch (err) {
-          console.log("Error fetching user data:", err);
-        }
 
-        // get replies of comment
-        if (comment.comments && comment.comments.length > 0) {
-          for (const replyId of comment.comments) {
-            try {
-              const replyResponse = await axios.get(`http://localhost:3001/api/comments/${replyId}`);
-              console.log("Reply response:", replyResponse.data);
+          // get replies of comment
+          if (comment.comments && comment.comments.length > 0) {
+            for (const replyId of comment.comments) {
+              try {
+                const replyResponse = await axios.get(`http://localhost:3001/api/comments/${replyId}`);
+                console.log("Reply response:", replyResponse.data);
 
-              setReplies(prevReplies => {
-                const existingReplies = prevReplies[comment._id] || [];
-                
-                const isDuplicate = existingReplies.some(reply => reply._id === replyResponse.data._id);
+                setReplies(prevReplies => {
+                  const existingReplies = prevReplies[comment._id] || [];
+                  
+                  const isDuplicate = existingReplies.some(reply => reply._id === replyResponse.data._id);
 
-                // if not a duplicate add to replies
-                if (!isDuplicate) {
-                  return {
-                    ...prevReplies,
-                    [comment._id]: [...existingReplies, replyResponse.data]
-                  };
-                }
+                  // if not a duplicate add to replies
+                  if (!isDuplicate) {
+                    return {
+                      ...prevReplies,
+                      [comment._id]: [...existingReplies, replyResponse.data]
+                    };
+                  }
 
-                // If a duplicate, skip
-                return prevReplies;
-              });            
+                  // If a duplicate, skip
+                  return prevReplies;
+                });            
 
-            } catch (err) {
-              console.log("Error fetching reply:", err);
+              } catch (err) {
+                console.log("Error fetching reply:", err);
+              }
             }
           }
         }
+      } catch (err) {
+        console.log("Error fetching comments:", err);
       }
-    } catch (err) {
-      console.log("Error fetching comments:", err);
-    }
 
-    setLoading(false);
-  };
+      setLoading(false);
+    };
 
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
   
   useEffect(()=>{
     axios.post("http://localhost:3001/api/posts/action", {"postId": _id, "actionType": "view"});
@@ -205,7 +207,6 @@ const handleReplyChange = (e) => {
   }
   
   const handleReplyPopup = (comment) => {
-    console.log("red")
     setCurrentComment(comment);
     setReplyPopupOpen(true);
   }
@@ -231,10 +232,32 @@ const handleReplyChange = (e) => {
   }
  
   // TODO
-  const handleEditPopup = () => {
-    
+  const handleEditPopup = (comment) => {
+    setCurrentComment(comment);
+    setEditPopupOpen(true);
   }
 
+  const closeEditPopup = () => {
+    setEditPopupOpen(false);
+    setCurrentComment(null);    
+  };
+
+  /* 
+   * This function is called when the value of the textarea 
+   * involved in editing a comment is changed 
+   */
+  const handleCommentEditChange = (e) => {
+    setCurrentComment(prevComment => ({
+      ...prevComment,        
+      text: e.target.value 
+    }));
+  }
+
+  // TODO
+  const handleCommentEdit = () => {
+    // use currentComment to get id ... 
+    closeEditPopup();
+  }
 
   return (
     <div className="post-content-container">
@@ -308,7 +331,7 @@ const handleReplyChange = (e) => {
                         {(canEdit && ( 
                           <img
                               src={editIcon}
-                              onClick={() => handleEditPopup(post, postEvent)}
+                              onClick={() => handleEditPopup(comment)}
                               alt="Edit"
                               className="edit-post-icon "
                           />
@@ -402,7 +425,35 @@ const handleReplyChange = (e) => {
             </div>
           </div>
         )}
+        
+        {isEditPopupOpen && (
+          <div className="edit-popup">
+            <div className="edit-popup-content">
+              <h2>Edit comment</h2>
+              <textarea 
+                value={currentComment?.text || ''} 
+                className="edit-post-textarea"
+                onChange={handleCommentEditChange}  
+                placeholder="Edit your comment"
+                rows="5"
+                cols="30"
+              />
 
+              <button 
+                onClick={closeEditPopup} 
+                className="close-button">
+                x
+              </button>
+
+              <button 
+                onClick={handleCommentEdit} 
+                className="save-button">
+                Save
+              </button>
+            </div>
+          </div>
+        )}
+    
       </div>
     </div>
   );
