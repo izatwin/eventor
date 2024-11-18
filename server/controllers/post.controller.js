@@ -4,6 +4,7 @@ const Comment = require("../models/comment")
 const BaseEvent = require("../models/event")
 const mongoose = require("mongoose");
 
+const textfilter = require("../modules/textfilter.js");
 
 // Create and save a new Post
 exports.create = async (req, res) => {
@@ -38,6 +39,12 @@ exports.create = async (req, res) => {
     }
 
     try {
+        // Check for profanity
+        if (textfilter.containsProfanity(req.body.content)) {
+            res.status(422).json({ message: err.message || "Post content contains profanity." });
+            return;
+        }
+
         // Create the post
         const newPost = new Post({
             content: req.body.content,
@@ -230,6 +237,12 @@ exports.update = async (req, res) => {
             return res.status(403).send({
                 message: "You are not allowed to update someone else's post."
             });
+        }
+
+        // Check for profanity
+        if (textfilter.containsProfanity(req.body.content)) {
+            res.status(422).json({ message: err.message || "Post content contains profanity." });
+            return;
         }
 
         const updatedPost = await Post.findByIdAndUpdate(id, req.body, { runValidators: true, new: true });
