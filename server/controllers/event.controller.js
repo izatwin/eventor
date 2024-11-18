@@ -86,7 +86,7 @@ exports.createEvent = async (req, res) => {
         // Check for profanity
         for (field in req.body) {
             if (textfilter.containsProfanity(value)) {
-                res.status(422).json({ message: err.message || "Event content contains profanity." });
+                res.status(422).json({ message: "Event content contains profanity." });
                 return;
             }
         }
@@ -149,7 +149,7 @@ exports.editEvent = async (req, res) => {
         // Check for profanity
         for (field in req.body) {
             if (textfilter.containsProfanity(value)) {
-                res.status(422).json({ message: err.message || "Event content contains profanity." });
+                res.status(422).json({ message: "Event content contains profanity." });
                 return;
             }
         }

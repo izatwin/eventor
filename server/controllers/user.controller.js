@@ -177,11 +177,11 @@ exports.signup = async (req, res) => {
 
     // Check for profanity
     if (textfilter.containsProfanity(userName)) {
-        res.status(422).json({ message: err.message || "UserName contains profanity." });
+        res.status(422).json({ message: "UserName contains profanity." });
         return;
     }
     if (textfilter.containsProfanity(displayName)) {
-        res.status(422).json({ message: err.message || "DisplayName contains profanity." });
+        res.status(422).json({ message:  "DisplayName contains profanity." });
         return;
     }
 
@@ -576,7 +576,7 @@ exports.updateUsername = async (req, res) => {
 
     // Profanity Filter
     if (textfilter.containsProfanity(newUsername)) {
-        res.status(422).json({ message: err.message || "UserName contains profanity." });
+        res.status(422).json({ message:  "UserName contains profanity." });
         return;
     }
 
@@ -644,7 +644,7 @@ exports.updateDisplayName = async (req, res) => {
 
     // Profanity Filter
     if (textfilter.containsProfanity(newDisplay)) {
-        res.status(422).json({ message: err.message || "DisplayName contains profanity." });
+        res.status(422).json({ message:  "DisplayName contains profanity." });
         return;
     }
 
@@ -695,7 +695,7 @@ exports.setBiography = async (req, res) => {
         if (req.body.biography) {
             // Profanity Filtering
             if (textfilter.containsProfanity(req.body.biography)) {
-                res.status(422).json({ message: err.message || "Biography contains profanity." });
+                res.status(422).json({ message:  "Biography contains profanity." });
                 return;
             }
 
@@ -727,7 +727,7 @@ exports.setStatus = async (req, res) => {
         if (req.body.status) {
             // Profanity Filtering
             if (textfilter.containsProfanity(req.body.status)) {
-                res.status(422).json({ message: err.message || "Biography contains profanity." });
+                res.status(422).json({ message:  "Biography contains profanity." });
                 return;
             }
 
