@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from '../AuthContext'; 
+import { usePopup } from '../PopupContext';
+
 
 
 const SettingsContent = () => {
@@ -23,6 +25,7 @@ const SettingsContent = () => {
   const navigate = useNavigate();
 
   const { user, setUser } = useAuth();  
+  const { showOffensivePopup } = usePopup();
 
   useEffect(() => {
     axios.get("http://localhost:3001/api/user/validate") 

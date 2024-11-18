@@ -416,7 +416,7 @@ useEffect(() => {
     }
   };
 
-
+  // TODO: FOR IMAGE UPLOAD
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -424,6 +424,7 @@ useEffect(() => {
     }
   };
 
+  // TODO: FOR IMAGE UPLOAD
   const handleUploadClick = () => {
     document.getElementById('file-input').click();
   };
