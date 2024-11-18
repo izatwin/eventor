@@ -20,7 +20,6 @@ export const PopupProvider = ({ children }) => {
     setCurrentUrl(''); 
   };
   
-  // TODO 
   const updateShareCount= async (id) => {
     try {
       axios.post("http://localhost:3001/api/posts/action", {"postId": id, "actionType": "share"})
@@ -31,7 +30,6 @@ export const PopupProvider = ({ children }) => {
     }
   }
 
-  // TODO 
   const updateLike= async (id, shouldLike) => {
     try {
       axios.post("http://localhost:3001/api/posts/toggle-like", {"postId": id, "like": shouldLike})

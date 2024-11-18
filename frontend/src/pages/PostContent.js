@@ -6,6 +6,7 @@ import axios from 'axios'
 
 import profilePic from './icons/profile.png';
 import likeIcon from './icons/like.png'
+import likedIcon from './icons/liked.png'
 import commentIcon from './icons/comment.png'
 import removeIcon from '../pages/icons/remove.png'
 import editIcon from '../pages/icons/edit.png'
@@ -53,7 +54,8 @@ const PostContent = () => {
             userName: userInfo.userName,
             userId: userInfo.userId,
             pfp: userInfo.imageURL,
-            likedPosts: userInfo.likedPosts
+            likedPosts: userInfo.likedPosts,
+            likedComments: userInfo.likedComments
           });
         } else {
           navigate("/");
@@ -214,11 +216,65 @@ const PostContent = () => {
     return tempNewComment._id; 
   }
 
-
-  // TODO
-  const handleLikeComment = async (id) => {
-  
+  const updateCommentLike= async (id, shouldLike) => {
+    try {
+      axios.post("http://localhost:3001/api/comments/toggle-like", {"commentId": id, "like": shouldLike})
+      return true; // successfull
+    } catch (err) {
+      console.log(err)
+      return false;
+    }
   }
+
+  const updateCommentLikeCache = async (id, isReply, increment, rootId) => {
+    if (isReply) {
+      setReplies(prevComments => ({
+        ...prevComments,
+        [rootId]: prevComments[rootId].map(reply =>
+          reply._id === id
+            ? { ...reply, likes: reply.likes + increment }
+            : reply
+        )
+      }));
+
+    } else {
+      setComments(prevComments =>
+        prevComments.map(comment =>
+          comment._id === id ? { ...comment, likes: comment.likes + increment } : comment
+        )
+      );
+    }
+  }
+
+
+  const handleLikeComment = async (id, isReply, rootId) => {
+    var success = false
+    var likedComments = user.likedComments || [];
+    if (likedComments.includes(id)) {
+      success = await updateCommentLike(id, false);
+      if (success) {
+        updateCommentLikeCache(id, isReply, -1, rootId)
+        likedComments = likedComments.filter(curId => curId !== id)
+
+      }
+
+    } else {
+      success = await updateCommentLike(id, true);
+      if (success) {
+        updateCommentLikeCache(id, isReply, 1, rootId)
+        likedComments.push(id)
+      }
+    }
+    setUser(prevUser => ({
+      ...prevUser,
+      likedComments: likedComments
+    }))
+
+    if (!success) {
+      console.error('Error updating like status');
+    }
+  };
+
   
   const handleReplyPopup = (comment) => {
     setCurrentComment(comment);
@@ -317,7 +373,7 @@ const PostContent = () => {
 
             <div className="comment-buttons">
               <button 
-                onClick={()=>handleComment(newComment)} 
+                onClick={()=>handleComment(false)} 
                 className="comment-btn"> 
                 Comment 
               </button> 
@@ -339,7 +395,8 @@ const PostContent = () => {
                 const commentReplies = replies[comment._id] || []
                 
                 const canDelete = commentUser?.userName === user.userName || post[0].user === user.userId
-                const canEdit = commentUser?.userName === user.userName 
+                const canEdit = commentUser?.userName === user.userName
+                const isLiking = user?.likedComments?.includes(comment._id);
 
                 return (
                   <div className="comment" key={comment._id}> 
@@ -384,8 +441,8 @@ const PostContent = () => {
                     </div>
 
                     <div className="comment-buttons buttons">
-                      <img onClick={() => handleLikeComment()} src={likeIcon} alt="Like" className="like-icon post-icon" />
-                      <div className="likes-num num"> {0} </div>
+                      <img onClick={() => handleLikeComment(comment._id, false, comment._id)} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon" />
+                      <div className="likes-num num"> {comment.likes} </div>
                       <img onClick={()=>{handleReplyPopup(comment)}}src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
                       <div className="comment-num num">{0}</div>
                     </div>
@@ -395,6 +452,7 @@ const PostContent = () => {
                       <div className="replies-section">
                         {commentReplies.map(reply => {
                           const replyUser = commenters[reply.user];
+                          const isLiking = user?.likedComments?.includes(reply._id);
                           return (
                             <div className="comment-reply" key={reply._id}>
                               <div className="post-header">
@@ -412,8 +470,8 @@ const PostContent = () => {
                               <div className="comment-content">{reply.text}</div>
 
                               <div className="comment-buttons buttons">
-                                <img onClick={() => handleLikeComment()} src={likeIcon} alt="Like" className="like-icon post-icon" />
-                                <div className="likes-num num"> {0} </div>
+                                <img onClick={() => handleLikeComment(reply._id, true, comment._id)} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon" />
+                                <div className="likes-num num"> {reply.likes} </div>
                               </div>
 
                             </div>
