@@ -453,6 +453,8 @@ const PostContent = () => {
                         {commentReplies.map(reply => {
                           const replyUser = commenters[reply.user];
                           const isLiking = user?.likedComments?.includes(reply._id);
+                          const canDeleteReply = replyUser.userName === user.userName || post[0].user === replyUser._id
+                          const canEditReply = replyUser.userName === user.userName
                           return (
                             <div className="comment-reply" key={reply._id}>
                               <div className="post-header">
@@ -465,9 +467,36 @@ const PostContent = () => {
                                   <div className="post-name">{replyUser?.displayName}</div>
                                   <div className="post-username">@{replyUser?.userName}</div>
                                 </div>
+
+                                <div className="modify-reply">
+
+                                  {(canEditReply && ( 
+                                    <img
+                                      src={editIcon}
+                                      onClick={() => handleEditPopup(comment)}
+                                      alt="Edit"
+                                      className="edit-post-icon "
+                                    />
+                                  ))}
+
+                                  {(canDeleteReply && (
+                                    <img
+                                      src={removeIcon}
+                                      onClick={() => handleCommentDelete(post._id)}
+                                      alt="Remove"
+                                      className="remove-icon "
+                                    />
+                                  ))}
+
+                                </div>
+
                               </div>
 
+ 
+
                               <div className="comment-content">{reply.text}</div>
+                              
+
 
                               <div className="comment-buttons buttons">
                                 <img onClick={() => handleLikeComment(reply._id, true, comment._id)} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon" />
