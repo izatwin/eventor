@@ -65,6 +65,8 @@ const DiscoverContent = () => {
         else {
           response = await axios.post(`http://localhost:3001/api/posts/search`, { query: query, category: categoryMapping[category]});
           setPosts(response.data)
+          // We have the posts, but we need supporting data.
+          await processPosts(response.data)
         }
         if (response === undefined || response.data.length < 1) {
           showFailPopup("No Results");
@@ -87,6 +89,44 @@ const DiscoverContent = () => {
     setQuery(""); 
     setCategory("");
   };
+
+  const processPosts = async (posts) => {
+    await Promise.all(
+      posts.map(async (post) => {
+        try {
+          // Fetch post owner details
+          const postOwner = await axios.get(`http://localhost:3001/api/user/${post.user}`);
+          const { displayName, userName, imageURL } = postOwner.data;
+
+          setProfilesById((prevProfiles) => ({
+            ...prevProfiles,
+            [post.user]: {
+              displayName: displayName,
+              userName: userName,
+              pfp: imageURL,
+            },
+          }));
+
+          // Fetch event details if the post has an eventId
+          if (post.eventId) {
+            if (!eventsById[post.eventId]) {
+              const event = (await axios.get(`http://localhost:3001/api/events/${post.eventId}`)).data;
+
+              setEventsById((prevEvents) => ({
+                ...prevEvents,
+                [post.eventId]: event,
+              }));
+            }
+          }
+        } catch (error) {
+          console.error(`Error processing post with ID ${post.id}:`, error);
+        }
+      })
+    );
+
+    console.log("All posts have been processed.");    
+  };
+  
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -202,7 +242,7 @@ const DiscoverContent = () => {
               <Post
                 key={post._id}
                 post={post}
-                poster={profileUser}
+                poster={profilesById[post.user]}
                 postEvent={post.eventId && eventsById[post.eventId]}
                 setPost={setPosts}
               />
