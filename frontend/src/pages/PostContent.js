@@ -101,7 +101,8 @@ const PostContent = () => {
         // get comments
         const commentsResponse = await axios.get(`http://localhost:3001/api/comments/post/${_id}`);
         console.log(`Comments are:`, commentsResponse.data);
-        setComments(commentsResponse.data);
+        const rootComments = commentsResponse.data.filter(comment => comment.isRoot === true);
+        setComments(rootComments);
 
         // loop through each comment
         for (const comment of commentsResponse.data) {
@@ -170,19 +171,32 @@ const PostContent = () => {
     setNewComment({ ...newComment, [e.target.name]: e.target.value });
   }
 
-const handleReplyChange = (e) => {
+  const handleReplyChange = (e) => {
     setReplyComment({ ...replyComment, [e.target.name]: e.target.value });
   }
 
-  const handleComment = async () => {
-    const tempNewComment = (await axios.post(`http://localhost:3001/api/comments`, {"comment": newComment, "postId": post[0]._id})).data
+  const handleComment = async (isReply) => {
+    const tempNewComment = (await axios.post(`http://localhost:3001/api/comments`, {"comment": isReply ? replyComment : newComment, "postId": post[0]._id})).data
     console.log("tempNEWCOMMENT:")
     console.log(tempNewComment)
-    setComments((prevComments) => [tempNewComment, ...prevComments]);
-    setNewComment({
-      text: "",
-      isRoot: true
-    })
+    if (isReply) {
+      setReplies(prevReplies => {
+        return {
+          ...prevReplies, [currentComment._id]: [...(prevReplies[currentComment._id] || []), tempNewComment]
+        }
+      });    
+      setReplyComment({
+        text: "",
+        isRoot: false
+      })
+    }
+    else {
+      setComments((prevComments) => [tempNewComment, ...prevComments]);
+      setNewComment({
+        text: "",
+        isRoot: true
+      })
+    }
     axios.get(`http://localhost:3001/api/user/${tempNewComment.user}`)
       .then(response => {
         console.log("commenter response:", response.data);
@@ -197,7 +211,7 @@ const handleReplyChange = (e) => {
       .catch(err => {
         console.log("Error fetching user data:", err);
       });
-
+    return tempNewComment._id; 
   }
 
 
@@ -221,9 +235,23 @@ const handleReplyChange = (e) => {
     setReplyPopupOpen(false)
   }
 
-  // TODO
-  const handleReplyComment = () => {
-  
+  const handleReplyComment = async () => {
+    console.log("new comment: ")
+    console.log(newComment)
+    handleComment(replyComment).then((childId)=> {
+      axios.post(`http://localhost:3001/api/comments/addChild/${currentComment._id}`, {"childId": childId})
+      .then(response => {
+        console.log("reply response:", response.data);
+      })
+      .catch(err => {
+        console.log("Error creating reply:", err);
+      });   
+    })
+    .catch(err => {
+      console.log("Error creating comment:", err)
+    });
+
+    setReplyPopupOpen(false)
   }
 
   // TODO
@@ -289,7 +317,7 @@ const handleReplyChange = (e) => {
 
             <div className="comment-buttons">
               <button 
-                onClick={handleComment} 
+                onClick={()=>handleComment(newComment)} 
                 className="comment-btn"> 
                 Comment 
               </button> 
