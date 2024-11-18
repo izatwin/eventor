@@ -42,6 +42,7 @@ exports.create = async (req, res) => {
         const newPost = new Post({
             content: req.body.content,
             is_event: req.body.is_event,
+            embeddedImage: req.body.embeddedImage,
             user: authenticatedUser._id
         });
 

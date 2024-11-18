@@ -9,6 +9,7 @@ const PostSchema = new Schema({
     shares: { type: Number, min: 0, required: true, default: 0 },
     likes: { type: Number, min: 0, required: true, default: 0 },
     content: { type: String },
+    embeddedImage: { type: String, required: false },
     is_event: { type: Boolean, required: true },
     eventId: { type: Schema.Types.ObjectId, required: false },
     commentsEnabled: { type: Boolean, required: true, default: true },
