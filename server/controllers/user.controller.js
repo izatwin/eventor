@@ -1,5 +1,6 @@
 const User = require("../models/user")
 const Post = require("../models/post")
+const Common = require(`./common.controller`)
 const crypto = require("crypto");
 
 const sendmail = require("../modules/sendmail.js");
@@ -1113,15 +1114,11 @@ exports.checkBlockStatus = async (req, res) => {
     }
 };
 
-const escapeRegExp = (string) => {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escapes special characters
-};
-
 
 // Searching
 exports.searchUsers = async (req, res) => {
     const query = req.body.query;
-    const safeQuery = escapeRegExp(query)
+    const safeQuery = Common.escapeRegExp(query)
 
     if (!query) {
         return res.status(400).send({

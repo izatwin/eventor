@@ -5,10 +5,17 @@ import axios from 'axios';
 import profilePic from './icons/profile.png'; 
 import { useAuth } from '../AuthContext'; 
 
+import Post from '../components/Post';
+
+
 const DiscoverContent = () => { 
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [suggestions, setSuggestions] = useState([]);  
+  const [suggestions, setSuggestions] = useState([]);
+  const [isPosts, setIsPosts] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [eventsById, setEventsById] = useState({});
+  const [profilesById, setProfilesById] = useState({})
   const { setUser } = useAuth();  
   const navigate = useNavigate();
   const categories = ["Users", "Post Content", "Event Title", "Event Location"] 
@@ -53,15 +60,27 @@ const DiscoverContent = () => {
       try {
         let response;
         if (category === "Users") {
-           response = await axios.post(`http://localhost:3001/api/user/search`, { "query": query });
+          response = await axios.post(`http://localhost:3001/api/user/search`, { "query": query });
         }
-        else { 
-          //response = await axios.post(`http://localhost:3001/api/posts/search`, { query: query, category: categoryMapping[category]});
+        else {
+          response = await axios.post(`http://localhost:3001/api/posts/search`, { query: query, category: categoryMapping[category]});
+          setPosts(response.data)
+          // We have the posts, but we need supporting data.
+          await processPosts(response.data)
         }
         if (response === undefined || response.data.length < 1) {
           showFailPopup("No Results");
         } else {
+          
+          if (category === "Users") { // Set IsPosts here instead of above category check so that the page does not disappear in case bool changes
+            setIsPosts(false)
+          } else {
+            setIsPosts(true)
+          }
+
           setSearchResults(response.data);
+          console.log("SEARCH FOR POSTS")
+          console.log(response.data)
         }
       } catch (error) {
         console.error(error);
@@ -70,6 +89,44 @@ const DiscoverContent = () => {
     setQuery(""); 
     setCategory("");
   };
+
+  const processPosts = async (posts) => {
+    await Promise.all(
+      posts.map(async (post) => {
+        try {
+          // Fetch post owner details
+          const postOwner = await axios.get(`http://localhost:3001/api/user/${post.user}`);
+          const { displayName, userName, imageURL } = postOwner.data;
+
+          setProfilesById((prevProfiles) => ({
+            ...prevProfiles,
+            [post.user]: {
+              displayName: displayName,
+              userName: userName,
+              pfp: imageURL,
+            },
+          }));
+
+          // Fetch event details if the post has an eventId
+          if (post.eventId) {
+            if (!eventsById[post.eventId]) {
+              const event = (await axios.get(`http://localhost:3001/api/events/${post.eventId}`)).data;
+
+              setEventsById((prevEvents) => ({
+                ...prevEvents,
+                [post.eventId]: event,
+              }));
+            }
+          }
+        } catch (error) {
+          console.error(`Error processing post with ID ${post.id}:`, error);
+        }
+      })
+    );
+
+    console.log("All posts have been processed.");    
+  };
+  
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -180,15 +237,28 @@ const DiscoverContent = () => {
             <p> Enter a search to get started with discovery</p>
           </div>
         ) : (
-          searchResults.map(result => (
-            <div className="profile-card" onClick={() => navigate(`/profile/${result._id}`)} key={result._id}> 
-              <img src={result.imageURL || profilePic} alt="PostProfile" className="post-profilepic" />
-              <div className="post-profile-info">
-                <div className="post-name">{result.displayName}</div>
-                <div className="post-username">{result.userName}</div>
-              </div>      
-            </div>
-          ))
+          isPosts ? (
+            posts.map((post) => (
+              <Post
+                key={post._id}
+                post={post}
+                poster={profilesById[post.user]}
+                postEvent={post.eventId && eventsById[post.eventId]}
+                setPost={setPosts}
+              />
+            ))
+          ) : (
+
+            searchResults.map(result => (
+              <div className="profile-card" onClick={() => navigate(`/profile/${result._id}`)} key={result._id}>
+                <img src={result.imageURL || profilePic} alt="PostProfile" className="post-profilepic" />
+                <div className="post-profile-info">
+                  <div className="post-name">{result.displayName}</div>
+                  <div className="post-username">{result.userName}</div>
+                </div>
+              </div>
+            ))
+          )
         )}
 
         <div className="postPopups">

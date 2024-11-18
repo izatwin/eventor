@@ -1,6 +1,7 @@
 const Post = require("../models/post");
 const User = require("../models/user");
 const Comment = require("../models/comment")
+const Common = require(`./common.controller`)
 const BaseEvent = require("../models/event")
 const mongoose = require("mongoose");
 
@@ -521,7 +522,7 @@ exports.searchPosts = async (req, res) => {
         });
     }
 
-    const safeQuery = escapeRegExp(query);
+    const safeQuery = Common.escapeRegExp(query);
     const regex = new RegExp(safeQuery, 'i');
 
     try {
