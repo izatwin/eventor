@@ -311,8 +311,19 @@ const PostContent = () => {
   }
 
   // TODO
-  const handleCommentDelete = () => {
-    
+  const handleCommentDelete = (id, isRoot, rootId) => {
+    // api request
+    axios.delete(`http://localhost:3001/api/comments/${id}`)
+      .then((response) => {
+        if (isRoot) {
+          setComments(prevComments =>prevComments.filter((comment) => comment._id !== id))
+        } //else {
+
+        //}
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
  
   // TODO
@@ -338,8 +349,22 @@ const PostContent = () => {
   }
 
   // TODO
-  const handleCommentEdit = () => {
+  const handleCommentEdit = (isRoot) => {
     // use currentComment to get id ... 
+    const { _id, content: text } = currentComment;
+    axios.put(`http://localhost:3001/api/comments/${_id}`, {"text": text})
+      .then((response) => {
+        if (isRoot) {
+          setComments((prevComments) =>
+            prevComments.map((comment) =>
+              comment._id === currentComment._id ? { ...comment, text: text } : comment
+            )
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      });
     closeEditPopup();
   }
 
@@ -425,7 +450,7 @@ const PostContent = () => {
                         {(canDelete && (
                           <img
                               src={removeIcon}
-                              onClick={() => handleCommentDelete(post._id)}
+                              onClick={() => handleCommentDelete(comment._id, true, comment._id)}
                               alt="Remove"
                               className="remove-icon "
                           />
