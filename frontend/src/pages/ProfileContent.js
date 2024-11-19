@@ -451,21 +451,22 @@ useEffect(() => {
    * involved in editing a post is changed 
    */
   const handlePostEditChange = (e) => {
+    console.log(e.target)
     setCurrentPost(prevPost => ({
       ...prevPost,        
-      content: e.target.value 
+      [e.target.name]: e.target.value 
     }));
   }
 
   const handlePostEdit = () => {
 
-    const { _id, content } = currentPost;
-    axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content})
+    const { _id, content, embeddedImage } = currentPost;
+    axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content, "embeddedImage": embeddedImage})
 
     // Update the post dynamically on the page
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
-        post._id === _id ? { ...post, content: content } : post
+        post._id === _id ? { ...post, content: content, embeddedImage: embeddedImage} : post
       )
     );
     
@@ -870,11 +871,23 @@ const handleEventDateChange = (e) => {
           <div className="edit-popup">
             <div className="edit-popup-content">
               <h2>Edit post</h2>
-              <textarea 
+              <p>Content</p>
+              <textarea
+                name="content"
                 value={currentPost?.content || ''} 
-                className="edit-post-textarea"
+                className="textarea-field input-field"
                 onChange={handlePostEditChange}  
-                placeholder="Edit your post"
+                placeholder="Edit your post content"
+                rows="5"
+                cols="30"
+              />
+              <p>Image URL</p>
+              <textarea
+              name="embeddedImage"
+                value={currentPost?.embeddedImage || ''}
+                className="textarea-field input-field"
+                onChange={handlePostEditChange}
+                placeholder="Edit your post image URL"
                 rows="5"
                 cols="30"
               />
