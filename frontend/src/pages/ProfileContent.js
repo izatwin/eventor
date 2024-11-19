@@ -2,6 +2,7 @@ import "../styles/ProfileContent.css";
 import profilePic from './icons/profile.png'; 
 import editIcon from './icons/edit.png'
 import eventIcon from './icons/event.png'
+import imageIcon from './icons/image.png'
 import checkIcon from './icons/check.png'
 import removeIcon from './icons/remove.png'
 
@@ -26,6 +27,7 @@ const ProfileContent= () => {
   const [eventsById, setEventsById] = useState({});
   const [isEditPopupOpen, setEditPopupOpen] = useState(false);
   const [isAddEventPopupOpen, setAddEventPopupOpen] = useState(false);
+  const [isAddImage, setIsAddImage] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
   
   const [newPost, setNewPost] = useState({
@@ -414,7 +416,7 @@ useEffect(() => {
       console.log("posting res: ");
       console.log(response.data);
       showSuccessPopup("Post created successfully!");
-      setNewPost({ ...newPost, content: "" });
+      setNewPost({ ...newPost, content: "", embeddedImage: "" });
       setPosts((prevPosts) => [response.data, ...prevPosts]);
       console.log("RETURNING: " + response.data['_id']);
       return response.data['_id'];  
@@ -465,22 +467,24 @@ useEffect(() => {
    * involved in editing a post is changed 
    */
   const handlePostEditChange = (e) => {
+    console.log(e.target)
     setCurrentPost(prevPost => ({
       ...prevPost,        
-      content: e.target.value 
+      [e.target.name]: e.target.value 
     }));
   }
 
   const handlePostEdit = async () => {
 
-    const { _id, content } = currentPost;
-    axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content})
+
+    const { _id, content, embeddedImage } = currentPost;
+    axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content, "embeddedImage": embeddedImage})
     .then(()=> {
 
       // Update the post dynamically on the page
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
-          post._id === _id ? { ...post, content: content } : post
+          post._id === _id ? { ...post, content: content, embeddedImage: embeddedImage } : post
         )
       );
     })
@@ -596,6 +600,10 @@ const handleAddEvent = async () => {
     setAddEventPopupOpen(true); 
     setEventStep('select-type')
     setNewEvent(defaultNewEvent)
+  }
+
+  const handleAddImageBox = (statusChange) => {
+    setIsAddImage(statusChange)
   }
 
   const closeAddEventPopup = () => {
@@ -799,87 +807,126 @@ const handleEventDateChange = (e) => {
           </div>
 
         </div>
-        
-        { isOwnProfile && (
-          <div className="post-card">
-            
-            <div className="post-input">
-              <textarea 
-                name="content" 
-                className="post-text" 
-                value={newPost.content} 
-                type="text" 
-                onChange={handlePostChange} 
-                placeholder="What will you be hosting next?"/>
-            </div>
+        <div className="profile-post-feed-container">
+          {isOwnProfile && (
+            <div className="post-card">
 
-            <div className="post-buttons">
-              <img 
-                src={eventIcon} 
-                alt="Event" 
-                className="event-icon"
-                onClick={() => handleAddEventPopup()} 
-              /> 
+              <div className="post-input">
+                <textarea
+                  name="content"
+                  className="post-text"
+                  value={newPost.content}
+                  type="text"
+                  onChange={handlePostChange}
+                  placeholder="What will you be hosting next?" />
+              </div>
 
-              <button 
-                onClick={handlePost} 
-                className="post-btn"> 
-                Post 
-              </button> 
-            </div>
-              
-          </div>
-        )}
-        
-        
-        <div className="profile-feed">
-          {isBlocking ? (
-            <div className="empty-message">
-              <h2 className="block-message">This User is Blocked</h2>
-              <p>You won't see posts from this user.</p>
-            </div>
-          ) : isBlocked ? (
-            <div className="empty-message">
-              <h2 className="block-message">This user has you blocked</h2>
-              <p>You do not have permission to view this user's post.</p>
-            </div>
-          ) : posts.length === 0 ? (
-            isOwnProfile ? (
-              <div className="empty-message">
-                <h2>Nothing Here Yet</h2>
-                <p>Create a post for it to show up on your profile!</p>
+              {isAddImage && (
+                <div>
+                  <textarea
+                    name="embeddedImage"
+                    className="input-field"
+                    value={newPost.embeddedImage}
+                    type="text"
+                    onChange={handlePostChange}
+                    placeholder="Insert Image URL here" />
+                </div>
+              )}
+
+              {newPost.embeddedImage && (
+                <img
+                  src={newPost.embeddedImage}
+                  alt="Post Image"
+                  className="event-embeddedImage"
+                />
+              )}
+
+              <div className="post-buttons">
+                <img
+                  src={eventIcon}
+                  alt="Event"
+                  className="event-icon"
+                  onClick={() => handleAddEventPopup()}
+                />
+                <img
+                  src={imageIcon}
+                  alt="Image"
+                  className="image-icon"
+                  onClick={() => handleAddImageBox(!isAddImage)}
+                />
+
+                <button
+                  onClick={handlePost}
+                  className="post-btn">
+                  Post
+                </button>
               </div>
-            ) : (
-              <div className="empty-message">
-                <h2>Nothing Here Yet</h2>
-                <p>Come back later!</p>
-              </div>
-            )
-          ) : (
-            posts.map((post) => (
-              <Post
-                key={post._id}
-                post={post}
-                poster={profileUser}
-                postEvent={post.eventId && eventsById[post.eventId]}
-                setPost={setPosts}
-                handleAddEventPopup={handleAddEventPopup}
-                handleEditPopup={handleEditPopup}
-                handlePostDelete={handlePostDelete}
-                isProfile={true}
-              />
-            ))
+
+            </div>
           )}
+
+
+          <div className="profile-feed">
+            {isBlocking ? (
+              <div className="empty-message">
+                <h2 className="block-message">This User is Blocked</h2>
+                <p>You won't see posts from this user.</p>
+              </div>
+            ) : isBlocked ? (
+              <div className="empty-message">
+                <h2 className="block-message">This user has you blocked</h2>
+                <p>You do not have permission to view this user's post.</p>
+              </div>
+            ) : posts.length === 0 ? (
+              isOwnProfile ? (
+                <div className="empty-message">
+                  <h2>Nothing Here Yet</h2>
+                  <p>Create a post for it to show up on your profile!</p>
+                </div>
+              ) : (
+                <div className="empty-message">
+                  <h2>Nothing Here Yet</h2>
+                  <p>Come back later!</p>
+                </div>
+              )
+            ) : (
+              posts.map((post) => (
+                <Post
+                  key={post._id}
+                  post={post}
+                  poster={profileUser}
+                  postEvent={post.eventId && eventsById[post.eventId]}
+                  setPost={setPosts}
+                  handleAddEventPopup={handleAddEventPopup}
+                  handleEditPopup={handleEditPopup}
+                  handlePostDelete={handlePostDelete}
+                  isProfile={true}
+                />
+              ))
+            )}
+          </div>
         </div>
         {isEditPopupOpen && (
           <div className="edit-popup">
             <div className="edit-popup-content">
               <h2>Edit post</h2>
-              <textarea 
+              <p>Content</p>
+              <textarea
+                name="content"
                 value={currentPost?.content || ''} 
-                className="edit-post-textarea"
+                className="textarea-field input-field"
                 onChange={handlePostEditChange}  
-                placeholder="Edit your post"
+                placeholder="Edit your post content"
+                rows="5"
+                cols="30"
+              />
+              <p>Image URL</p>
+              <textarea
+              name="embeddedImage"
+                value={currentPost?.embeddedImage || ''}
+                className="textarea-field input-field"
+                onChange={handlePostEditChange}
+                placeholder="Edit your post image URL"
                 rows="5"
                 cols="30"
               />

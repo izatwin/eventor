@@ -208,12 +208,16 @@
     
 }
 
+.profile-post-feed-container {
+  overflow-y: auto;
+}
+
 .post-card {
   width: 100%; 
   padding: 10px;
   box-sizing: border-box; 
   border-bottom: 1px solid black; 
-  height: 15vh;
+  height: auto;
 }
 
 .post-input {
@@ -436,6 +440,15 @@
 
 .post-content {
 }
+
+.post-embeddedImage {
+  width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+
 
 .edit-popup {
   position: fixed;
