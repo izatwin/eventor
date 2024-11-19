@@ -31,6 +31,8 @@ const PostContent = () => {
   const [loading, setLoading] = useState(true); 
   const [isReplyPopupOpen, setReplyPopupOpen] = useState(false);
   const [currentComment, setCurrentComment] = useState(null);
+  const [isCurrentCommentRoot, setIsCurrentCommentRoot] = useState(false);
+  const [currentCommentRootId, setCurrentCommentRootId] = useState(null);
   const [replyComment, setReplyComment] = useState({
     text: "",
     isRoot: false,
@@ -311,13 +313,29 @@ const PostContent = () => {
   }
 
   // TODO
-  const handleCommentDelete = () => {
-    
+  const handleCommentDelete = (id, isRoot, rootId) => {
+    // api request
+    axios.delete(`http://localhost:3001/api/comments/${id}`)
+      .then((response) => {
+        if (isRoot) {
+          setComments(prevComments => prevComments.filter((comment) => comment._id !== id))
+        } else {
+          setReplies(prevComments => ({
+            ...prevComments,
+            [rootId]: prevComments[rootId].filter(reply => reply._id !== id)
+          }));
+
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
   }
  
-  // TODO
-  const handleEditPopup = (comment) => {
+  const handleEditPopup = (comment, isRoot, rootId) => {
     setCurrentComment(comment);
+    setIsCurrentCommentRoot(isRoot)
+    setCurrentCommentRootId(rootId)
     setEditPopupOpen(true);
   }
 
@@ -337,9 +355,33 @@ const PostContent = () => {
     }));
   }
 
-  // TODO
   const handleCommentEdit = () => {
     // use currentComment to get id ... 
+    const { _id, text: text } = currentComment;
+    axios.put(`http://localhost:3001/api/comments/${_id}`, {"text": text})
+      .then((response) => {
+        
+        if (isCurrentCommentRoot) {
+          setComments((prevComments) =>
+            prevComments.map((comment) =>
+              comment._id === currentComment._id ? { ...comment, text: text } : comment
+            )
+          );
+        } else {
+          console.log(currentComment)
+          setReplies(prevComments => ({
+            ...prevComments,
+            [currentCommentRootId]: prevComments[currentCommentRootId].map(reply =>
+              reply._id === currentComment._id
+                ? { ...reply, text: currentComment.text }
+                : reply
+            )
+          }));
+        }
+      })
+      .catch((err) => {
+        console.log(err)
+      });
     closeEditPopup();
   }
 
@@ -416,7 +458,7 @@ const PostContent = () => {
                         {(canEdit && ( 
                           <img
                               src={editIcon}
-                              onClick={() => handleEditPopup(comment)}
+                              onClick={() => handleEditPopup(comment, true, comment._id)}
                               alt="Edit"
                               className="edit-post-icon "
                           />
@@ -425,7 +467,7 @@ const PostContent = () => {
                         {(canDelete && (
                           <img
                               src={removeIcon}
-                              onClick={() => handleCommentDelete(post._id)}
+                              onClick={() => handleCommentDelete(comment._id, true, comment._id)}
                               alt="Remove"
                               className="remove-icon "
                           />
@@ -473,7 +515,7 @@ const PostContent = () => {
                                   {(canEditReply && ( 
                                     <img
                                       src={editIcon}
-                                      onClick={() => handleEditPopup(comment)}
+                                      onClick={() => handleEditPopup(reply, false, comment._id)}
                                       alt="Edit"
                                       className="edit-post-icon "
                                     />
@@ -482,7 +524,7 @@ const PostContent = () => {
                                   {(canDeleteReply && (
                                     <img
                                       src={removeIcon}
-                                      onClick={() => handleCommentDelete(post._id)}
+                                      onClick={() => handleCommentDelete(reply._id, false, comment._id)}
                                       alt="Remove"
                                       className="remove-icon "
                                     />
