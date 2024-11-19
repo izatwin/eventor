@@ -43,9 +43,12 @@ export const PopupProvider = ({ children }) => {
 
 
   const showOffensivePopup = (message) => {
-    var popup = document.getElementById("fail");
+    console.log("IN POP")
+    console.log(message)
+    var popup = document.getElementById("offensive");
     setPopupMessage(message)
     popup.classList.add("show");
+    console.log(message)
 
     setTimeout(function() {
         popup.classList.remove("show"); 
@@ -70,7 +73,7 @@ export const PopupProvider = ({ children }) => {
           </div>
         </div>
       )}
-      <div className="popup" id="fail">{popupMessage}</div>
+      <div className="offensive-popup" id="offensive">{popupMessage}</div>
     </PopupContext.Provider>
   );
 };

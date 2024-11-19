@@ -83,6 +83,9 @@ const SettingsContent = () => {
       else {
       }
     } catch (err) {
+      if (err.response.status === 422) {
+        showOffensivePopup('The display name you entered is offensive or obscene')
+      }
       console.log("Error:", err);
     }
   };
@@ -143,6 +146,9 @@ const SettingsContent = () => {
       else {
       }
     } catch (err) {
+      if (err.response.status === 422) {
+        showOffensivePopup('The username you entered is offensive or obscene')
+      }
       console.log("Error:", err);
     }
   };
