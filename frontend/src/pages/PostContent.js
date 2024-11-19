@@ -316,10 +316,14 @@ const PostContent = () => {
     axios.delete(`http://localhost:3001/api/comments/${id}`)
       .then((response) => {
         if (isRoot) {
-          setComments(prevComments =>prevComments.filter((comment) => comment._id !== id))
-        } //else {
+          setComments(prevComments => prevComments.filter((comment) => comment._id !== id))
+        } else {
+          setReplies(prevComments => ({
+            ...prevComments,
+            [rootId]: prevComments[rootId].filter(reply => reply._id !== id)
+          }));
 
-        //}
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -507,7 +511,7 @@ const PostContent = () => {
                                   {(canDeleteReply && (
                                     <img
                                       src={removeIcon}
-                                      onClick={() => handleCommentDelete(post._id)}
+                                      onClick={() => handleCommentDelete(reply._id, false, comment._id)}
                                       alt="Remove"
                                       className="remove-icon "
                                     />
