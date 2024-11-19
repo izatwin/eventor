@@ -425,6 +425,15 @@
 .post-content {
 }
 
+.post-embeddedImage {
+  width: 80%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 10px;
+}
+
+
 .edit-popup {
   position: fixed;
   z-index: 2000;

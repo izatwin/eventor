@@ -116,6 +116,13 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
             <div className="post-content">
                 {post.content}
             </div>
+            {post.embeddedImage && (
+                        <img
+                            src={post.embeddedImage}
+                            alt="Post"
+                            className="post-embeddedImage"
+                        />
+                    )}
             {postEvent ? (
                 <div className="event">
                     <h1
