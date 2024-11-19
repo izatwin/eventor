@@ -8,6 +8,7 @@ export const PopupProvider = ({ children }) => {
   
   const [isSharePopupOpen, setSharePopupOpen] = useState(false);
   const [currentUrl, setCurrentUrl] = useState('');
+  const [popupMessage, setPopupMessage] = useState('');
 
   const showSharePopup = (id) => {
     const url = `${window.location.origin}/post/${id}`; // Construct the post URL
@@ -40,8 +41,22 @@ export const PopupProvider = ({ children }) => {
     }
   }
 
+
+  const showOffensivePopup = (message) => {
+    console.log("IN POP")
+    console.log(message)
+    var popup = document.getElementById("offensive");
+    setPopupMessage(message)
+    popup.classList.add("show");
+    console.log(message)
+
+    setTimeout(function() {
+        popup.classList.remove("show"); 
+    }, 1000);
+  }
+
   return (
-    <PopupContext.Provider value={{ showSharePopup, updateShareCount, updateLike}}>
+    <PopupContext.Provider value={{ showSharePopup, updateShareCount, updateLike, showOffensivePopup}}>
       {children}
       {isSharePopupOpen && (
         <div className="share-popup-container">
@@ -58,6 +73,7 @@ export const PopupProvider = ({ children }) => {
           </div>
         </div>
       )}
+      <div className="offensive-popup" id="offensive">{popupMessage}</div>
     </PopupContext.Provider>
   );
 };

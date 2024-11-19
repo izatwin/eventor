@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../AuthContext'; 
+import { usePopup } from '../PopupContext';
 
 import Post from '../components/Post';
 
@@ -18,6 +19,7 @@ import Post from '../components/Post';
 const ProfileContent= () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();  
+  const { showOffensivePopup } = usePopup();
   
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
@@ -348,6 +350,10 @@ useEffect(() => {
       else {
       }
     } catch (err) {
+      if (err.response.status === 422) {
+        showOffensivePopup('Your biography contains offensive or obscene content')
+        setBio(user.bio)
+      }
       console.log("Error:", err);
     }
   };
@@ -385,6 +391,10 @@ useEffect(() => {
       else {
       }
     } catch (err) {
+      if (err.response.status === 422) {
+        showOffensivePopup('Your status contains offensive or obscene content')
+        setStatus(user.status)
+      }
       console.log("Error:", err);
     }
   };
@@ -411,14 +421,19 @@ useEffect(() => {
       console.log("RETURNING: " + response.data['_id']);
       return response.data['_id'];  
     } catch (err) {
+      if (err.response.status === 422) {
+        showOffensivePopup('Your post contains offensive or obscene content')
+        setBio(user.bio)
+      } else {
+        showFailPopup("Error creating post!");
+      }
+
       console.log(err);
-      showFailPopup("Error creating post!");
       setNewPost({ ...newPost, content: "" });
-      throw err; 
     }
   };
 
-
+  // TODO: FOR IMAGE UPLOAD
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -426,6 +441,7 @@ useEffect(() => {
     }
   };
 
+  // TODO: FOR IMAGE UPLOAD
   const handleUploadClick = () => {
     document.getElementById('file-input').click();
   };
@@ -458,17 +474,25 @@ useEffect(() => {
     }));
   }
 
-  const handlePostEdit = () => {
+  const handlePostEdit = async () => {
+
 
     const { _id, content, embeddedImage } = currentPost;
     axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content, "embeddedImage": embeddedImage})
+    .then(()=> {
 
-    // Update the post dynamically on the page
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post._id === _id ? { ...post, content: content, embeddedImage: embeddedImage} : post
-      )
-    );
+      // Update the post dynamically on the page
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === _id ? { ...post, content: content, embeddedImage: embeddedImage } : post
+        )
+      );
+    })
+    .catch((err) => {
+      if (err.response.status === 422) {
+        showOffensivePopup('Your edit contains offensive or obscene content')
+      }
+    })
     
     // TODO: UPDATE EVENT CALL
     if (newEvent === null || newEvent === undefined) {
@@ -482,6 +506,9 @@ useEffect(() => {
             }));
           })
           .catch((err) => {
+            if (err.response.status === 422) {
+              showOffensivePopup('Your edit contains offensive or obscene content')
+            }
             console.log(err)
           })
       }
@@ -542,7 +569,6 @@ const handleAddEvent = async () => {
     eventType: newEvent.eventType,
     eventData: newEvent,
   };
-
   axios.post("http://localhost:3001/api/events", requestData)
     .then((response) => {
       setEventsById(prevEvents => ({
@@ -556,8 +582,13 @@ const handleAddEvent = async () => {
       );
     })
     .catch((err) => {
+      if (err.response.status === 422) {
+        showOffensivePopup('Your event contains offensive or obscene content')
+      }
+      else {
+        showFailPopup("Error creating event.");
+      }
       console.log(err);
-      showFailPopup("Error creating event.");
     });
 
   closeAddEventPopup();
@@ -875,7 +906,6 @@ const handleEventDateChange = (e) => {
             )}
           </div>
         </div>
-        
         {isEditPopupOpen && (
           <div className="edit-popup">
             <div className="edit-popup-content">
@@ -917,7 +947,6 @@ const handleEventDateChange = (e) => {
                     alt="Remove" 
                     className="remove-event-icon " 
                   />
-                  <form>
                     <input 
                       type="text" 
                       placeholder="Name" 
@@ -941,7 +970,6 @@ const handleEventDateChange = (e) => {
                       value={newEvent.embeddedImage}
                       onChange={handleEventInputChange}
                     />
-                    <div className="time-fields">
                       <input 
                         type="datetime-local" 
                         name="startTime" 
@@ -957,22 +985,20 @@ const handleEventDateChange = (e) => {
                         value={formatDateTimeLocal(newEvent.endTime)}
                         onChange={handleEventInputChange}
                       />
-                    </div>
 
-                  </form>
 
 
                 </div>
 
               )}
-              {newEvent === null || newEvent === undefined && (
+              {(newEvent === null || newEvent === undefined) && (
                 <div className="edit-event-content">
                   <button 
                     onClick={() => {
                       setEditPopupOpen(false);
                       handleAddEventPopup(currentPost)} 
                     }
-                    className="add-event-btn"> 
+                    className="edit-add-event-btn"> 
                     Add Event 
                   </button> 
                 </div>
