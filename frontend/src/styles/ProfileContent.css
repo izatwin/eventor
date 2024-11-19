@@ -291,6 +291,18 @@
   background-color: #b71c1c;
 }
 
+.edit-add-event-btn {
+  margin-top: 10px;
+  border: none;
+  background-color: #d32f2f;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 10px;
+  font-size: 18px;
+  width: 100%;
+}
+
 .edit-post-icon {
   margin-left: 2vw;
   height: 25px;
@@ -394,7 +406,6 @@
   text-align: left;  
 }
 
-
 .popup {
     position: fixed;
     bottom: 20px;
@@ -407,6 +418,7 @@
     opacity: 0; 
     visibility: hidden;
     transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    z-index: 2000;
 }
 
 .popup.show {
@@ -470,6 +482,7 @@
 .edit-event-content {
   display: flex;
   flex-direction: column;
+  align-items: center; 
   width: 100%;
 }
 
