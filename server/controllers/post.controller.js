@@ -42,7 +42,7 @@ exports.create = async (req, res) => {
     try {
         // Check for profanity
         if (textfilter.containsProfanity(req.body.content)) {
-            res.status(422).json({ message: err.message || "Post content contains profanity." });
+            res.status(422).json({ message: "Post content contains profanity." });
             return;
         }
 
@@ -243,7 +243,7 @@ exports.update = async (req, res) => {
 
         // Check for profanity
         if (textfilter.containsProfanity(req.body.content)) {
-            res.status(422).json({ message: err.message || "Post content contains profanity." });
+            res.status(422).json({ message: "Post content contains profanity." });
             return;
         }
 
