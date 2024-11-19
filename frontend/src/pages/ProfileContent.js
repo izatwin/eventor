@@ -406,7 +406,7 @@ useEffect(() => {
       console.log("posting res: ");
       console.log(response.data);
       showSuccessPopup("Post created successfully!");
-      setNewPost({ ...newPost, content: "" });
+      setNewPost({ ...newPost, content: "", embeddedImage: "" });
       setPosts((prevPosts) => [response.data, ...prevPosts]);
       console.log("RETURNING: " + response.data['_id']);
       return response.data['_id'];  
@@ -776,95 +776,104 @@ const handleEventDateChange = (e) => {
           </div>
 
         </div>
-        
-        { isOwnProfile && (
-          <div className="post-card">
-            
-            <div className="post-input">
-              <textarea 
-                name="content" 
-                className="post-text" 
-                value={newPost.content} 
-                type="text" 
-                onChange={handlePostChange} 
-                placeholder="What will you be hosting next?"/>
-            </div>
+        <div className="profile-post-feed-container">
+          {isOwnProfile && (
+            <div className="post-card">
 
-            {isAddImage && (
-              <div>
+              <div className="post-input">
                 <textarea
-                name="embeddedImage"
-                className="input-field"
-                value={newPost.embeddedImage}
-                type="text"
-                onChange={handlePostChange}
-                placeholder="Insert Image URL here"/>
+                  name="content"
+                  className="post-text"
+                  value={newPost.content}
+                  type="text"
+                  onChange={handlePostChange}
+                  placeholder="What will you be hosting next?" />
               </div>
-            )}
 
-            <div className="post-buttons">
-              <img 
-                src={eventIcon} 
-                alt="Event" 
-                className="event-icon"
-                onClick={() => handleAddEventPopup()} 
-              />
-              <img 
-                src={imageIcon} 
-                alt="Image" 
-                className="image-icon"
-                onClick={() => handleAddImageBox(! isAddImage)} 
-              /> 
+              {isAddImage && (
+                <div>
+                  <textarea
+                    name="embeddedImage"
+                    className="input-field"
+                    value={newPost.embeddedImage}
+                    type="text"
+                    onChange={handlePostChange}
+                    placeholder="Insert Image URL here" />
+                </div>
+              )}
 
-              <button 
-                onClick={handlePost} 
-                className="post-btn"> 
-                Post 
-              </button> 
-            </div>
-              
-          </div>
-        )}
-        
-        
-        <div className="profile-feed">
-          {isBlocking ? (
-            <div className="empty-message">
-              <h2 className="block-message">This User is Blocked</h2>
-              <p>You won't see posts from this user.</p>
-            </div>
-          ) : isBlocked ? (
-            <div className="empty-message">
-              <h2 className="block-message">This user has you blocked</h2>
-              <p>You do not have permission to view this user's post.</p>
-            </div>
-          ) : posts.length === 0 ? (
-            isOwnProfile ? (
-              <div className="empty-message">
-                <h2>Nothing Here Yet</h2>
-                <p>Create a post for it to show up on your profile!</p>
+              {newPost.embeddedImage && (
+                <img
+                  src={newPost.embeddedImage}
+                  alt="Post Image"
+                  className="event-embeddedImage"
+                />
+              )}
+
+              <div className="post-buttons">
+                <img
+                  src={eventIcon}
+                  alt="Event"
+                  className="event-icon"
+                  onClick={() => handleAddEventPopup()}
+                />
+                <img
+                  src={imageIcon}
+                  alt="Image"
+                  className="image-icon"
+                  onClick={() => handleAddImageBox(!isAddImage)}
+                />
+
+                <button
+                  onClick={handlePost}
+                  className="post-btn">
+                  Post
+                </button>
               </div>
-            ) : (
-              <div className="empty-message">
-                <h2>Nothing Here Yet</h2>
-                <p>Come back later!</p>
-              </div>
-            )
-          ) : (
-            posts.map((post) => (
-              <Post
-                key={post._id}
-                post={post}
-                poster={profileUser}
-                postEvent={post.eventId && eventsById[post.eventId]}
-                setPost={setPosts}
-                handleAddEventPopup={handleAddEventPopup}
-                handleEditPopup={handleEditPopup}
-                handlePostDelete={handlePostDelete}
-                isProfile={true}
-              />
-            ))
+
+            </div>
           )}
+
+
+          <div className="profile-feed">
+            {isBlocking ? (
+              <div className="empty-message">
+                <h2 className="block-message">This User is Blocked</h2>
+                <p>You won't see posts from this user.</p>
+              </div>
+            ) : isBlocked ? (
+              <div className="empty-message">
+                <h2 className="block-message">This user has you blocked</h2>
+                <p>You do not have permission to view this user's post.</p>
+              </div>
+            ) : posts.length === 0 ? (
+              isOwnProfile ? (
+                <div className="empty-message">
+                  <h2>Nothing Here Yet</h2>
+                  <p>Create a post for it to show up on your profile!</p>
+                </div>
+              ) : (
+                <div className="empty-message">
+                  <h2>Nothing Here Yet</h2>
+                  <p>Come back later!</p>
+                </div>
+              )
+            ) : (
+              posts.map((post) => (
+                <Post
+                  key={post._id}
+                  post={post}
+                  poster={profileUser}
+                  postEvent={post.eventId && eventsById[post.eventId]}
+                  setPost={setPosts}
+                  handleAddEventPopup={handleAddEventPopup}
+                  handleEditPopup={handleEditPopup}
+                  handlePostDelete={handlePostDelete}
+                  isProfile={true}
+                />
+              ))
+            )}
+          </div>
         </div>
         
         {isEditPopupOpen && (

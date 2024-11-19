@@ -208,6 +208,10 @@
     
 }
 
+.profile-post-feed-container {
+  overflow-y: auto;
+}
+
 .post-card {
   width: 100%; 
   padding: 10px;
