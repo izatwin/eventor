@@ -31,6 +31,8 @@ const PostContent = () => {
   const [loading, setLoading] = useState(true); 
   const [isReplyPopupOpen, setReplyPopupOpen] = useState(false);
   const [currentComment, setCurrentComment] = useState(null);
+  const [isCurrentCommentRoot, setIsCurrentCommentRoot] = useState(false);
+  const [currentCommentRootId, setCurrentCommentRootId] = useState(null);
   const [replyComment, setReplyComment] = useState({
     text: "",
     isRoot: false,
@@ -330,9 +332,10 @@ const PostContent = () => {
       })
   }
  
-  // TODO
-  const handleEditPopup = (comment) => {
+  const handleEditPopup = (comment, isRoot, rootId) => {
     setCurrentComment(comment);
+    setIsCurrentCommentRoot(isRoot)
+    setCurrentCommentRootId(rootId)
     setEditPopupOpen(true);
   }
 
@@ -352,18 +355,28 @@ const PostContent = () => {
     }));
   }
 
-  // TODO
-  const handleCommentEdit = (isRoot) => {
+  const handleCommentEdit = () => {
     // use currentComment to get id ... 
-    const { _id, content: text } = currentComment;
+    const { _id, text: text } = currentComment;
     axios.put(`http://localhost:3001/api/comments/${_id}`, {"text": text})
       .then((response) => {
-        if (isRoot) {
+        
+        if (isCurrentCommentRoot) {
           setComments((prevComments) =>
             prevComments.map((comment) =>
               comment._id === currentComment._id ? { ...comment, text: text } : comment
             )
           );
+        } else {
+          console.log(currentComment)
+          setReplies(prevComments => ({
+            ...prevComments,
+            [currentCommentRootId]: prevComments[currentCommentRootId].map(reply =>
+              reply._id === currentComment._id
+                ? { ...reply, text: currentComment.text }
+                : reply
+            )
+          }));
         }
       })
       .catch((err) => {
@@ -445,7 +458,7 @@ const PostContent = () => {
                         {(canEdit && ( 
                           <img
                               src={editIcon}
-                              onClick={() => handleEditPopup(comment)}
+                              onClick={() => handleEditPopup(comment, true, comment._id)}
                               alt="Edit"
                               className="edit-post-icon "
                           />
@@ -502,7 +515,7 @@ const PostContent = () => {
                                   {(canEditReply && ( 
                                     <img
                                       src={editIcon}
-                                      onClick={() => handleEditPopup(comment)}
+                                      onClick={() => handleEditPopup(reply, false, comment._id)}
                                       alt="Edit"
                                       className="edit-post-icon "
                                     />
