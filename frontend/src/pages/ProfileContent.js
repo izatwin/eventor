@@ -2,6 +2,7 @@ import "../styles/ProfileContent.css";
 import profilePic from './icons/profile.png'; 
 import editIcon from './icons/edit.png'
 import eventIcon from './icons/event.png'
+import imageIcon from './icons/image.png'
 import checkIcon from './icons/check.png'
 import removeIcon from './icons/remove.png'
 
@@ -24,6 +25,7 @@ const ProfileContent= () => {
   const [eventsById, setEventsById] = useState({});
   const [isEditPopupOpen, setEditPopupOpen] = useState(false);
   const [isAddEventPopupOpen, setAddEventPopupOpen] = useState(false);
+  const [isAddImage, setIsAddImage] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
   
   const [newPost, setNewPost] = useState({
@@ -568,6 +570,10 @@ const handleAddEvent = async () => {
     setNewEvent(defaultNewEvent)
   }
 
+  const handleAddImageBox = (statusChange) => {
+    setIsAddImage(statusChange)
+  }
+
   const closeAddEventPopup = () => {
     setAddEventPopupOpen(false);
     setCurrentPost(null);    
@@ -783,12 +789,30 @@ const handleEventDateChange = (e) => {
                 placeholder="What will you be hosting next?"/>
             </div>
 
+            {isAddImage && (
+              <div>
+                <textarea
+                name="embeddedImage"
+                className="input-field"
+                value={newPost.embeddedImage}
+                type="text"
+                onChange={handlePostChange}
+                placeholder="Insert Image URL here"/>
+              </div>
+            )}
+
             <div className="post-buttons">
               <img 
                 src={eventIcon} 
                 alt="Event" 
                 className="event-icon"
                 onClick={() => handleAddEventPopup()} 
+              />
+              <img 
+                src={imageIcon} 
+                alt="Image" 
+                className="image-icon"
+                onClick={() => handleAddImageBox(! isAddImage)} 
               /> 
 
               <button 
