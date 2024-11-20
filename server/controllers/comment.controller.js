@@ -4,6 +4,9 @@ const Post = require("../models/post");
 const Common = require(`./common.controller`)
 const mongoose = require("mongoose");
 
+const textfilter = require("../modules/textfilter.js");
+const comment = require('../models/comment');
+
 // Create a save a new comment
 exports.create = async (req, res) => {
     const authenticatedUser = await Common.authenticateUser(req);
@@ -22,7 +25,12 @@ exports.create = async (req, res) => {
     const postId = req.body.postId;
     const commentFields = req.body.comment;
 
-
+    for (field in commentFields) {
+        if (textfilter.containsProfanity(field)) {
+            res.status(422).json({ message: "Comment content contains profanity." });
+            return;
+        }
+    }
 
     try {
         const post = await Post.findById(postId).exec();
@@ -163,6 +171,13 @@ exports.update = (req, res) => {
     }
 
     const commentId = req.params.id;
+
+    for (field in req.body) {
+        if (textfilter.containsProfanity(field)) {
+            res.status(422).json({ message: "Comment content contains profanity." });
+            return;
+        }
+    }
 
     Comment.findByIdAndUpdate(commentId, req.body, { runValidators: true })
         .then(data => {
