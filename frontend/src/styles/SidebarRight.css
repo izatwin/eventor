@@ -20,3 +20,8 @@
   height: 35px; 
   cursor: pointer;
 }
+
+.icon-small {
+  width: 20px;  
+  height: 20px; 
+}

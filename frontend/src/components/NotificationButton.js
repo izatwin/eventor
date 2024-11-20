@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import bellIcon from '../pages/icons/bell.png'; 
+
 
 const DropdownButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +17,9 @@ const DropdownButton = () => {
 
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
-      <button className="notification-btn" onClick={toggleDropdown}>{notificationType}</button>
+      <img src={bellIcon} alt="Bell" className="icon-small" />
+      <button className="notification-btn" onClick={toggleDropdown}>
+        {notificationType}</button>
       {isOpen && (
         <div className="notification-dropdown">
           <div
