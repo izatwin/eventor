@@ -67,3 +67,22 @@
 1. Navigate to one of your posts without an attached image
 2. Attach an image to the post and ensure it remains after a page refresh.
 3. Remove the image from the post and ensure it's gone after a page refresh.
+
+
+### Test 7: Notification Opt-In
+1. Navigate to a profile of a user (with existing posts) that you are not currently following
+2. Follow the user and enable notifications for all posts
+3. Refresh the page and view notifications, ensure you did not receive new notifications for their old posts.
+4. Create a post on the account which you opted into notifications for.
+5. Ensure that their post showed up on your client notifications list.
+
+### Test 8: Notification Opt-Out
+1. Navigate to a profile of a user who you are currently opted into notifications for.
+2. Opt out of notifications or unfollow the user.
+3. Ensure when they post, you do not get notified.
+
+### Test 9: Viewing Notifications
+1. Receive a notification from someone you have opted into notifications for.
+2. Ensure there is an indicator on the notification bell that you have unread notifications within 15 seconds.
+3. Open the notification dropdown and ensure there is an unread indicator on new notifcations you are viewing for the first time. Ensure that the unread icon has been removed from the notifcation bell icon.
+4. Close and reopen the notification dropdown. Ensure that no unread indicators remain.
