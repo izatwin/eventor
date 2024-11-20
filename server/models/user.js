@@ -66,6 +66,12 @@ UserCredentialsSchema.methods.removeAuthToken = function (token) {
     accessTokens[token] = null;
 }
 
+const NotificationSchema = new Schema({
+    timestamp: { type: Number, required: true },
+    postId: { type: String, required: true },
+    read: { type: Boolean, required: true, default: false },
+}, { _id: false });
+
 const UserSchema = new Schema({
     /*
 
@@ -100,7 +106,10 @@ const UserSchema = new Schema({
 
     biography: {type: String},
     status: {type: String},
-    imageURL: {type: String}
+    imageURL: {type: String},
+
+    notifications: [NotificationSchema],
+    notificationOptIns: { type: Map, of: String, default: {} }
 });
 
 UserSchema.methods.getInfoForClient = function () {

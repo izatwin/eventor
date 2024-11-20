@@ -13,6 +13,8 @@
 .bell-icon {
   margin-left: 10px;
   display: flex;
+  align-items: center;
+  height: 40px; 
 }
 
 .icon-right {
@@ -24,4 +26,31 @@
 .icon-small {
   width: 20px;  
   height: 20px; 
+}
+
+.noti-dropdown {
+  position: fixed;
+  top: 50px;
+  margin-left: auto; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+
+  padding: 12px 12px;
+  background-color: white;
+  width: 22vw;
+  font-size: 18px;
+  border: 1px solid black; 
+
+}
+
+.noti {
+}
+
+
+
+.popup-item:hover {
+  background-color: #f0f0f0;
 }

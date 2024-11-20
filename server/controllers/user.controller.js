@@ -897,6 +897,10 @@ exports.followUser = async (req, res) => {
             myUser.following.push(userToFollowId);
             userToFollow.followers.push(myUser._id);
 
+            if (!myUser.notificationOptIns.has(userToFollowId)) {
+                myUser.notificationOptIns.set(userToFollowId, "None");
+            }
+
             await myUser.save();
             await userToFollow.save();
             return res.status(200).send({ message: `Following user with id=${userToFollowId}` });
@@ -954,6 +958,8 @@ exports.unfollowUser = async (req, res) => {
             myUser.following.pull(userToUnfollowId);
             userToUnfollow.followers.pull(myUser._id);
 
+            myUser.notificationOptIns.delete(userToUnfollowId);
+
             await myUser.save();
             await userToUnfollow.save();
             return res.status(200).send({ message: `Unfollowed user with id=${userToUnfollowId}` });
@@ -971,7 +977,7 @@ exports.unfollowUser = async (req, res) => {
 // Find user by id
 exports.findOne = (req, res) => {
     const id = req.params.id;
-
+    
     User.findById(id).select('_id displayName userName biography status imageURL followers following')
         .then(data => {
             if (!data) {
@@ -1156,3 +1162,219 @@ exports.searchUsers = async (req, res) => {
         });
     }
 };
+
+exports.getNotificationOptInStatus = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+
+    // Authenticate
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    const targetUserId = req.params.id;
+    if (!targetUserId) {
+        return res.status(400).send({
+            message: "Missing userId to check notification opt-in status."
+        });
+    }
+
+    try {
+        // Ensure user is being followed
+        if (!myUser.following.includes(targetUserId)) {
+            return res.status(400).send({
+                message: "You are not following this user."
+            });
+        }
+
+        const optInStatus = myUser.notificationOptIns.get(targetUserId);
+        return res.status(200).send({
+            userId: targetUserId,
+            optInStatus: optInStatus || "None", // Defaulting to "None" if not set
+        });
+
+    } catch (err) {
+        return res.status(500).send({
+            message: `Error retrieving notification opt-in status for user id=${targetUserId}`,
+            error: err.message || "Unexpected Error"
+        });
+    }
+};
+
+exports.updateNotificationOptIn = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+
+    // Authenticate
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    const userId = req.body.userId;
+    const optInStatus = req.body.optInStatus;
+    if (!(userId && optInStatus)) {
+        return res.status(400).send({
+            message: "Missing userId or optInStatus."
+        });
+    }
+
+    // Ensure user is currently followed
+    if (!myUser.following.includes(userId)) {
+        return res.status(400).send({
+            message: "You are not following this user."
+        });
+    }
+
+    // Validating the opt-in status values
+    if (["None", "Posts", "Events"].includes(optInStatus)) {
+        myUser.notificationOptIns.set(userId, optInStatus);
+
+        await myUser.save();
+        return res.status(200).send({ message: "Notification Opt-In updated." });
+    } else {
+        return res.status(400).send({ message: "Invalid opt-in status." });
+    }
+}
+
+// Fetch and update user notifications
+exports.getNotifications = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+    
+    // Authenticate
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    try {
+        const notifications = [];
+
+        for (const [followedUserId, optInType] of myUser.notificationOptIns.entries()) {
+            const followedUser = await User.findById(followedUserId).populate('posts', '_id timestamp');
+            if (!followedUser) continue;
+
+            const userNotifications = followedUser.posts.reduce((acc, post) => {
+                const existingNotification = myUser.notifications.find(n => n.postId === String(post._id));
+                if (!existingNotification) {
+                    const newNotification = { timestamp: post.timestamp.getTime(), postId: String(post._id), read: false };
+                    if (optInType === "Posts" || (optInType === "Events" && post.is_event)) {
+                        acc.push(newNotification);
+                    }
+                }
+                return acc;
+            }, []);
+
+            notifications.push(...userNotifications);
+        }
+
+        // Combine and deduplicate existing and new notifications
+        const updatedNotifications = [...myUser.notifications, ...notifications]
+            .sort((a, b) => b.timestamp - a.timestamp) // Sort by timestamp descending
+            .filter((item, index, self) => index === self.findIndex(n => n.postId === item.postId)); // Remove duplicates
+
+        // Cap notifications to a maximum of 100
+        myUser.notifications = updatedNotifications.slice(0, 100);
+
+        await myUser.save();
+        return res.status(200).send(myUser.notifications);
+    } catch (err) {
+        return res.status(500).send({
+            message: "Error occurred while fetching notifications.",
+            error: err.message
+        });
+    }
+}
+
+
+exports.markAllNotificationsAsRead = async (req, res) => {
+    let myUser = null;
+    let authenticated = false;
+    let req_cookies = req.cookies;
+
+    // Authenticate
+    if (req_cookies) {
+        let user_id = req_cookies.user_id;
+        if (user_id) {
+            myUser = await User.findById(user_id);
+            if (myUser) {
+                let auth_token = req_cookies.auth_token;
+                if (auth_token) {
+                    let userCredentials = myUser.userCredentials;
+                    if (userCredentials.matchAuthToken(auth_token)) {
+                        authenticated = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!authenticated) {
+        return res.status(400).send({
+            message: "Not logged in!"
+        });
+    }
+
+    myUser.notifications.forEach(notification => {
+        notification.read = true;
+    });
+
+    await myUser.save();
+    return res.status(200).send({ message: "All notifications marked as read." });
+}

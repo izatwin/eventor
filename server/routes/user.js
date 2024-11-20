@@ -42,10 +42,18 @@ router.post('/unfollow', userController.unfollowUser);
 
 router.post('/search', userController.searchUsers);
 
-router.get('/:id', userController.findOne);
-
 router.post('/block', userController.toggleBlockUser);
 
 router.get('/block-status/:id', userController.checkBlockStatus);
+
+router.get('/notifications/opt-in/:id', userController.getNotificationOptInStatus);
+
+router.post('/notifications/opt-in', userController.updateNotificationOptIn);
+
+router.get('/notifications', userController.getNotifications);
+
+router.patch('/notifications/mark-read', userController.markAllNotificationsAsRead);
+
+router.get('/:id', userController.findOne); // make sure this is always last
 
 module.exports = router;
