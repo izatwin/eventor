@@ -72,6 +72,11 @@ const NotificationSchema = new Schema({
     read: { type: Boolean, required: true, default: false },
 }, { _id: false });
 
+const NotificationOptInSchema = new Schema({
+    status: { type: String, required: true, enum: ["None", "Posts", "Events"], default: "None" },
+    timestamp: { type: Date, required: true, default: Date.now }
+}, { _id: false });
+
 const UserSchema = new Schema({
     /*
 
@@ -109,7 +114,7 @@ const UserSchema = new Schema({
     imageURL: {type: String},
 
     notifications: [NotificationSchema],
-    notificationOptIns: { type: Map, of: String, default: {} }
+    notificationOptIns: { type: Map, of: NotificationOptInSchema, default: {} }
 });
 
 UserSchema.methods.getInfoForClient = function () {

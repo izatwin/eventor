@@ -898,7 +898,10 @@ exports.followUser = async (req, res) => {
             userToFollow.followers.push(myUser._id);
 
             if (!myUser.notificationOptIns.has(userToFollowId)) {
-                myUser.notificationOptIns.set(userToFollowId, "None");
+                myUser.notificationOptIns.set(userId, {
+                    status: "None",
+                    timestamp: new Date()
+                });
             }
 
             await myUser.save();
@@ -1206,10 +1209,14 @@ exports.getNotificationOptInStatus = async (req, res) => {
             });
         }
 
-        const optInStatus = myUser.notificationOptIns.get(targetUserId);
+        let optInStatus = "None"
+        const optIn = myUser.notificationOptIns.get(targetUserId);
+        if (optIn) {
+            optInStatus = optIn.status;
+        }
         return res.status(200).send({
             userId: targetUserId,
-            optInStatus: optInStatus || "None", // Defaulting to "None" if not set
+            optInStatus: optInStatus, // Defaulting to "None" if not set
         });
 
     } catch (err) {
@@ -1265,7 +1272,10 @@ exports.updateNotificationOptIn = async (req, res) => {
 
     // Validating the opt-in status values
     if (["None", "Posts", "Events"].includes(optInStatus)) {
-        myUser.notificationOptIns.set(userId, optInStatus);
+        myUser.notificationOptIns.set(userId, {
+            status: optInStatus,
+            timestamp: new Date()
+        });
 
         await myUser.save();
         return res.status(200).send({ message: "Notification Opt-In updated." });
@@ -1306,21 +1316,29 @@ exports.getNotifications = async (req, res) => {
     try {
         const notifications = [];
 
-        for (const [followedUserId, optInType] of myUser.notificationOptIns.entries()) {
+        for (const [followedUserId, optInDetails] of myUser.notificationOptIns.entries()) {
             const followedUser = await User.findById(followedUserId).populate('posts', '_id timestamp');
             if (!followedUser) continue;
-
+            
+            const optInStatus = optInDetails.status;
+            const optInTimestamp = new Date(optInDetails.timestamp);
+            
             const userNotifications = followedUser.posts.reduce((acc, post) => {
                 const existingNotification = myUser.notifications.find(n => n.postId === String(post._id));
-                if (!existingNotification) {
-                    const newNotification = { timestamp: post.timestamp.getTime(), postId: String(post._id), read: false };
-                    if (optInType === "Posts" || (optInType === "Events" && post.is_event)) {
+                
+                // Check if we already have this notification or if it's older than the opt-in timestamp
+                if (!existingNotification && post.timestamp > optInTimestamp) {
+                    
+                    const postTime = post.timestamp.getTime();
+                    const newNotification = { timestamp: postTime, postId: String(post._id), read: false };
+                    
+                    if (optInStatus === "Posts" || (optInStatus === "Events" && post.is_event)) {
                         acc.push(newNotification);
                     }
                 }
                 return acc;
             }, []);
-
+            
             notifications.push(...userNotifications);
         }
 
