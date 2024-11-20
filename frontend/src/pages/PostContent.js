@@ -14,10 +14,12 @@ import editIcon from '../pages/icons/edit.png'
 import Post from '../components/Post';
 
 import { useAuth } from '../AuthContext';
+import { usePopup } from '../PopupContext';
 
 const PostContent = () => {
   const [post, setPost] = useState([]);
   const { user, setUser } = useAuth();
+  const { showOffensivePopup } = usePopup();
   const navigate = useNavigate();
   const { _id } = useParams();
   const [newComment, setNewComment] = useState({
