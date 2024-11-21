@@ -207,6 +207,7 @@ const DiscoverContent = () => {
           onChange={handleQueryChange}  
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
+          autoComplete="off"
         />
         <button 
           className="search-button"
