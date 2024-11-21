@@ -182,7 +182,17 @@ const PostContent = () => {
   }
 
   const handleComment = async (isReply) => {
-    const tempNewComment = (await axios.post(`http://localhost:3001/api/comments`, {"comment": isReply ? replyComment : newComment, "postId": post[0]._id})).data
+    let tempNewComment;
+    try {
+      tempNewComment= (await axios.post(`http://localhost:3001/api/comments`, {"comment": isReply ? replyComment : newComment, "postId": post[0]._id})).data
+    }
+    catch (err) {
+      if (err.response.status === 422) {
+        showOffensivePopup('Your comment contains offensive or obscene content')
+        setReplyComment("")
+        setNewComment("")
+      }
+    }
     console.log("tempNEWCOMMENT:")
     console.log(tempNewComment)
     if (isReply) {
@@ -382,6 +392,11 @@ const PostContent = () => {
         }
       })
       .catch((err) => {
+        if (err.response.status === 422) {
+          showOffensivePopup('Your comment contains offensive or obscene content')
+          setReplyComment("")
+          setNewComment("")
+        }
         console.log(err)
       });
     closeEditPopup();
@@ -497,7 +512,7 @@ const PostContent = () => {
                         {commentReplies.map(reply => {
                           const replyUser = commenters[reply.user];
                           const isLiking = user?.likedComments?.includes(reply._id);
-                          const canDeleteReply = replyUser.userName === user.userName || post[0].user === replyUser._id
+                          const canDeleteReply = replyUser.userName === user.userName || post[0].user === user.userId
                           const canEditReply = replyUser.userName === user.userName
                           return (
                             <div className="comment-reply" key={reply._id}>
