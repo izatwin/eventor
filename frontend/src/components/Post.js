@@ -175,35 +175,68 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
 
 
                     {postEvent.type === "MusicReleaseEvent" && (
-                        <div>
-                            <h2 className="event-release-title"> <b> {postEvent.releaseTitle} </b> </h2>
-                            <p className="event-release-artist"> {postEvent.releaseArtist} </p>
-                            <p className="event-release-type"> [{postEvent.releaseType}] </p>
+                      <div className="music-release-container">
+                        <h2 className="event-release-title">
+                          🎵 <b>{postEvent.releaseTitle}</b>
+                        </h2>
+                        <p className="event-release-artist">Artist: {postEvent.releaseArtist}</p>
+                        <p className="event-release-type">Release Type: <span>[{postEvent.releaseType}]</span></p>
 
-                            {postEvent.songs.map((song, index) => (
-                                <div className="event-song" key={index}>
-                                    {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
-                                </div>
-                            ))}
-                            <br />
-                            <i> Apple Music: </i> <a href={postEvent.appleMusicLink} style={{ color: 'black' }}> {postEvent.appleMusicLink} </a>  <br />
-                            <i> Spotify: </i> <a href={postEvent.spotifyLink} style={{ color: 'black' }} > {postEvent.spotifyLink} </a> <br /> <br />
-
-
+                        <div className="songs-list">
+                          <h3>Tracklist:</h3>
+                          {postEvent.songs.map((song, index) => (
+                            <div className="event-song" key={index}>
+                              {index + 1}. <b>{song.songTitle}</b> by {song.songArtist} 
+                              <span className="song-duration">({song.songDuration} secs)</span>
+                            </div>
+                          ))}
                         </div>
+
+                        <div className="music-links">
+                          <i>Listen on: </i>
+                          <a
+                            href={postEvent.appleMusicLink.startsWith("http") ? postEvent.appleMusicLink : `https://${postEvent.appleMusicLink}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Apple Music
+                          </a>
+                          <a
+                            href={postEvent.spotifyLink.startsWith("http") ? postEvent.spotifyLink : `https://${postEvent.spotifyLink}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Spotify
+                          </a>
+                        </div>
+                      </div>
                     )}
 
                     {postEvent.type === "TicketedEvent" && (
-                        <div>
-                            <i> Get Tickets: </i> <a href={postEvent.getTicketsLink} style={{ color: 'black' }}> {postEvent.getTicketsLink} </a>  <br /><br />
-                            {postEvent.destinations.map((destination, index) => (
-                                <div className="event-destination">
-                                    {index + 1}. {destination.location} ({destination.time})
-                                </div>
-                            ))}
-                            <br />
+                      <div className="ticketed-event-container">
+                        <h2 className="ticketed-event-title">🎟️ Ticketed Event</h2>
+                        <div className="ticket-link">
+                          <i>Get Tickets: </i>
+                          <a
+                            href={postEvent.getTicketsLink.startsWith("http") ? postEvent.getTicketsLink : `https://${postEvent.getTicketsLink}`}
+                            className="ticket-button"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Buy Tickets
+                          </a>
                         </div>
+                        <div className="event-destinations">
+                          <h3>Destinations:</h3>
+                          {postEvent.destinations.map((destination, index) => (
+                            <div className="event-destination" key={index}>
+                              {index + 1}. {destination.location} <span className="destination-time">({destination.time} secs)</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
+
 
                 </div>
             ) : null}
