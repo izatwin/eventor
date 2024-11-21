@@ -10,8 +10,6 @@ router.post('/login', userController.login);
 
 router.get('/validate', userController.isLoggedIn);
 
-router.get('/:email/exists', userController.isValidAccountEmail);
-
 router.post('/verify', userController.beginVerification);
 
 router.patch('/verify', userController.verifyEmail);
@@ -25,14 +23,6 @@ router.post('/username', userController.updateUsername);
 router.post('/displayname', userController.updateDisplayName);
 
 router.patch('/logout', userController.logout);
-
-router.get('/:id/posts/', userController.findAllPosts);
-
-router.post('/:id/biography', userController.setBiography)
-
-router.post('/:id/status', userController.setStatus)
-
-router.post('/:id/image', userController.setImage)
 
 router.delete('/account', userController.delete);
 
@@ -54,6 +44,21 @@ router.get('/notifications', userController.getNotifications);
 
 router.patch('/notifications/mark-read', userController.markAllNotificationsAsRead);
 
-router.get('/:id', userController.findOne); // make sure this is always last
+router.post('/test', (req, res) => {
+    res.send('Test endpoint hit');
+  });
+
+// make sure parameterized is always last
+router.get('/:id', userController.findById);
+
+router.get('/:id/posts/', userController.findAllPosts);
+
+router.post('/:id/biography', userController.setBiography)
+
+router.post('/:id/status', userController.setStatus)
+
+router.post('/:id/image', userController.setImage)
+
+router.get('/:email/exists', userController.isValidAccountEmail);
 
 module.exports = router;

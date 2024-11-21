@@ -114,7 +114,7 @@ const UserSchema = new Schema({
     imageURL: {type: String},
 
     notifications: [NotificationSchema],
-    notificationOptIns: { type: Map, of: NotificationOptInSchema, default: {} }
+    notificationOptIns: { type: Map, default: {} }
 });
 
 UserSchema.methods.getInfoForClient = function () {

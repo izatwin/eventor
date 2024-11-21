@@ -288,7 +288,7 @@ exports.login = async (req, res) => {
         });
         return;
     }
-
+    
     let email = req.body.email;
     let password = req.body.password;
     if (!(email && password)) {
@@ -838,6 +838,8 @@ exports.followUser = async (req, res) => {
     let authenticated = false;
     let req_cookies = req.cookies;
 
+    console.log("Handler for Follow User", req.path);
+
     // Authenticate the user
     if (req_cookies) {
         let user_id = req_cookies.user_id;
@@ -898,7 +900,7 @@ exports.followUser = async (req, res) => {
             userToFollow.followers.push(myUser._id);
 
             if (!myUser.notificationOptIns.has(userToFollowId)) {
-                myUser.notificationOptIns.set(userId, {
+                myUser.notificationOptIns.set(userToFollowId, {
                     status: "None",
                     timestamp: new Date()
                 });
@@ -978,13 +980,13 @@ exports.unfollowUser = async (req, res) => {
 }
 
 // Find user by id
-exports.findOne = (req, res) => {
+exports.findById = (req, res) => {
     const id = req.params.id;
     
     User.findById(id).select('_id displayName userName biography status imageURL followers following')
         .then(data => {
             if (!data) {
-                return res.status(404).send({ message: `User not found with id=${id}` });
+                return res.status(404).send({ message: `FindById: User not found with id=${id}` });
             }
 
             res.send(data);
