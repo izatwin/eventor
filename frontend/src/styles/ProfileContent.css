@@ -210,6 +210,7 @@
 
 .profile-post-feed-container {
   overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .post-card {
@@ -384,30 +385,6 @@
 .block-message {
   color: red;
   font-style: bold;
-}
-
-.event {
-  display: flex;
-  flex-direction: column;
-  width: 80%;
-  text-align: left;
-  margin-left: 7%;
-}
-
-.event-name {
-  text-align: center;
-}
-
-.event-embeddedImage {
-  width: 80%;
-  height: auto;
-}
-.event-times {
-  margin-bottom: 2%;
-}
-
-.event-song {
-  text-align: left;  
 }
 
 .popup {

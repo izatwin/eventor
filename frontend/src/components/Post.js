@@ -6,6 +6,7 @@ import removeIcon from '../pages/icons/remove.png'
 import editIcon from '../pages/icons/edit.png'
 import expandIcon from '../pages/icons/expand.png'
 import commentIcon from '../pages/icons/comment.png'
+import eventIcon from '../pages/icons/event.png'
 
 import profilePic from '../pages/icons/profile.png';
 
@@ -124,63 +125,118 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
                         />
                     )}
             {postEvent ? (
-                <div className="event">
-                    <h1
-                        className="event-name">
-                        {postEvent.eventName}
-                    </h1>
-                    <p
-                        className="event-description">
-                        {postEvent.eventDescription}
-                    </p>
+                  <div className="event">
+                    <div className="event-header">
+                      <img src={eventIcon} alt="Event Icon" className="event-icon" />
+                      <h1>Event</h1>
+                    </div>
+                    <h2 className="event-name">{postEvent.eventName}</h2>
+                    <p className="event-description">{postEvent.eventDescription}</p>
+
                     {(postEvent.startTime || postEvent.endTime) && (
-                        <div className="event-times">
-                            {postEvent.startTime ? new Date(postEvent.startTime).toLocaleString() : ""}
-                            {postEvent.startTime && postEvent.endTime ? " - " : ""}
-                            {postEvent.endTime ? new Date(postEvent.endTime).toLocaleString() : ""}
-                        </div>
+                      <div className="event-times">
+                        {postEvent.startTime && (
+                          <span>{new Date(postEvent.startTime).toLocaleString('en-US', { 
+                            weekday: 'long', 
+                            month: 'long', 
+                            day: 'numeric', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}</span>
+                        )}
+                        {postEvent.startTime && postEvent.endTime && <span> - </span>}
+                        {postEvent.endTime && (
+                          <span>{new Date(postEvent.endTime).toLocaleString('en-US', { 
+                            weekday: 'long', 
+                            month: 'long', 
+                            day: 'numeric', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}</span>
+                        )}
+                      </div>
                     )}
+
                     {postEvent.embeddedImage && (
+                      <div className="event-image-container">
                         <img
-                            src={postEvent.embeddedImage}
-                            alt="Event Image"
-                            className="event-embeddedImage"
+                          src={postEvent.embeddedImage}
+                          alt="Event Visual"
+                          className="event-embeddedImage"
                         />
+                      </div>
                     )}
 
                     {postEvent.type === "NormalEvent" && (
-                        <p className="event-location"> Location: {postEvent.location} </p>
+                      <p className="event-location">
+                        <strong>Location:</strong> {postEvent.location}
+                      </p>
                     )}
+
 
                     {postEvent.type === "MusicReleaseEvent" && (
-                        <div>
-                            <h2 className="event-release-title"> <b> {postEvent.releaseTitle} </b> </h2>
-                            <p className="event-release-artist"> {postEvent.releaseArtist} </p>
-                            <p className="event-release-type"> [{postEvent.releaseType}] </p>
+                      <div className="music-release-container">
+                        <h2 className="event-release-title">
+                          🎵 <b>{postEvent.releaseTitle}</b>
+                        </h2>
+                        <p className="event-release-artist">Artist: {postEvent.releaseArtist}</p>
+                        <p className="event-release-type">Release Type: <span>[{postEvent.releaseType}]</span></p>
 
-                            {postEvent.songs.map((song, index) => (
-                                <div className="event-song" key={index}>
-                                    {index + 1}. {song.songTitle} ({song.songArtist}) [{song.songDuration}]
-                                </div>
-                            ))}
-                            <br />
-                            <i> Apple Music: </i> <a href={postEvent.appleMusicLink} style={{ color: 'black' }}> {postEvent.appleMusicLink} </a>  <br />
-                            <i> Spotify: </i> <a href={postEvent.spotifyLink} style={{ color: 'black' }} > {postEvent.spotifyLink} </a> <br /> <br />
-
-
+                        <div className="songs-list">
+                          <h3>Tracklist:</h3>
+                          {postEvent.songs.map((song, index) => (
+                            <div className="event-song" key={index}>
+                              {index + 1}. <b>{song.songTitle}</b> by {song.songArtist} 
+                              <span className="song-duration">({song.songDuration} secs)</span>
+                            </div>
+                          ))}
                         </div>
+
+                        <div className="music-links">
+                          <i>Listen on: </i>
+                          <a
+                            href={postEvent.appleMusicLink.startsWith("http") ? postEvent.appleMusicLink : `https://${postEvent.appleMusicLink}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Apple Music
+                          </a>
+                          <a
+                            href={postEvent.spotifyLink.startsWith("http") ? postEvent.spotifyLink : `https://${postEvent.spotifyLink}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Spotify
+                          </a>
+                        </div>
+                      </div>
                     )}
+
                     {postEvent.type === "TicketedEvent" && (
-                        <div>
-                            <i> Get Tickets: </i> <a href={postEvent.getTicketsLink} style={{ color: 'black' }}> {postEvent.getTicketsLink} </a>  <br /><br />
-                            {postEvent.destinations.map((destination, index) => (
-                                <div className="event-destination">
-                                    {index + 1}. {destination.location} ({destination.time})
-                                </div>
-                            ))}
-                            <br />
+                      <div className="ticketed-event-container">
+                        <h2 className="ticketed-event-title">🎟️ Ticketed Event</h2>
+                        <div className="ticket-link">
+                          <i>Get Tickets: </i>
+                          <a
+                            href={postEvent.getTicketsLink.startsWith("http") ? postEvent.getTicketsLink : `https://${postEvent.getTicketsLink}`}
+                            className="ticket-button"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Buy Tickets
+                          </a>
                         </div>
+                        <div className="event-destinations">
+                          <h3>Destinations:</h3>
+                          {postEvent.destinations.map((destination, index) => (
+                            <div className="event-destination" key={index}>
+                              {index + 1}. {destination.location} <span className="destination-time">({destination.time} secs)</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     )}
+
 
                 </div>
             ) : null}
