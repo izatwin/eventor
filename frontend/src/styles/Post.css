@@ -1,5 +1,77 @@
 .post-container {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   position: relative;
 }
+
+.event {
+  display: flex;
+  flex-direction: column;
+  width: 85%;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  text-align: left;
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #dc5959;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.event-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.event-name {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.event-description {
+  font-size: 16px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.event-times {
+  font-size: 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.event-image-container {
+  display: flex;
+  justify-content: left;
+  margin: 20px 0;
+}
+
+.event-embeddedImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.event-location {
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.event-song {
+}
+
+
+
+

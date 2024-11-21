@@ -6,6 +6,7 @@ import removeIcon from '../pages/icons/remove.png'
 import editIcon from '../pages/icons/edit.png'
 import expandIcon from '../pages/icons/expand.png'
 import commentIcon from '../pages/icons/comment.png'
+import eventIcon from '../pages/icons/event.png'
 
 import profilePic from '../pages/icons/profile.png';
 
@@ -124,33 +125,54 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
                         />
                     )}
             {postEvent ? (
-                <div className="event">
-                    <h1
-                        className="event-name">
-                        {postEvent.eventName}
-                    </h1>
-                    <p
-                        className="event-description">
-                        {postEvent.eventDescription}
-                    </p>
+                  <div className="event">
+                    <div className="event-header">
+                      <img src={eventIcon} alt="Event Icon" className="event-icon" />
+                      <h1>Event</h1>
+                    </div>
+                    <h2 className="event-name">{postEvent.eventName}</h2>
+                    <p className="event-description">{postEvent.eventDescription}</p>
+
                     {(postEvent.startTime || postEvent.endTime) && (
-                        <div className="event-times">
-                            {postEvent.startTime ? new Date(postEvent.startTime).toLocaleString() : ""}
-                            {postEvent.startTime && postEvent.endTime ? " - " : ""}
-                            {postEvent.endTime ? new Date(postEvent.endTime).toLocaleString() : ""}
-                        </div>
+                      <div className="event-times">
+                        {postEvent.startTime && (
+                          <span>{new Date(postEvent.startTime).toLocaleString('en-US', { 
+                            weekday: 'long', 
+                            month: 'long', 
+                            day: 'numeric', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}</span>
+                        )}
+                        {postEvent.startTime && postEvent.endTime && <span> - </span>}
+                        {postEvent.endTime && (
+                          <span>{new Date(postEvent.endTime).toLocaleString('en-US', { 
+                            weekday: 'long', 
+                            month: 'long', 
+                            day: 'numeric', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                          })}</span>
+                        )}
+                      </div>
                     )}
+
                     {postEvent.embeddedImage && (
+                      <div className="event-image-container">
                         <img
-                            src={postEvent.embeddedImage}
-                            alt="Event Image"
-                            className="event-embeddedImage"
+                          src={postEvent.embeddedImage}
+                          alt="Event Visual"
+                          className="event-embeddedImage"
                         />
+                      </div>
                     )}
 
                     {postEvent.type === "NormalEvent" && (
-                        <p className="event-location"> Location: {postEvent.location} </p>
+                      <p className="event-location">
+                        <strong>Location:</strong> {postEvent.location}
+                      </p>
                     )}
+
 
                     {postEvent.type === "MusicReleaseEvent" && (
                         <div>
@@ -170,6 +192,7 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
 
                         </div>
                     )}
+
                     {postEvent.type === "TicketedEvent" && (
                         <div>
                             <i> Get Tickets: </i> <a href={postEvent.getTicketsLink} style={{ color: 'black' }}> {postEvent.getTicketsLink} </a>  <br /><br />
