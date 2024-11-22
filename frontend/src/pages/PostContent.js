@@ -503,7 +503,7 @@ const PostContent = () => {
                       <img onClick={() => handleLikeComment(comment._id, false, comment._id)} src={isLiking ? likedIcon : likeIcon} alt="Like" className="like-icon post-icon" />
                       <div className="likes-num num"> {comment.likes} </div>
                       <img onClick={()=>{handleReplyPopup(comment)}}src={commentIcon} alt="Comment" className="comment-icon post-icon"/> 
-                      <div className="comment-num num">{0}</div>
+                      <div className="comment-num num">{comment.comments.length}</div>
                     </div>
 
                     {/* Render replies of comment */}
