@@ -148,8 +148,8 @@ exports.editEvent = async (req, res) => {
         }
 
         // Check for profanity
-        for (field in eventData) {
-            let val = eventData[field]
+        for (field in updates) {
+            let val = updates[field]
             if (textfilter.containsProfanity(val)) {
                 res.status(422).json({ message: "Event content contains profanity." });
                 return;

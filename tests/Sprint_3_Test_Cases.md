@@ -48,12 +48,11 @@
 
 #### Test 5.1: Special Event Creation
 1. Log in to any valid account.
-2. Navigate to your personal profile page.
-3. Start a new post creation.
-4. Enter a valid message body.
+2. Navigate to your profile.
+4. Enter a valid post body and create the post.
 5. Attach a special event with a name and fill all necessary fields.
-6. Publish the post.
-7. Refresh the page; verify post with all details.
+6. Publish the event.
+7. Refresh the page; verify profile page.
 
 #### Test 5.2: Special Event Editing
 1. Log in to any valid account.
@@ -79,7 +78,8 @@
 ### Test 8: Notification Opt-Out
 1. Navigate to a profile of a user who you are currently opted into notifications for.
 2. Opt out of notifications or unfollow the user.
-3. Ensure when they post, you do not get notified.
+3. Ensure the option to opt into notificaitons disappears.
+4. Ensure when they post, you do not get notified.
 
 ### Test 9: Viewing Notifications
 1. Receive a notification from someone you have opted into notifications for.
