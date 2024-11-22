@@ -18,7 +18,7 @@ const Feed = () => {
   
   useEffect(() => {
     
-    axios.get("http://localhost:3001/api/user/validate") 
+    axios.get(process.env.REACT_APP_API_URL + "/api/user/validate") 
     .then(response => {
       console.log(response);
       if (response.status === 200) {
@@ -43,7 +43,7 @@ const Feed = () => {
       navigate("/");
       console.log(err)
     })  
-    axios.get("http://localhost:3001/api/posts/feed")
+    axios.get(process.env.REACT_APP_API_URL + "/api/posts/feed")
     .then(response => {
       console.log("feed posts res:")
       console.log(response.data)
@@ -58,7 +58,7 @@ const Feed = () => {
     const updatedPosts = await Promise.all(
       posts.map(async (post) => {
         try {
-          const postOwner = await axios.get(`http://localhost:3001/api/user/${post.user}`);
+          const postOwner = await axios.get(process.env.REACT_APP_API_URL + `/api/user/${post.user}`);
           console.log("updatePosts res:")
           console.log(postOwner)
           const { displayName, userName, imageURL } = postOwner.data;
@@ -74,7 +74,7 @@ const Feed = () => {
         for (const currentPost of posts) {
           if (currentPost.eventId) {
             if (!eventsById[currentPost.eventId]) {
-              const event = (await axios.get(`http://localhost:3001/api/events/${currentPost.eventId}`)).data
+              const event = (await axios.get(process.env.REACT_APP_API_URL + `/api/events/${currentPost.eventId}`)).data
               setEventsById(prevEvents => ({
                 ...prevEvents,
                 [currentPost.eventId]: event
@@ -108,7 +108,7 @@ const trackViewCount = async (postId) => {
     return;
   }
   try {
-    await axios.post("http://localhost:3001/api/posts/action", {
+    await axios.post(process.env.REACT_APP_API_URL + "/api/posts/action", {
       postId: postId, 
       actionType: "view"
     });

@@ -39,7 +39,7 @@ const Code = () => {
     e.preventDefault(); 
     console.log("a: " + formData.verifyId);
     console.log(formData);
-    axios.patch("http://localhost:3001/api/user/verify", formData)
+    axios.patch(process.env.REACT_APP_API_URL + "/api/user/verify", formData)
     .then(response => {
       console.log(response);
       if (response.status === 200) {

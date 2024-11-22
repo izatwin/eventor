@@ -28,7 +28,7 @@ const SettingsContent = () => {
   const { showOffensivePopup } = usePopup();
 
   useEffect(() => {
-    axios.get("http://localhost:3001/api/user/validate") 
+    axios.get(process.env.REACT_APP_API_URL + "/api/user/validate") 
     .then(response => {
       console.log(response);
       if (response.status === 200) {
@@ -71,7 +71,7 @@ const SettingsContent = () => {
         {newDisplay : newDisplay,
         };
       console.log(params);
-      const response = await axios.post(`http://localhost:3001/api/user/displayname`, params);  
+      const response = await axios.post(process.env.REACT_APP_API_URL + `/api/user/displayname`, params);  
       console.log(response);
       if (response.status === 200) {   
         setUser(prevUser => ({
@@ -104,7 +104,7 @@ const SettingsContent = () => {
         const params =
           {imageURL : imageUrl};
         console.log(params);
-        const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/image`, params);  
+        const response = await axios.post(process.env.REACT_APP_API_URL + `/api/user/${user.userId}/image`, params);  
         console.log('pic response:')
         console.log(response);
         if (response.status === 200) {   
@@ -134,7 +134,7 @@ const SettingsContent = () => {
         {newUsername : newUsername,
         };
       console.log(params);
-      const response = await axios.post(`http://localhost:3001/api/user/username`, params);  
+      const response = await axios.post(process.env.REACT_APP_API_URL + `/api/user/username`, params);  
       console.log(response);
       if (response.status === 200) {   
         setUser(prevUser => ({
@@ -171,7 +171,7 @@ const SettingsContent = () => {
          newPassword : newPassword
         };
       console.log(params);
-      const response = await axios.post(`http://localhost:3001/api/user/authorized-reset`, params); 
+      const response = await axios.post(process.env.REACT_APP_API_URL + `/api/user/authorized-reset`, params); 
  
       
       console.log(response);
@@ -205,7 +205,7 @@ const SettingsContent = () => {
         password : password
       };
       console.log(params);
-      const response = await axios.delete(`http://localhost:3001/api/user/account`, {data: params});  
+      const response = await axios.delete(process.env.REACT_APP_API_URL + `/api/user/account`, {data: params});  
 
       console.log(response);
       if (response.status === 200) {   
