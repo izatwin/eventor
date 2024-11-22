@@ -22,10 +22,15 @@ const PostContent = () => {
   const { showOffensivePopup } = usePopup();
   const navigate = useNavigate();
   const { _id } = useParams();
-  const [newComment, setNewComment] = useState({
+  const defaultNewComment = {
     text: "",
     isRoot: true,
-  })
+  }
+  const defaultReplyComment = {
+    text: "",
+    isRoot: false,
+  }
+  const [newComment, setNewComment] = useState(defaultNewComment)
   const [comments, setComments] = useState([])
   const [poster, setPoster] = useState([])
   const [commenters, setCommenters] = useState([])
@@ -35,10 +40,7 @@ const PostContent = () => {
   const [currentComment, setCurrentComment] = useState(null);
   const [isCurrentCommentRoot, setIsCurrentCommentRoot] = useState(false);
   const [currentCommentRootId, setCurrentCommentRootId] = useState(null);
-  const [replyComment, setReplyComment] = useState({
-    text: "",
-    isRoot: false,
-  })
+  const [replyComment, setReplyComment] = useState(defaultReplyComment)
   const [replies, setReplies] = useState({})
   const [isEditPopupOpen, setEditPopupOpen] = useState(false);
 
@@ -189,8 +191,8 @@ const PostContent = () => {
     catch (err) {
       if (err.response.status === 422) {
         showOffensivePopup('Your comment contains offensive or obscene content')
-        setReplyComment("")
-        setNewComment("")
+        setReplyComment(defaultReplyComment)
+        setNewComment(defaultNewComment)
         return;
       }
     }
@@ -202,17 +204,11 @@ const PostContent = () => {
           ...prevReplies, [currentComment._id]: [...(prevReplies[currentComment._id] || []), tempNewComment]
         }
       });    
-      setReplyComment({
-        text: "",
-        isRoot: false
-      })
+      setReplyComment(defaultReplyComment)
     }
     else {
       setComments((prevComments) => [tempNewComment, ...prevComments]);
-      setNewComment({
-        text: "",
-        isRoot: true
-      })
+      setNewComment(defaultNewComment)
     }
     axios.get(`http://localhost:3001/api/user/${tempNewComment.user}`)
       .then(response => {
@@ -298,10 +294,7 @@ const PostContent = () => {
   
   const closeReplyPopup = () => {
     setCurrentComment(null);
-    setReplyComment({
-      text: "",
-      isRoot: false
-    })
+    setReplyComment(defaultReplyComment)
 
     setReplyPopupOpen(false)
   }
@@ -395,8 +388,8 @@ const PostContent = () => {
       .catch((err) => {
         if (err.response.status === 422) {
           showOffensivePopup('Your comment contains offensive or obscene content')
-          setReplyComment("")
-          setNewComment("")
+          setReplyComment(defaultReplyComment)
+          setNewComment(defaultNewComment)
         }
         console.log(err)
       });
