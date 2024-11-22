@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../AuthContext'; 
 import { usePopup } from '../PopupContext';
+import DropdownButton from "../components/NotificationButton";
 
 import Post from '../components/Post';
 
@@ -734,19 +735,21 @@ const handleEventDateChange = (e) => {
                 <div>
                   {!isBlocked && !isBlocking && (
                     <div>
-                      <button 
+                      <button
                         onClick={handleFollow}
-                        className="follow-btn"> 
+                        className="follow-btn">
                         {isFollowing ? 'Following' : 'Follow'}
                       </button>
                     </div>
                   )}
-                                      
-                  <button 
-                    onClick={handleBlock}
-                    className="block-btn"> 
-                    {!isBlocking ? 'Block' : 'Unblock'}
-                  </button>
+                  <div>
+                    <button
+                      onClick={handleBlock}
+                      className="block-btn">
+                      {!isBlocking ? 'Block' : 'Unblock'}
+                    </button>
+                  </div>
+                    {isFollowing && (<DropdownButton userId={profileUser.userId}/>)}
                 </div>
               )} 
 

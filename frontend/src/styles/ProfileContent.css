@@ -34,7 +34,7 @@
   display: flex;
   flex-direction: column;
   width: 50vw;
-  height: 15vh;
+  height: auto;
 }
 
 .profile-upper-container {
@@ -106,7 +106,7 @@
   margin-left: auto;
   margin-right: 2%;
   align-items: flex-start;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .follower-count {
@@ -143,7 +143,49 @@
   margin-left: 3px;
 }
 
+.notification-btn {
+  background-color: #d32f2f;
+  z-index: 10;
+  color: white;
+  padding: 6px;
+  width: 100px;
+  border: none;
+  border-radius: 20px;
+  font-size: 15px;
+  cursor: pointer;
+  height: 50px;
+  margin-top: 10px;
+  margin-left: 3px;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.notification-dropdown-btn {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.notification-dropdown-btn:hover {
+  background-color: rgb(204, 203, 203);
+}
+
 .follow-btn:hover {
+  background-color: #b71c1c;
+}
+
+.notification-btn:hover {
+  background-color: #b71c1c;
+}
+
+.block-btn:hover {
   background-color: #b71c1c;
 }
 
@@ -164,7 +206,7 @@
   flex-direction: column;
   padding-left: 3%;
   padding-right: 3%;
-  height: 15vh;
+  height: auto;
 }
 
 .about-title-container {

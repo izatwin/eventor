@@ -23,6 +23,11 @@
   cursor: pointer;
 }
 
+.icon-small {
+  width: 20px;  
+  height: 20px; 
+}
+
 .noti-dropdown {
   position: fixed;
   top: 50px;
