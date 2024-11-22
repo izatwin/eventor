@@ -208,11 +208,14 @@ exports.delete = async (req, res) => {
             });
         }
 
+        let commentsDeleted = 1; // Start by assuming we'll delete the current comment
+
         if (commentToDelete.isRoot && commentToDelete.comments.length > 0) {
-            // If this is a root comment, delete all child comments
+            // If it's a root comment, delete all child comments and count them
+            commentsDeleted += commentToDelete.comments.length;
             await Comment.deleteMany({ _id: { $in: commentToDelete.comments } });
         } else {
-            // If this is not a root comment, find the parent comment and remove this comment's ID from its array
+            // If it's a non-root comment, find and update the parent
             const parentComment = await Comment.findOne({ comments: id }).exec();
             if (parentComment) {
                 parentComment.comments = parentComment.comments.filter(childId => !childId.equals(id));
@@ -220,15 +223,15 @@ exports.delete = async (req, res) => {
             }
         }
 
-        // Delete the comment itself
+        // Delete the root or individual child comment
         await Comment.findByIdAndDelete(id);
 
-        // Find and update the post containing this comment to remove the ID
+        // Find and update the post containing this comment 
         const post = await Post.findOne({ comments: id }).exec();
         if (post) {
             post.comments = post.comments.filter(commentId => !commentId.equals(id));
-            // Decrement the comment count on the post if needed
-            post.commentCount = Math.max(post.commentCount - 1, 0);
+            // Decrement the comment count on the post
+            post.commentCount = Math.max(post.commentCount - commentsDeleted, 0);
             await post.save();
         }
 

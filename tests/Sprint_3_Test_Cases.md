@@ -22,7 +22,7 @@
 
 
 #### Test 3.1: Comment Deletion on Others' Posts
-1. Navigate to another user's and expand it to view the comments section.
+1. Navigate to another user's post and expand it to view the comments section.
 2. Ensure that no delete option is available for comments and reply-comments created by other users.
 3. Ensure that a delete option is available for comments and reply-comments created by yourself.
 4. When delete option is available, ensure that deleting the comment/reply-comment is successful.
