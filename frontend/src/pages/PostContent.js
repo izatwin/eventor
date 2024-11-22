@@ -191,6 +191,7 @@ const PostContent = () => {
         showOffensivePopup('Your comment contains offensive or obscene content')
         setReplyComment("")
         setNewComment("")
+        return;
       }
     }
     console.log("tempNEWCOMMENT:")

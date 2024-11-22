@@ -344,7 +344,7 @@
 }
 
 .event-icon {
-  width: 25px;
+  width: 50px;
   height: 25px;
   margin-left: 10px;
   cursor: pointer;
@@ -631,4 +631,8 @@ h2 {
   margin-bottom: 10px;
   width: 25px;
   align-self: center;
+}
+
+textarea {
+  resize: none;
 }
