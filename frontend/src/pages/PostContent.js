@@ -191,8 +191,10 @@ const PostContent = () => {
     catch (err) {
       if (err.response.status === 422) {
         showOffensivePopup('Your comment contains offensive or obscene content')
+
         setReplyComment(defaultReplyComment)
         setNewComment(defaultNewComment)
+
         return;
       }
     }
