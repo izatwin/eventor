@@ -1317,41 +1317,38 @@ exports.getNotifications = async (req, res) => {
 
     try {
         const notifications = [];
-
+    
         for (const [followedUserId, optInDetails] of myUser.notificationOptIns.entries()) {
             const followedUser = await User.findById(followedUserId).populate('posts', '_id timestamp');
             if (!followedUser) continue;
             
             const optInStatus = optInDetails.status;
             const optInTimestamp = new Date(optInDetails.timestamp);
-            
-            const userNotifications = followedUser.posts.reduce((acc, post) => {
+    
+            for (let post of followedUser.posts) {
                 const existingNotification = myUser.notifications.find(n => n.postId === String(post._id));
-                
+                post = await Post.findById(post._id).exec();
+    
                 // Check if we already have this notification or if it's older than the opt-in timestamp
                 if (!existingNotification && post.timestamp > optInTimestamp) {
-                    
                     const postTime = post.timestamp.getTime();
                     const newNotification = { timestamp: postTime, postId: String(post._id), read: false };
-                    
-                    if (optInStatus === "Posts" || (optInStatus === "Events" && post.is_event)) {
-                        acc.push(newNotification);
+    
+                    if (optInStatus === "Posts" || ((optInStatus === "Events") && (post.is_event))) {
+                        notifications.push(newNotification);
                     }
                 }
-                return acc;
-            }, []);
-            
-            notifications.push(...userNotifications);
+            }
         }
-
+    
         // Combine and deduplicate existing and new notifications
         const updatedNotifications = [...myUser.notifications, ...notifications]
             .sort((a, b) => b.timestamp - a.timestamp) // Sort by timestamp descending
             .filter((item, index, self) => index === self.findIndex(n => n.postId === item.postId)); // Remove duplicates
-
+    
         // Cap notifications to a maximum of 100
         myUser.notifications = updatedNotifications.slice(0, 100);
-
+    
         await myUser.save();
         return res.status(200).send(myUser.notifications);
     } catch (err) {
