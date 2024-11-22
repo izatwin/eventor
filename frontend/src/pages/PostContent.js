@@ -105,7 +105,16 @@ const PostContent = () => {
         console.log(err);
       }
 
-      try {
+      getComments()
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+  
+  const getComments = async () => {
+        try {
         // get comments
         const commentsResponse = await axios.get(process.env.REACT_APP_API_URL + `/api/comments/post/${_id}`);
         console.log(`Comments are:`, commentsResponse.data);
@@ -164,12 +173,7 @@ const PostContent = () => {
       } catch (err) {
         console.log("Error fetching comments:", err);
       }
-
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
+  }
   
   useEffect(()=>{
     axios.post(process.env.REACT_APP_API_URL + "/api/posts/action", {"postId": _id, "actionType": "view"});
