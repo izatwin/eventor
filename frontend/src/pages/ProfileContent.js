@@ -434,19 +434,6 @@ useEffect(() => {
     }
   };
 
-  // TODO: FOR IMAGE UPLOAD
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      console.log(file);
-    }
-  };
-
-  // TODO: FOR IMAGE UPLOAD
-  const handleUploadClick = () => {
-    document.getElementById('file-input').click();
-  };
-  
 
   /* Function to handle a user requesting to edit their post */
   const handleEditPopup = (post, postEvent) => {
@@ -499,7 +486,8 @@ useEffect(() => {
     if (newEvent === null || newEvent === undefined) {
     } else {
       if (currentPost.eventId && currentPost.eventId === newEvent._id) {
-        axios.put(process.env.REACT_APP_API_URL + `/api/events/${newEvent._id}`, {"event": newEvent, "postId": currentPost._id})
+        console.log(newEvent)
+        axios.put(process.env.REACT_APP_API_URL + `/api/events/${newEvent._id}`, {"id": newEvent._id, "event": newEvent, "postId": currentPost._id})
           .then((response) => {
             setEventsById(prevEvents => ({
               ...prevEvents,
@@ -554,12 +542,13 @@ const handleAddEvent = async () => {
     showFailPopup("Release type required")
     return;
   }
-  
+  let shouldDeleteId;
   let currPostId;
   // check if the post is being added or created along side post
   if (!currentPost) {
     try {
       currPostId = await handlePost();  
+      shouldDeleteId = true;
       console.log('CURRPOSTID AFTER HANDLEPOST: ' + currPostId);
     } catch (err) {
       console.log("Error creating post for event:", err);
@@ -589,6 +578,10 @@ const handleAddEvent = async () => {
     .catch((err) => {
       if (err.response.status === 422) {
         showOffensivePopup('Your event contains offensive or obscene content')
+        if (shouldDeleteId) {
+          axios.delete(process.env.REACT_APP_API_URL + `/api/posts/${currPostId}`)
+        }
+        
       }
       else {
         showFailPopup("Error creating event.");

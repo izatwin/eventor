@@ -190,28 +190,40 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
                           {postEvent.songs.map((song, index) => (
                             <div className="event-song" key={index}>
                               {index + 1}. <b>{song.songTitle}</b> by {song.songArtist} 
-                              <span className="song-duration">({song.songDuration} secs)</span>
+                             {song.songDuration && (
+                                <span className="destination-time"> ({song.songDuration} secs)</span>
+                              )}
                             </div>
                           ))}
                         </div>
 
                         <div className="music-links">
-                          <i>Listen on: </i>
-                          <a
-                            href={postEvent.appleMusicLink.startsWith("http") ? postEvent.appleMusicLink : `https://${postEvent.appleMusicLink}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Apple Music
-                          </a>
-                          <a
-                            href={postEvent.spotifyLink.startsWith("http") ? postEvent.spotifyLink : `https://${postEvent.spotifyLink}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Spotify
-                          </a>
+
+                          {(postEvent.appleMusicLink || postEvent.spotifyLink) && (
+                            <>
+                              <i>Listen on: </i>
+                              {postEvent.appleMusicLink && (
+                                <a
+                                  href={postEvent.appleMusicLink.startsWith("http") ? postEvent.appleMusicLink : `https://${postEvent.appleMusicLink}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Apple Music
+                                </a>
+                              )}
+                              {postEvent.spotifyLink && (
+                                <a
+                                  href={postEvent.spotifyLink.startsWith("http") ? postEvent.spotifyLink : `https://${postEvent.spotifyLink}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  Spotify
+                                </a>
+                              )}
+                            </>
+                          )}
                         </div>
+
                       </div>
                     )}
 
@@ -233,7 +245,10 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
                           <h3>Destinations:</h3>
                           {postEvent.destinations.map((destination, index) => (
                             <div className="event-destination" key={index}>
-                              {index + 1}. {destination.location} <span className="destination-time">({destination.time} secs)</span>
+                              {index + 1}. {destination.location}
+                              {destination.time && (
+                                <span className="destination-time"> ({destination.time} secs)</span>
+                              )}
                             </div>
                           ))}
                         </div>
