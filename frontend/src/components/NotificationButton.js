@@ -7,6 +7,12 @@ import axios from 'axios'
 const DropdownButton = ({userId}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [notificationType, setNotificationType] = useState("No Notifications")
+  const notiTypeDict = {
+    "None": "No Notifications",
+    "Events": "Events Only",
+    "Posts": "All Posts",
+  };
+  
   
 
   useEffect(() => {
@@ -14,12 +20,10 @@ const DropdownButton = ({userId}) => {
 
     const fetchNotificationType = async () => {
       try {
-        const response = await axios.get(`http://localhost:3001/api/user/notifications/opt-in/${userId}`);
+        const response = await axios.get(process.env.REACT_APP_API_URL + `/api/user/notifications/opt-in/${userId}`);
         const optInStatus = response.data.optInStatus
 
-        if (optInStatus !== "None") {
-          setNotificationType(optInStatus)
-        }
+        setNotificationType(notiTypeDict[optInStatus])
       } catch (err) {
         console.error(`Error retrieving opt-in status ${err}`)
       }
@@ -36,13 +40,13 @@ const DropdownButton = ({userId}) => {
   };
 
   const handleOptionClick = (option) => {
-    setNotificationType(option)
+    setNotificationType(notiTypeDict[option])
     setServerNotificationType(option)
     setIsOpen(false); // Close dropdown after selection
   };
 
   const setServerNotificationType = (option) => {
-    axios.post(`http://localhost:3001/api/user/notifications/opt-in`, {userId: userId, optInStatus: option})
+    axios.post(process.env.REACT_APP_API_URL + `/api/user/notifications/opt-in`, {userId: userId, optInStatus: option})
     .catch((err) => {
       console.error(`Unable to update notification type, error: ${err}`)
     })
@@ -57,19 +61,19 @@ const DropdownButton = ({userId}) => {
         <div className="notification-dropdown">
           <div
             className="notification-dropdown-btn"
-            onClick={() => handleOptionClick("No Notifications")}
+            onClick={() => handleOptionClick("None")}
           >
             No Notifications
           </div>
           <div
             className="notification-dropdown-btn"
-            onClick={() => handleOptionClick("Events Only")}
+            onClick={() => handleOptionClick("Events")}
           >
             Events Only
           </div>
           <div
             className="notification-dropdown-btn"
-            onClick={() => handleOptionClick("All Posts")}
+            onClick={() => handleOptionClick("Posts")}
           >
             All Posts
           </div>

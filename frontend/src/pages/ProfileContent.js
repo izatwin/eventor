@@ -749,7 +749,7 @@ const handleEventDateChange = (e) => {
                       {!isBlocking ? 'Block' : 'Unblock'}
                     </button>
                   </div>
-                    <DropdownButton userId={profileUser.userId}/>
+                    {isFollowing && (<DropdownButton userId={profileUser.userId}/>)}
                 </div>
               )} 
 
