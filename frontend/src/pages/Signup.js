@@ -4,18 +4,21 @@ import '../styles/Signup.css';
 import '../styles/eventor.css';
 import axios from 'axios';
 import { useAuth } from '../AuthContext';  
+import { usePopup } from '../PopupContext';
 
 const SignUp = () => {
   const navigate = useNavigate();
   const { email, verifyId, setUser, setAuthenticated } = useAuth();
-
-  const [formData, setFormData] = useState({
+  const { showOffensivePopup } = usePopup();
+  
+  const defaultForm = {
     email: email,
     verifyId : verifyId,
     userName: "",
     password: "",
     displayName: "",
-  });
+  }
+  const [formData, setFormData] = useState(defaultForm);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -39,7 +42,10 @@ const SignUp = () => {
       }
     })
     .catch (err =>  {
-      console.log(err);
+      if (err.response.status === 422) {
+        showOffensivePopup("Your profile can't contain offensive or obscene content")
+        setFormData(defaultForm)
+      }
       console.log(err)
     })
   };

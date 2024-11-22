@@ -549,6 +549,10 @@ useEffect(() => {
   }
 
 const handleAddEvent = async () => {
+  if (newEvent.eventType === "MusicReleaseEvent" && newEvent.releaseType === '') {
+    showFailPopup("Release type required")
+    return;
+  }
   
   let currPostId;
   // check if the post is being added or created along side post
