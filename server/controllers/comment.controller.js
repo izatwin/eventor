@@ -197,28 +197,51 @@ exports.update = (req, res) => {
         });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
 
-    Comment.findByIdAndDelete(id)
-        .then(data => {
-            if (!data) {
-                res.status(404).send({
-                    message: `Cannot find comment with id=${id}`
-                });
-            } else {
-                res.send({
-                    message: "Comment deleted successfully."
-                });
+    try {
+        const commentToDelete = await Comment.findById(id).exec();
+        if (!commentToDelete) {
+            return res.status(404).send({
+                message: `Cannot find comment with id=${id}`
+            });
+        }
+
+        if (commentToDelete.isRoot && commentToDelete.comments.length > 0) {
+            // If this is a root comment, delete all child comments
+            await Comment.deleteMany({ _id: { $in: commentToDelete.comments } });
+        } else {
+            // If this is not a root comment, find the parent comment and remove this comment's ID from its array
+            const parentComment = await Comment.findOne({ comments: id }).exec();
+            if (parentComment) {
+                parentComment.comments = parentComment.comments.filter(childId => !childId.equals(id));
+                await parentComment.save();
             }
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `Error deleting comment with id=${id}`,
-                error: err
-            })
-        })
-}
+        }
+
+        // Delete the comment itself
+        await Comment.findByIdAndDelete(id);
+
+        // Find and update the post containing this comment to remove the ID
+        const post = await Post.findOne({ comments: id }).exec();
+        if (post) {
+            post.comments = post.comments.filter(commentId => !commentId.equals(id));
+            // Decrement the comment count on the post if needed
+            post.commentCount = Math.max(post.commentCount - 1, 0);
+            await post.save();
+        }
+
+        res.send({
+            message: "Comment and its child comments (if any) deleted successfully."
+        });
+    } catch (err) {
+        res.status(500).send({
+            message: `Error deleting comment with id=${id}`,
+            error: err.message || "Unexpected Error"
+        });
+    }
+};
 
 // Like or Unlike a post
 exports.toggleLike = async (req, res) => {
