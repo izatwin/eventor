@@ -128,9 +128,8 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
                   <div className="event">
                     <div className="event-header">
                       <img src={eventIcon} alt="Event Icon" className="event-icon" />
-                      <h1>Event</h1>
+                      <h1>{postEvent.eventName}</h1>
                     </div>
-                    <h2 className="event-name">{postEvent.eventName}</h2>
                     <p className="event-description">{postEvent.eventDescription}</p>
 
                     {(postEvent.startTime || postEvent.endTime) && (
@@ -169,7 +168,11 @@ export default function Post({ post, poster, postEvent, setPost, handleAddEventP
 
                     {postEvent.type === "NormalEvent" && (
                       <p className="event-location">
-                        <strong>Location:</strong> {postEvent.location}
+                          {postEvent.location && (
+                            <>
+                              <strong>Location:</strong> {postEvent.location}
+                            </>
+                          )}
                       </p>
                     )}
 
