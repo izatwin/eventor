@@ -84,5 +84,5 @@
 ### Test 9: Viewing Notifications
 1. Receive a notification from someone you have opted into notifications for.
 2. Ensure there is an indicator on the notification bell that you have unread notifications within 15 seconds.
-3. Open the notification dropdown and ensure there is an unread indicator on new notifcations you are viewing for the first time. Ensure that the unread icon has been removed from the notifcation bell icon.
-4. Close and reopen the notification dropdown. Ensure that no unread indicators remain.
+3. Open the notification dropdown and ensure there is a visible notifciation.
+4. Close and reopen the notification dropdown. Ensure that the unread icon has been removed from the notifcation bell icon. Ensure that no unread notifications remain.
