@@ -26,8 +26,8 @@ exports.create = async (req, res) => {
     const commentFields = req.body.comment;
 
     for (field in commentFields) {
-        console.log(field);
-        if (textfilter.containsProfanity(field)) {
+        let val = commentFields[field]
+        if (textfilter.containsProfanity(val)) {
             res.status(422).json({ message: "Comment content contains profanity." });
             return;
         }
@@ -174,7 +174,8 @@ exports.update = (req, res) => {
     const commentId = req.params.id;
 
     for (field in req.body) {
-        if (textfilter.containsProfanity(field)) {
+        let val = req.body[field]
+        if (textfilter.containsProfanity(val)) {
             res.status(422).json({ message: "Comment content contains profanity." });
             return;
         }
