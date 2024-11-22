@@ -103,7 +103,7 @@ const ProfileContent= () => {
     const validateAndGetProfileUser = async () => {
       try {
         // validate the user
-        const validateResponse = await axios.get("http://localhost:3001/api/user/validate") 
+        const validateResponse = await axios.get(process.env.REACT_APP_API_URL + "/api/user/validate") 
           console.log("validate response: ")
           console.log(validateResponse);
 
@@ -124,7 +124,7 @@ const ProfileContent= () => {
             })
             // TODO
             console.log("profileId: " + profileId) 
-            const profileUserResponse = (await axios.get(`http://localhost:3001/api/user/${profileId}`)).data;
+            const profileUserResponse = (await axios.get(process.env.REACT_APP_API_URL + `/api/user/${profileId}`)).data;
             console.log("pro res:")
             console.log(profileUserResponse)
             setProfileUser({
@@ -143,7 +143,7 @@ const ProfileContent= () => {
             console.log("userId="+userInfo.userId)
             console.log("profileId="+profileId)
             setIsOwnProfile(userInfo.userId===profileId)
-            const blockStatusResponse = (await axios.get(`http://localhost:3001/api/user/block-status/${profileId}`)).data
+            const blockStatusResponse = (await axios.get(process.env.REACT_APP_API_URL + `/api/user/block-status/${profileId}`)).data
             console.log("block-status response:")
             console.log(blockStatusResponse) 
             const isBlockingResponse = blockStatusResponse['blockingThem']
@@ -157,16 +157,16 @@ const ProfileContent= () => {
             
             if (!isBlockedResponse && !isBlockingResponse) {
               /* postResponse is a list of post ids */
-              const postResponse = (await axios.get(`http://localhost:3001/api/user/${profileId}/posts/`)).data
+              const postResponse = (await axios.get(process.env.REACT_APP_API_URL + `/api/user/${profileId}/posts/`)).data
               const postContents = []
               /* make request to get the content of each post using id */ 
               for (const currentPost of postResponse) {
-                const curPostData = (await axios.get(`http://localhost:3001/api/posts/${currentPost}`)).data
+                const curPostData = (await axios.get(process.env.REACT_APP_API_URL + `/api/posts/${currentPost}`)).data
                 postContents.push(curPostData)
 
                 if (curPostData.eventId) {
                   if (!eventsById[curPostData.eventId]) {
-                    const event = (await axios.get(`http://localhost:3001/api/events/${curPostData.eventId}`)).data
+                    const event = (await axios.get(process.env.REACT_APP_API_URL + `/api/events/${curPostData.eventId}`)).data
                     setEventsById(prevEvents => ({
                       ...prevEvents,
                       [curPostData.eventId]: event
@@ -199,7 +199,7 @@ const handleFollow = async () => {
   // API request to follow/unfollow userId 
   try {
     if (isFollowing) {
-      const response = await axios.post("http://localhost:3001/api/user/unfollow", {
+      const response = await axios.post(process.env.REACT_APP_API_URL + "/api/user/unfollow", {
         userId: profileUser.userId,
       });
 
@@ -211,7 +211,7 @@ const handleFollow = async () => {
         setIsFollowing(false); 
       }
     } else {
-      const response = await axios.post("http://localhost:3001/api/user/follow", {
+      const response = await axios.post(process.env.REACT_APP_API_URL + "/api/user/follow", {
         userId: profileUser.userId,
       });
 
@@ -239,11 +239,11 @@ const handleFollow = async () => {
     // api req to block/unblock userId 
     if (isBlocking) {
       // unblock
-      axios.post("http://localhost:3001/api/user/block", {"userId": profileUser.userId, "block": false})
+      axios.post(process.env.REACT_APP_API_URL + "/api/user/block", {"userId": profileUser.userId, "block": false})
     }
     else {
       // block
-      axios.post("http://localhost:3001/api/user/block", {"userId": profileUser.userId, "block": true})
+      axios.post(process.env.REACT_APP_API_URL + "/api/user/block", {"userId": profileUser.userId, "block": true})
     }
 
     setIsBlocking(!isBlocking) 
@@ -271,7 +271,7 @@ const trackViewCount = async (postId) => {
     return;
   }
   try {
-    await axios.post("http://localhost:3001/api/posts/action", {
+    await axios.post(process.env.REACT_APP_API_URL + "/api/posts/action", {
       postId: postId, 
       actionType: "view"
     });
@@ -339,7 +339,7 @@ useEffect(() => {
       const params = {
         biography: bio,
       }
-      const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/biography`, params);  
+      const response = await axios.post(process.env.REACT_APP_API_URL + `/api/user/${user.userId}/biography`, params);  
       console.log("change bio response: ")
       console.log(response);
       if (response.status === 200) {    
@@ -380,7 +380,7 @@ useEffect(() => {
       const params = {
         status: status,
       }
-      const response = await axios.post(`http://localhost:3001/api/user/${user.userId}/status`, params);  
+      const response = await axios.post(process.env.REACT_APP_API_URL + `/api/user/${user.userId}/status`, params);  
       console.log("status response: ")
       console.log(response);
       if (response.status === 200) {    
@@ -413,7 +413,7 @@ useEffect(() => {
   const handlePost = async () => {
     try {
       console.log(newPost);
-      const response = await axios.post("http://localhost:3001/api/posts", newPost);
+      const response = await axios.post(process.env.REACT_APP_API_URL + "/api/posts", newPost);
       console.log("posting res: ");
       console.log(response.data);
       showSuccessPopup("Post created successfully!");
@@ -479,7 +479,7 @@ useEffect(() => {
 
 
     const { _id, content, embeddedImage } = currentPost;
-    axios.put(`http://localhost:3001/api/posts/${_id}`, {"content": content, "embeddedImage": embeddedImage})
+    axios.put(process.env.REACT_APP_API_URL + `/api/posts/${_id}`, {"content": content, "embeddedImage": embeddedImage})
     .then(()=> {
 
       // Update the post dynamically on the page
@@ -499,7 +499,7 @@ useEffect(() => {
     if (newEvent === null || newEvent === undefined) {
     } else {
       if (currentPost.eventId && currentPost.eventId === newEvent._id) {
-        axios.put(`http://localhost:3001/api/events/${newEvent._id}`, {"event": newEvent, "postId": currentPost._id})
+        axios.put(process.env.REACT_APP_API_URL + `/api/events/${newEvent._id}`, {"event": newEvent, "postId": currentPost._id})
           .then((response) => {
             setEventsById(prevEvents => ({
               ...prevEvents,
@@ -520,7 +520,7 @@ useEffect(() => {
 
   const handlePostDelete = (id) => {
     // api request
-    axios.delete(`http://localhost:3001/api/posts/${id}`)
+    axios.delete(process.env.REACT_APP_API_URL + `/api/posts/${id}`)
     .then((response) => {
       setPosts((prevPosts) => prevPosts.filter((post) => post._id !== id));
       showSuccessPopup("Post deleted successfully!")
@@ -534,7 +534,7 @@ useEffect(() => {
   const handleEventDelete = (id) => {
     // api request
     console.log("CURRPOSTID:" + currentPost._id)
-    axios.post(`http://localhost:3001/api/events/delete/${id}`, {"postId": currentPost._id})
+    axios.post(process.env.REACT_APP_API_URL + `/api/events/delete/${id}`, {"postId": currentPost._id})
     .then((response) => {
       setEventsById((prevEvents) => {
         const { [id]: _, ...remainingEvents } = prevEvents; 
@@ -550,6 +550,10 @@ useEffect(() => {
   }
 
 const handleAddEvent = async () => {
+  if (newEvent.eventType === "MusicReleaseEvent" && newEvent.releaseType === '') {
+    showFailPopup("Release type required")
+    return;
+  }
   
   let currPostId;
   // check if the post is being added or created along side post
@@ -570,7 +574,7 @@ const handleAddEvent = async () => {
     eventType: newEvent.eventType,
     eventData: newEvent,
   };
-  axios.post("http://localhost:3001/api/events", requestData)
+  axios.post(process.env.REACT_APP_API_URL + "/api/events", requestData)
     .then((response) => {
       setEventsById(prevEvents => ({
         ...prevEvents,

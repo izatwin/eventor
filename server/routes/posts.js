@@ -10,16 +10,16 @@ router.get('/user/:id', postController.findAllPostsByUser);
 
 router.get('/feed', postController.getFeed)
 
-router.get('/:id', postController.findOne);
-
-router.delete('/:id', postController.delete);
-
-router.put('/:id', postController.update);
-
 router.post('/toggle-like', postController.toggleLike);
 
 router.post('/action', postController.viewOrSharePost);
 
 router.post('/search', postController.searchPosts);
+
+router.get('/:id', postController.findOne);
+
+router.delete('/:id', postController.delete);
+
+router.put('/:id', postController.update);
 
 module.exports = router;

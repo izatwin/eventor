@@ -26,7 +26,7 @@ const handleSubmit = async (e) => {
   let terminate = false;
 
   try {
-    const response = await axios.get(`http://localhost:3001/api/user/${formData.email}/exists`);
+    const response = await axios.get(process.env.REACT_APP_API_URL + `/api/user/${formData.email}/exists`);
 
     if (action === 'signup') {
       console.log(response.data.exists);
@@ -49,7 +49,7 @@ const handleSubmit = async (e) => {
 
     setEmail(formData.email);
 
-    const verifyResponse = await axios.post("http://localhost:3001/api/user/verify", formData);
+    const verifyResponse = await axios.post(process.env.REACT_APP_API_URL + "/api/user/verify", formData);
     console.log(verifyResponse.data.verifyId);
     console.log(verifyResponse.data.verifyId);
     setVerifyId(verifyResponse.data.verifyId);

@@ -26,7 +26,8 @@ exports.create = async (req, res) => {
     const commentFields = req.body.comment;
 
     for (field in commentFields) {
-        if (textfilter.containsProfanity(field)) {
+        let val = commentFields[field]
+        if (textfilter.containsProfanity(val)) {
             res.status(422).json({ message: "Comment content contains profanity." });
             return;
         }
@@ -173,7 +174,8 @@ exports.update = (req, res) => {
     const commentId = req.params.id;
 
     for (field in req.body) {
-        if (textfilter.containsProfanity(field)) {
+        let val = req.body[field]
+        if (textfilter.containsProfanity(val)) {
             res.status(422).json({ message: "Comment content contains profanity." });
             return;
         }
@@ -195,28 +197,54 @@ exports.update = (req, res) => {
         });
 };
 
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
 
-    Comment.findByIdAndDelete(id)
-        .then(data => {
-            if (!data) {
-                res.status(404).send({
-                    message: `Cannot find comment with id=${id}`
-                });
-            } else {
-                res.send({
-                    message: "Comment deleted successfully."
-                });
+    try {
+        const commentToDelete = await Comment.findById(id).exec();
+        if (!commentToDelete) {
+            return res.status(404).send({
+                message: `Cannot find comment with id=${id}`
+            });
+        }
+
+        let commentsDeleted = 1; // Start by assuming we'll delete the current comment
+
+        if (commentToDelete.isRoot && commentToDelete.comments.length > 0) {
+            // If it's a root comment, delete all child comments and count them
+            commentsDeleted += commentToDelete.comments.length;
+            await Comment.deleteMany({ _id: { $in: commentToDelete.comments } });
+        } else {
+            // If it's a non-root comment, find and update the parent
+            const parentComment = await Comment.findOne({ comments: id }).exec();
+            if (parentComment) {
+                parentComment.comments = parentComment.comments.filter(childId => !childId.equals(id));
+                await parentComment.save();
             }
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `Error deleting comment with id=${id}`,
-                error: err
-            })
-        })
-}
+        }
+
+        // Delete the root or individual child comment
+        await Comment.findByIdAndDelete(id);
+
+        // Find and update the post containing this comment 
+        const post = await Post.findOne({ comments: id }).exec();
+        if (post) {
+            post.comments = post.comments.filter(commentId => !commentId.equals(id));
+            // Decrement the comment count on the post
+            post.commentCount = Math.max(post.commentCount - commentsDeleted, 0);
+            await post.save();
+        }
+
+        res.send({
+            message: "Comment and its child comments (if any) deleted successfully."
+        });
+    } catch (err) {
+        res.status(500).send({
+            message: `Error deleting comment with id=${id}`,
+            error: err.message || "Unexpected Error"
+        });
+    }
+};
 
 // Like or Unlike a post
 exports.toggleLike = async (req, res) => {

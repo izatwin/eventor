@@ -252,6 +252,7 @@
 
 .profile-post-feed-container {
   overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .post-card {
@@ -385,7 +386,7 @@
 }
 
 .event-icon {
-  width: 25px;
+  width: 50px;
   height: 25px;
   margin-left: 10px;
   cursor: pointer;
@@ -426,30 +427,6 @@
 .block-message {
   color: red;
   font-style: bold;
-}
-
-.event {
-  display: flex;
-  flex-direction: column;
-  width: 80%;
-  text-align: left;
-  margin-left: 7%;
-}
-
-.event-name {
-  text-align: center;
-}
-
-.event-embeddedImage {
-  width: 80%;
-  height: auto;
-}
-.event-times {
-  margin-bottom: 2%;
-}
-
-.event-song {
-  text-align: left;  
 }
 
 .popup {
@@ -696,4 +673,8 @@ h2 {
   margin-bottom: 10px;
   width: 25px;
   align-self: center;
+}
+
+textarea {
+  resize: none;
 }

@@ -35,7 +35,7 @@ const SidebarLeft = () => {
 
 
   const handleSignout = () => {
-    axios.patch("http://localhost:3001/api/user/logout")
+    axios.patch(process.env.REACT_APP_API_URL + "/api/user/logout")
     .then(response => {
       console.log(response);
       if (response.status === 200) { 

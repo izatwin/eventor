@@ -23,7 +23,7 @@ export const PopupProvider = ({ children }) => {
   
   const updateShareCount= async (id) => {
     try {
-      axios.post("http://localhost:3001/api/posts/action", {"postId": id, "actionType": "share"})
+      axios.post(process.env.REACT_APP_API_URL + "/api/posts/action", {"postId": id, "actionType": "share"})
       return true; // successfull
     } catch (err) {
       console.log(err)
@@ -33,7 +33,7 @@ export const PopupProvider = ({ children }) => {
 
   const updateLike= async (id, shouldLike) => {
     try {
-      axios.post("http://localhost:3001/api/posts/toggle-like", {"postId": id, "like": shouldLike})
+      axios.post(process.env.REACT_APP_API_URL + "/api/posts/toggle-like", {"postId": id, "like": shouldLike})
       return true; // successfull
     } catch (err) {
       console.log(err)

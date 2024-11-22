@@ -8,14 +8,14 @@ router.post('/', commentController.create);
 
 router.get('/post/:postId', commentController.findCommentsOnPost)
 
+router.post('/addChild/:id', commentController.addComment);
+
+router.post('/toggle-like', commentController.toggleLike);
+
 router.get('/:id', commentController.findOne);
 
 router.delete('/:id', commentController.delete);
 
 router.put("/:id", commentController.update);
-
-router.post('/addChild/:id', commentController.addComment);
-
-router.post('/toggle-like', commentController.toggleLike);
 
 module.exports = router

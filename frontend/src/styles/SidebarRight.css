@@ -41,16 +41,33 @@
   padding: 12px 12px;
   background-color: white;
   width: 22vw;
+  max-height: 50vh;
   font-size: 18px;
   border: 1px solid black; 
-
+  overflow-y: auto; 
+  scrollbar-width: none;
 }
 
 .noti {
+  padding: 5px 5px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  border: 1px solid black; 
 }
 
+.noti-header {
+  display: flex;
+  margin-top: 2%;
+}
 
+.timestamp {
+  font-size: 18px;
+  text-align: left;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
 
-.popup-item:hover {
-  background-color: #f0f0f0;
+.noti-content {
+  text-align: left;
+  margin-left: 12%; 
 }
