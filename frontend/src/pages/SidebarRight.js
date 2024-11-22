@@ -32,18 +32,18 @@ const SidebarRight = () => {
   useEffect(() => {
     const getNotis = async () => {
       try {
-        //await axios.post(`http://localhost:3001/api/user/notifications/opt-in`, {userId: "8fd17048-52a1-4891-987c-472f0e935b8b", optInStatus: "Posts"});
-        const notiResponse = await axios.get(`http://localhost:3001/api/user/notifications`);
+        //await axios.post(process.env.REACT_APP_API_URL + `/api/user/notifications/opt-in`, {userId: "8fd17048-52a1-4891-987c-472f0e935b8b", optInStatus: "Posts"});
+        const notiResponse = await axios.get(process.env.REACT_APP_API_URL + `/api/user/notifications`);
         console.log(notiResponse)
         const unreadNotis = notiResponse.data.filter((noti) => noti.read === false);
         setNotis(unreadNotis);
 
         const postRequests = notiResponse.data.map((noti) =>
-          axios.get(`http://localhost:3001/api/posts/${noti.postId}`)
+          axios.get(process.env.REACT_APP_API_URL + `/api/posts/${noti.postId}`)
         );
         const postResponses = await Promise.all(postRequests);
         const userRequests = postResponses.map((response) =>
-          axios.get(`http://localhost:3001/api/user/${response.data.user}`)
+          axios.get(process.env.REACT_APP_API_URL + `/api/user/${response.data.user}`)
         );
         const userResponses = await Promise.all(userRequests);
 
@@ -76,7 +76,7 @@ const SidebarRight = () => {
   
   const readAllNotis = async () => {
     try {
-      await axios.patch(`http://localhost:3001/api/user/notifications/mark-read`);
+      await axios.patch(process.env.REACT_APP_API_URL + `/api/user/notifications/mark-read`);
       setNotis([])
     } catch (err) {
       console.log(err);

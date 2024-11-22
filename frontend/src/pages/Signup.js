@@ -25,7 +25,7 @@ const SignUp = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData); 
-    axios.post("http://localhost:3001/api/user/signup", formData)
+    axios.post(process.env.REACT_APP_API_URL + "/api/user/signup", formData)
     .then(response => {
       console.log(response); 
       if (response.status === 200) {

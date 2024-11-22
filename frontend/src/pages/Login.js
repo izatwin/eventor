@@ -33,7 +33,7 @@ const Login = () => {
     
     const test = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/user/validate") 
+        const response = await axios.get(process.env.REACT_APP_API_URL + "/api/user/validate") 
           console.log(response);
           if (response.status === 200) {
             console.log(response.data['user-info']);
@@ -70,7 +70,7 @@ const Login = () => {
     e.preventDefault(); 
     console.log(formData);
 
-    axios.post("http://localhost:3001/api/user/login", formData)
+    axios.post(process.env.REACT_APP_API_URL + "/api/user/login", formData)
     .then(response => {
       console.log(response);
       if (response.status === 200) {

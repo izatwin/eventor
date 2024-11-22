@@ -48,7 +48,7 @@ const PostContent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userResponse = await axios.get("http://localhost:3001/api/user/validate");
+        const userResponse = await axios.get(process.env.REACT_APP_API_URL + "/api/user/validate");
         console.log(userResponse);
         if (userResponse.status === 200) {
           console.log("here");
@@ -73,20 +73,20 @@ const PostContent = () => {
 
       console.log(`id: ${_id}`);
       try {
-        const postResponse = await axios.get(`http://localhost:3001/api/posts/${_id}`);
+        const postResponse = await axios.get(process.env.REACT_APP_API_URL + `/api/posts/${_id}`);
         console.log("feed posts res:");
         console.log(postResponse.data);
         setPost([postResponse.data]);
 
         // Get event of post if it exists
         if (postResponse.data["eventId"]) {
-          const eventResponse = await axios.get(`http://localhost:3001/api/events/${postResponse.data["eventId"]}`);
+          const eventResponse = await axios.get(process.env.REACT_APP_API_URL + `/api/events/${postResponse.data["eventId"]}`);
           setPostEvent(eventResponse.data)
         }
 
         // Get the poster information
         try {
-          const posterResponse = await axios.get(`http://localhost:3001/api/user/${postResponse.data["user"]}`);
+          const posterResponse = await axios.get(process.env.REACT_APP_API_URL + `/api/user/${postResponse.data["user"]}`);
           console.log("poster res:");
           console.log(posterResponse.data);
           const posterResponseInfo = posterResponse.data;
@@ -107,7 +107,7 @@ const PostContent = () => {
 
       try {
         // get comments
-        const commentsResponse = await axios.get(`http://localhost:3001/api/comments/post/${_id}`);
+        const commentsResponse = await axios.get(process.env.REACT_APP_API_URL + `/api/comments/post/${_id}`);
         console.log(`Comments are:`, commentsResponse.data);
         const rootComments = commentsResponse.data.filter(comment => comment.isRoot === true);
         setComments(rootComments);
@@ -118,7 +118,7 @@ const PostContent = () => {
         
           try {
             // get commenter of comment
-            const commenterResponse = await axios.get(`http://localhost:3001/api/user/${comment.user}`);
+            const commenterResponse = await axios.get(process.env.REACT_APP_API_URL + `/api/user/${comment.user}`);
             console.log("commenter response:", commenterResponse.data);
 
             if (!commenters[commenterResponse.data["_id"]]) {
@@ -135,7 +135,7 @@ const PostContent = () => {
           if (comment.comments && comment.comments.length > 0) {
             for (const replyId of comment.comments) {
               try {
-                const replyResponse = await axios.get(`http://localhost:3001/api/comments/${replyId}`);
+                const replyResponse = await axios.get(process.env.REACT_APP_API_URL + `/api/comments/${replyId}`);
                 console.log("Reply response:", replyResponse.data);
 
                 setReplies(prevReplies => {
@@ -172,7 +172,7 @@ const PostContent = () => {
   }, []);
   
   useEffect(()=>{
-    axios.post("http://localhost:3001/api/posts/action", {"postId": _id, "actionType": "view"});
+    axios.post(process.env.REACT_APP_API_URL + "/api/posts/action", {"postId": _id, "actionType": "view"});
   }, [])
 
   const handleCommentChange = (e) => {
@@ -186,7 +186,7 @@ const PostContent = () => {
   const handleComment = async (isReply) => {
     let tempNewComment;
     try {
-      tempNewComment= (await axios.post(`http://localhost:3001/api/comments`, {"comment": isReply ? replyComment : newComment, "postId": post[0]._id})).data
+      tempNewComment= (await axios.post(process.env.REACT_APP_API_URL + `/api/comments`, {"comment": isReply ? replyComment : newComment, "postId": post[0]._id})).data
     }
     catch (err) {
       if (err.response.status === 422) {
@@ -212,7 +212,7 @@ const PostContent = () => {
       setComments((prevComments) => [tempNewComment, ...prevComments]);
       setNewComment(defaultNewComment)
     }
-    axios.get(`http://localhost:3001/api/user/${tempNewComment.user}`)
+    axios.get(process.env.REACT_APP_API_URL + `/api/user/${tempNewComment.user}`)
       .then(response => {
         console.log("commenter response:", response.data);
 
@@ -231,7 +231,7 @@ const PostContent = () => {
 
   const updateCommentLike= async (id, shouldLike) => {
     try {
-      axios.post("http://localhost:3001/api/comments/toggle-like", {"commentId": id, "like": shouldLike})
+      axios.post(process.env.REACT_APP_API_URL + "/api/comments/toggle-like", {"commentId": id, "like": shouldLike})
       return true; // successfull
     } catch (err) {
       console.log(err)
@@ -305,7 +305,7 @@ const PostContent = () => {
     console.log("new comment: ")
     console.log(newComment)
     handleComment(replyComment).then((childId)=> {
-      axios.post(`http://localhost:3001/api/comments/addChild/${currentComment._id}`, {"childId": childId})
+      axios.post(process.env.REACT_APP_API_URL + `/api/comments/addChild/${currentComment._id}`, {"childId": childId})
       .then(response => {
         console.log("reply response:", response.data);
       })
@@ -323,7 +323,7 @@ const PostContent = () => {
   // TODO
   const handleCommentDelete = (id, isRoot, rootId) => {
     // api request
-    axios.delete(`http://localhost:3001/api/comments/${id}`)
+    axios.delete(process.env.REACT_APP_API_URL + `/api/comments/${id}`)
       .then((response) => {
         if (isRoot) {
           setComments(prevComments => prevComments.filter((comment) => comment._id !== id))
@@ -366,7 +366,7 @@ const PostContent = () => {
   const handleCommentEdit = () => {
     // use currentComment to get id ... 
     const { _id, text: text } = currentComment;
-    axios.put(`http://localhost:3001/api/comments/${_id}`, {"text": text})
+    axios.put(process.env.REACT_APP_API_URL + `/api/comments/${_id}`, {"text": text})
       .then((response) => {
         
         if (isCurrentCommentRoot) {

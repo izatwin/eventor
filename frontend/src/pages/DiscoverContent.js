@@ -29,7 +29,7 @@ const DiscoverContent = () => {
   };
 
   useEffect(() => {
-    axios.get("http://localhost:3001/api/user/validate") 
+    axios.get(process.env.REACT_APP_API_URL + "/api/user/validate") 
     .then(response => {
       if (response.status === 200) {
         const userInfo = response.data['user-info'];
@@ -60,10 +60,10 @@ const DiscoverContent = () => {
       try {
         let response;
         if (category === "Users") {
-          response = await axios.post(`http://localhost:3001/api/user/search`, { "query": query });
+          response = await axios.post(process.env.REACT_APP_API_URL + `/api/user/search`, { "query": query });
         }
         else {
-          response = await axios.post(`http://localhost:3001/api/posts/search`, { query: query, category: categoryMapping[category]});
+          response = await axios.post(process.env.REACT_APP_API_URL + `/api/posts/search`, { query: query, category: categoryMapping[category]});
           setPosts(response.data)
           // We have the posts, but we need supporting data.
           await processPosts(response.data)
@@ -95,7 +95,7 @@ const DiscoverContent = () => {
       posts.map(async (post) => {
         try {
           // Fetch post owner details
-          const postOwner = await axios.get(`http://localhost:3001/api/user/${post.user}`);
+          const postOwner = await axios.get(process.env.REACT_APP_API_URL + `/api/user/${post.user}`);
           const { displayName, userName, imageURL } = postOwner.data;
 
           setProfilesById((prevProfiles) => ({
@@ -110,7 +110,7 @@ const DiscoverContent = () => {
           // Fetch event details if the post has an eventId
           if (post.eventId) {
             if (!eventsById[post.eventId]) {
-              const event = (await axios.get(`http://localhost:3001/api/events/${post.eventId}`)).data;
+              const event = (await axios.get(process.env.REACT_APP_API_URL + `/api/events/${post.eventId}`)).data;
 
               setEventsById((prevEvents) => ({
                 ...prevEvents,

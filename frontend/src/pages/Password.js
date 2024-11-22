@@ -24,7 +24,7 @@ const Password= () => {
     e.preventDefault(); 
     console.log(formData);
     try {
-      const response = await axios.post(`http://localhost:3001/api/user/reset`, formData);
+      const response = await axios.post(process.env.REACT_APP_API_URL + `/api/user/reset`, formData);
       
       if (response.status === 200) {
         navigate("/home");
