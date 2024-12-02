@@ -25,7 +25,7 @@ const SettingsContent = () => {
   const navigate = useNavigate();
 
   const { user, setUser } = useAuth();  
-  const { showOffensivePopup } = usePopup();
+  const { showOffensivePopup, showFailPopup } = usePopup();
 
   useEffect(() => {
     axios.get(process.env.REACT_APP_API_URL + "/api/user/validate") 
@@ -62,7 +62,7 @@ const SettingsContent = () => {
   
   const handleDisplayName = async () => {
     if (!newDisplay) {
-      console.error('No URL entered.');
+      showFailPopup("Missing display name!")
       return;
     }
     setNewDisplay(""); 
@@ -86,6 +86,9 @@ const SettingsContent = () => {
       if (err.response.status === 422) {
         showOffensivePopup('The display name you entered is offensive or obscene')
       }
+      else {
+        showFailPopup(err.response.data.message)
+      }
       console.log("Error:", err);
     }
   };
@@ -96,7 +99,7 @@ const SettingsContent = () => {
 
   const handleProfilePic = async () => {    
     if (!imageUrl) {
-      console.error('No URL entered.');
+      showFailPopup("Missing URL!")
       return;
     }
     setImageUrl(""); 
@@ -117,14 +120,14 @@ const SettingsContent = () => {
         else {
         }
       } catch (err) {
+        showFailPopup(err.response.data.message)
         console.log("Error:", err);
       }
   };
 
   const handleUsername = async () => {
     if (!newUsername) {
-
-      console.error('No username entered.');
+      showFailPopup("Missing username!")
       return;  
     }
     try {
@@ -149,6 +152,9 @@ const SettingsContent = () => {
       if (err.response.status === 422) {
         showOffensivePopup('The username you entered is offensive or obscene')
       }
+      else {
+        showFailPopup(err.response.data.message)
+      }
       console.log("Error:", err);
     }
   };
@@ -159,7 +165,7 @@ const SettingsContent = () => {
 
   const handlePassword = async () => {
     if (!oldPassword || !newPassword) {
-      console.error('Missing password input')
+      showFailPopup("Missing password!")
       return;
     }
     setOldPassword("");
@@ -181,6 +187,7 @@ const SettingsContent = () => {
       else {
       }
     } catch (err) {
+      showFailPopup(err.response.data.message)
       console.log("Error:", err);
     }
   };
@@ -196,7 +203,7 @@ const SettingsContent = () => {
 
   const handleDelete= async () => {
     if (!password) {
-      console.error('Missing password input')
+      showFailPopup("Missing password!")
       return;
     }
     setPassword(""); 
@@ -214,6 +221,7 @@ const SettingsContent = () => {
       else {
       }
     } catch (err) {
+      showFailPopup(err.response.data.message)
       console.log("Error:", err);
     }
   };

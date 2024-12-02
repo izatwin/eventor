@@ -54,9 +54,29 @@ export const PopupProvider = ({ children }) => {
         popup.classList.remove("show"); 
     }, 1000);
   }
+  
+  const showFailPopup = (message) => {
+    var popup = document.getElementById("fail");
+    setPopupMessage(message)
+    popup.classList.add("show");
+
+    setTimeout(function() {
+        popup.classList.remove("show"); 
+    }, 1000);
+  }
+  
+  const showSuccessPopup = (message) => {
+    var popup = document.getElementById("success");
+    setPopupMessage(message)
+    popup.classList.add("show");
+
+    setTimeout(function() {
+        popup.classList.remove("show");
+    }, 1000);
+  }
 
   return (
-    <PopupContext.Provider value={{ showSharePopup, updateShareCount, updateLike, showOffensivePopup}}>
+    <PopupContext.Provider value={{ showSharePopup, updateShareCount, updateLike, showOffensivePopup, showSuccessPopup, showFailPopup}}>
       {children}
       {isSharePopupOpen && (
         <div className="share-popup-container">
@@ -74,6 +94,10 @@ export const PopupProvider = ({ children }) => {
         </div>
       )}
       <div className="offensive-popup" id="offensive">{popupMessage}</div>
+      <div className="postPopups">
+        <div className="popup" id="success">{popupMessage}</div>
+        <div className="popup" id="fail">{popupMessage}</div>
+      </div>
     </PopupContext.Provider>
   );
 };

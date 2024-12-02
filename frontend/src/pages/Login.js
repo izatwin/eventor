@@ -13,7 +13,7 @@ import '../styles/Login.css';
 import '../styles/eventor.css';
 
 import { useAuth } from '../AuthContext'; 
-
+import { usePopup } from '../PopupContext';
 
 axios.defaults.withCredentials = true;
 
@@ -21,7 +21,7 @@ const Login = () => {
   
   const navigate = useNavigate();
   const { setAction, setUser, setAuthenticated } = useAuth();  
-  
+  const { showFailPopup} = usePopup();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -69,7 +69,14 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData);
-
+    if (formData.email === "") {
+      showFailPopup("Missing email!")
+      return;
+    }
+    if (formData.password === "") {
+      showFailPopup("Missing password!")
+      return;
+    }
     axios.post(process.env.REACT_APP_API_URL + "/api/user/login", formData)
     .then(response => {
       console.log(response);
@@ -87,6 +94,7 @@ const Login = () => {
     .catch (err =>  {
       console.log("err");
       console.log(err)
+      showFailPopup(err.response.data.message)
     })
   };
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import '../styles/Signup.css'; 
 import '../styles/eventor.css';
@@ -9,7 +9,7 @@ import { usePopup } from '../PopupContext';
 const SignUp = () => {
   const navigate = useNavigate();
   const { email, verifyId, setUser, setAuthenticated } = useAuth();
-  const { showOffensivePopup } = usePopup();
+  const { showOffensivePopup, showFailPopup } = usePopup();
   
   const defaultForm = {
     email: email,
@@ -28,6 +28,18 @@ const SignUp = () => {
   const handleSubmit = (e) => {
     e.preventDefault(); 
     console.log(formData); 
+    if (formData.displayName === "") {
+      showFailPopup("Mising display name!")
+      return
+    }
+    if (formData.userName === "") {
+      showFailPopup("Mising username!")
+      return
+    }
+    if (formData.password === "") {
+      showFailPopup("Mising password!")
+      return
+    }
     axios.post(process.env.REACT_APP_API_URL + "/api/user/signup", formData)
     .then(response => {
       console.log(response); 
@@ -46,9 +58,19 @@ const SignUp = () => {
         showOffensivePopup("Your profile can't contain offensive or obscene content")
         setFormData(defaultForm)
       }
+      else {
+        showFailPopup(err.response.data.message)
+      }
       console.log(err)
     })
   };
+
+  useEffect(()=>{
+    if (verifyId === "") {
+      showFailPopup("Error accessing page!")
+      navigate("/");
+    }
+  }, [])
 
   return (
     <div className="signup-container">

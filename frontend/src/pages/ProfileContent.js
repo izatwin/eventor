@@ -7,7 +7,7 @@ import checkIcon from './icons/check.png'
 import removeIcon from './icons/remove.png'
 
 import axios from 'axios'
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from '../AuthContext'; 
@@ -20,7 +20,7 @@ import Post from '../components/Post';
 const ProfileContent= () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();  
-  const { showOffensivePopup } = usePopup();
+  const { showOffensivePopup, showSuccessPopup, showFailPopup} = usePopup();
   
   const [editingStatus, setEditingStatus] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
@@ -96,7 +96,6 @@ const ProfileContent= () => {
   });
   
   const [isOwnProfile, setIsOwnProfile] = useState(false)
-  const observer = useRef(null); 
 
   useEffect(() => {
     
@@ -682,26 +681,6 @@ const handleEventDateChange = (e) => {
 
   const [popupMessage, setPopupMessage] = useState("")
   
-  const showSuccessPopup = (message) => {
-    var popup = document.getElementById("success");
-    setPopupMessage(message)
-    popup.classList.add("show");
-
-    setTimeout(function() {
-        popup.classList.remove("show");
-    }, 1000);
-}
-
-  const showFailPopup = (message) => {
-    var popup = document.getElementById("fail");
-    setPopupMessage(message)
-    popup.classList.add("show");
-
-    setTimeout(function() {
-        popup.classList.remove("show"); 
-    }, 1000);
-  }
-
   return (
     <div className="profile-content-container">
       <div className="profile-content">
@@ -1519,11 +1498,6 @@ const handleEventDateChange = (e) => {
 
         )}
 
-        <div className="postPopups">
-          <div className="popup" id="success">{popupMessage}</div>
-          <div className="popup" id="fail">{popupMessage}</div>
-        </div>
-        
       </div>
     </div>
   );
