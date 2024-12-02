@@ -5,13 +5,15 @@ import '../styles/eventor.css';
 import axios from 'axios';
 
 import { useAuth } from '../AuthContext';  
+import { usePopup } from '../PopupContext';
 
 /* Page for inputting email when verifying */ 
 
 const Verify = () => {
   const navigate = useNavigate();
   const { action, verifyId, setVerifyId, email, setEmail } = useAuth();
-  
+  const { showFailPopup} = usePopup();
+
   const [formData, setFormData] = useState({
     email : "",
   });
@@ -23,6 +25,12 @@ const Verify = () => {
 const handleSubmit = async (e) => {
   e.preventDefault(); 
   console.log(formData);
+  
+  if (formData.email === "") {
+    showFailPopup("Missing email!")
+    return
+  }
+
   let terminate = false;
 
   try {
@@ -33,10 +41,12 @@ const handleSubmit = async (e) => {
       if (response.data.exists) {
         terminate = true;
         console.log("a:", terminate);
+        showFailPopup("This email is already registered!")
       }
     } else if (action === 'resetPassword') {
       if (!response.data.exists) {
         terminate = true;
+        showFailPopup("This email does not exist!")
       }
     }
 
@@ -58,6 +68,7 @@ const handleSubmit = async (e) => {
   } catch (err) {
     console.log(formData);
     console.log("Error:", err);
+    showFailPopup(err.response.data.message)
   }
 
   console.log("Completed the handleSubmit without terminating early");
