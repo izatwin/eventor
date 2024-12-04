@@ -97,6 +97,7 @@ const SidebarRight = () => {
         </span>
       </div>
 
+
   {isNotiDropdownVisible && (
     <div className="noti-dropdown" ref={dropdownRef}>
       {notis.length === 0 ? (
@@ -125,6 +126,7 @@ const SidebarRight = () => {
                 "{post.content ? post.content.length > 25
                   ? `${post.content.slice(0, 25)}...` : post.content
                   : "New event"}"
+
               </div>
             </div>
           ) : (
@@ -136,8 +138,6 @@ const SidebarRight = () => {
       )}
     </div>
   )}
-
-
 
     </div>
   );
