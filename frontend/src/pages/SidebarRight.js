@@ -97,44 +97,47 @@ const SidebarRight = () => {
         </span>
       </div>
 
-{isNotiDropdownVisible && (
-  <div className="noti-dropdown" ref={dropdownRef}>
-    {notis.length === 0 ? (
-      <div>
-        <b>All caught up!</b>
-      </div>
-    ) : (
-      notis.map((noti, index) => {
-        const post = postMap[noti.postId]; 
-        const user = userMap[post?.user]; 
 
-        return post && user && (
-          <div className="noti" key={index}>
-            <div className="timestamp"> 
-                {dayjs(noti.timestamp).fromNow()}
-            </div>
-            <div className="post-header">
-              <img src={user.imageURL ? user.imageURL : profilePic} alt="PostProfile" className="post-profilepic" />
-              <div className="post-profile-info">
-                  <div className="post-name">{user.displayName}</div>
-                  <div className="post-username">@{user.userName}</div>
+  {isNotiDropdownVisible && (
+    <div className="noti-dropdown" ref={dropdownRef}>
+      {notis.length === 0 ? (
+        <div>
+          <b>All caught up!</b>
+        </div>
+      ) : (
+        notis.map((noti, index) => {
+          const post = postMap[noti.postId]; 
+          const user = userMap[post?.user]; 
+
+          return post && user ? (
+            <div className="noti" key={index}>
+              <div className="timestamp"> 
+                  {dayjs(noti.timestamp).fromNow()}
+              </div>
+              <div className="post-header">
+                <img src={user.imageURL ? user.imageURL : profilePic} alt="PostProfile" className="post-profilepic" />
+                <div className="post-profile-info">
+                    <div className="post-name">{user.displayName}</div>
+                    <div className="post-username">@{user.userName}</div>
+                </div>
+              </div>
+              <div className="noti-content">
+                Posted: 
+                "{post.content ? post.content.length > 25
+                  ? `${post.content.slice(0, 25)}...` : post.content
+                  : "New event"}"
+
               </div>
             </div>
-            <div className="noti-content">
-              Posted: 
-              "{post.content ? post.content.length > 25
-                ? `${post.content.slice(0, 25)}...` : post.content
-                : "New event"}"
+          ) : (
+            <div className="noti" key={index}>
+              <p>Loading post/user details...</p> 
             </div>
-          </div>
-        ) 
-
-      })
-    )}
-  </div>
-)}
-
-
+          );
+        })
+      )}
+    </div>
+  )}
 
     </div>
   );
